@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel FlowGeeks</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone-192.png">
+<link rel="apple-touch-icon" href="icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FlowGeeks">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#08090a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Escuro de propósito (um só tema): grafite com o verde-limão da casa.
+     A cor de cada produto vem do produtos.json e é a mesma em todo o painel. */
+  :root {
+    color-scheme: dark;
+    --fundo: #08090a;
+    --cartao: rgba(255, 255, 255, .035);
+    --cartao-forte: rgba(255, 255, 255, .07);
+    --borda: rgba(255, 255, 255, .08);
+    --tinta: #f2f3ef;
+    --suave: #b9bdb4;
+    --apagado: #8b9087;
+    --grade: rgba(255, 255, 255, .06);
+    --limao: #b8f23a;
+    --madeira: #c9a43a;
+    --bom: #4ade80;
+    --atencao: #fab219;
+    --serio: #ec835a;
+    --critico: #e66767;
+    --raio: 20px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; background: var(--fundo); }
+  body { margin: 0; min-height: 100dvh; color: var(--tinta); font-family: "Archivo", system-ui, sans-serif;
+         font-size: 14.5px; line-height: 1.45; -webkit-font-smoothing: antialiased;
+         background: radial-gradient(900px 480px at 0% -10%, rgba(184, 242, 58, .07), transparent 60%), var(--fundo);
+         background-attachment: fixed; }
+  button, select { font: inherit; color: inherit; }
+  .num { font-variant-numeric: tabular-nums; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--limao); outline-offset: 2px; }
+
+  .moldura { max-width: 1180px; margin: 0 auto;
+             padding: calc(env(safe-area-inset-top, 0px) + 16px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 104px) max(16px, env(safe-area-inset-left, 0px)); }
+
+  /* ---------- cabeçalho ---------- */
+  .cabeca { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+  .titulo { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .selo { width: 42px; height: 42px; border-radius: 13px; flex: none; display: flex; align-items: flex-end; justify-content: center; gap: 3px;
+          padding: 10px 0; background: #16181a; border: 1px solid rgba(184, 242, 58, .35); }
+  .selo b { width: 5px; border-radius: 2px; background: var(--limao); }
+  .selo b:nth-child(1) { height: 9px; } .selo b:nth-child(2) { height: 15px; } .selo b:nth-child(3) { height: 21px; }
+  .titulo h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+  .titulo p { margin: 1px 0 0; font-size: 12.5px; color: var(--apagado); font-weight: 600; }
+  .titulo p .vivo { color: var(--limao); }
+  .titulo p .vivo::before { content: "●"; margin-right: 4px; animation: piscar 2s infinite; }
+  .titulo p .vivo.parado { color: var(--apagado); }
+  .titulo p .vivo.parado::before { animation: none; }
+  @keyframes piscar { 50% { opacity: .35; } }
+
+  .pilula { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-radius: 999px; flex: none;
+            background: var(--cartao-forte); border: 1px solid var(--borda); font-weight: 700; font-size: 13px; white-space: nowrap; }
+  .pilula svg { width: 15px; height: 15px; flex: none; }
+  .pilula select { appearance: none; -webkit-appearance: none; background: none; border: 0; font-weight: 700; font-size: 13px;
+                   padding-right: 14px; cursor: pointer;
+                   background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+                   background-position: right 4px center, right 0 center; background-size: 4px 4px; background-repeat: no-repeat; }
+  .pilula select option { background: #16181a; color: var(--tinta); }
+
+  /* seletor de produto */
+  .produtos { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 16px; padding: 2px 16px; }
+  .produtos::-webkit-scrollbar { display: none; }
+  .produtos button { cursor: pointer; }
+  .produtos button[aria-pressed="true"] { background: var(--limao); border-color: var(--limao); color: #08090a; }
+  .produtos button.fora { color: var(--apagado); }
+  .produtos button[aria-pressed="true"].fora { color: #08090a; }
+  .ponto { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--cor); }
+  .produtos button[aria-pressed="true"] .ponto { box-shadow: 0 0 0 2px #08090a; }
+  .produtos small { font-size: 11px; font-weight: 700; opacity: .75; }
+
+  /* ---------- cartões ---------- */
+  .cartao { background: var(--cartao); border: 1px solid var(--borda); border-radius: var(--raio); padding: 16px; min-width: 0; }
+  .cartao h2 { margin: 0; font-size: 14.5px; font-weight: 800; }
+  .cabeca-cartao { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .cabeca-cartao small { color: var(--apagado); font-weight: 700; font-size: 12px; white-space: nowrap; }
+  .vazio { color: var(--apagado); font-weight: 700; font-size: 13.5px; padding: 16px 0; text-align: center; }
+
+  .grade { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .kpi span { display: block; font-size: 12.5px; color: var(--suave); font-weight: 700; }
+  .kpi strong { display: block; font-size: 26px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; margin: 6px 0 8px; }
+  .kpi strong small { font-size: .55em; color: var(--suave); font-weight: 700; margin-right: 3px; letter-spacing: 0; }
+  .kpi strong.negativo { color: var(--critico); }
+  .etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .etq { font-size: 11.5px; font-weight: 800; padding: 3px 8px; border-radius: 7px; background: var(--cartao-forte); color: var(--suave); white-space: nowrap; }
+  .etq.sobe { background: rgba(74, 222, 128, .12); color: #86efac; }
+  .etq.desce { background: rgba(230, 103, 103, .14); color: #fca5a5; }
+  .etq.estimativa { background: rgba(201, 164, 58, .16); color: #e6cd84; }
+
+  .lucro { grid-column: 1 / -1; border-color: rgba(184, 242, 58, .3); background: linear-gradient(135deg, rgba(184, 242, 58, .1), rgba(255, 255, 255, .03) 70%); }
+  .lucro strong { font-size: 34px; }
+  .meta { grid-column: 1 / -1; position: relative; overflow: hidden; }
+  .meta strong { font-size: 30px; }
+  .meta strong em { font-style: normal; font-size: 13px; font-weight: 800; color: var(--limao); margin-left: 6px; letter-spacing: 0; }
+  .barra-meta { position: relative; height: 12px; border-radius: 6px; background: rgba(255, 255, 255, .08); overflow: hidden; margin: 4px 0 8px; }
+  .barra-meta .feito { position: absolute; inset: 0 auto 0 0; border-radius: 6px; background: var(--limao); }
+  .barra-meta .proj { position: absolute; top: 0; bottom: 0; border-radius: 0 6px 6px 0;
+                      background: repeating-linear-gradient(135deg, rgba(184, 242, 58, .7) 0 4px, rgba(184, 242, 58, .12) 4px 8px); }
+  .barra-meta .alvo { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--tinta); border-radius: 1px; }
+  .rodape-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--suave); font-weight: 700; }
+
+  /* gráficos */
+  .grafico svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .grafico text { font-family: inherit; font-weight: 700; }
+  .eixo { fill: var(--apagado); font-size: 11px; }
+  .linha-grade { stroke: var(--grade); }
+  .legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; font-weight: 700; color: var(--suave); margin: -4px 0 10px; }
+  .legenda b { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  /* barras horizontais */
+  .barras { display: grid; gap: 11px; }
+  .bl { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 9fr) auto; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; }
+  .bl > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--suave); }
+  .bl .trilho { height: 9px; border-radius: 5px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+  .bl .trilho i { display: block; height: 100%; border-radius: 5px; min-width: 3px; background: var(--limao); transition: width .5s ease; }
+  .bl .valor { min-width: 54px; text-align: right; }
+  .bl .valor.bom { color: var(--bom); } .bl .valor.ruim { color: var(--critico); }
+  .barras.empilhadas .bl { grid-template-columns: minmax(0, 1fr) auto; }
+  .barras.empilhadas .trilho { grid-column: 1 / -1; order: 3; }
+
+  /* por produto */
+  .tabela-produtos tbody tr[data-produto] { cursor: pointer; }
+  .tabela-produtos tbody tr[data-produto]:hover td { background: rgba(255, 255, 255, .03); }
+  .tabela-produtos td:first-child { display: flex; align-items: center; gap: 8px; }
+  .tabela-produtos tfoot td { border-bottom: 0; border-top: 1px solid var(--borda); font-weight: 800; }
+  .estado-produto { font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: var(--cartao-forte); color: var(--apagado); }
+  td.negativo { color: var(--critico); }
+
+  /* dia a dia: um quadro para o geral e um por produto */
+  .dia-a-dia h2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dia-a-dia h2 .etq { font-size: 12px; }
+  .dia-a-dia td, .dia-a-dia th { padding: 7px 6px; font-size: 12.5px; }
+  .dia-a-dia td.roas { padding: 7px 8px; }
+  @media (max-width: 560px) { .dia-a-dia td, .dia-a-dia th { padding: 7px 4px; font-size: 12px; } .dia-a-dia th { letter-spacing: 0; } }
+  .dia-a-dia tr.soma td { font-weight: 800; border-top: 1px solid var(--borda); }
+  .dia-a-dia tr.projecao td { color: var(--limao); }
+  td.roas { text-align: right; border-radius: 6px; }
+  td.roas.bom { background: rgba(74, 222, 128, .14); color: #86efac; }
+  td.roas.atencao { background: rgba(250, 178, 25, .15); color: #fcd34d; }
+  td.roas.ruim { background: rgba(230, 103, 103, .16); color: #fca5a5; }
+
+  /* atenção */
+  .atencao h2 { display: flex; align-items: center; gap: 8px; }
+  .atencao h2 svg { width: 16px; height: 16px; flex: none; }
+  .atencao h2 small { margin-left: auto; color: var(--apagado); }
+  .alertas { display: grid; gap: 8px; margin-top: 12px; }
+  .alerta { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 13px; background: var(--cartao-forte);
+            font-size: 13px; font-weight: 700; }
+  .alerta[role="button"] { cursor: pointer; }
+  .alerta::before { content: ""; width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--cor); }
+  .alerta span { flex: 1; min-width: 0; }
+  .alerta .tag { flex: none; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 7px;
+                 background: color-mix(in srgb, var(--cor) 18%, transparent); color: color-mix(in srgb, var(--cor) 70%, white); }
+
+  /* mapa dia x hora */
+  .mapa { display: grid; grid-template-columns: 28px repeat(24, minmax(0, 1fr)); gap: 2px; font-size: 10px; font-weight: 700; color: var(--apagado); }
+  .mapa .c { aspect-ratio: 1; border-radius: 3px; background: rgba(255, 255, 255, .05); }
+  .mapa .h { text-align: center; }
+  .escala { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11.5px; font-weight: 700; color: var(--apagado); }
+  .escala i { width: 16px; height: 10px; border-radius: 2px; }
+
+  /* listas e tabela */
+  .lista { display: grid; }
+  .item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 11px 0; border-bottom: 1px solid var(--grade); }
+  .item:last-child { border-bottom: 0; }
+  .item b { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item .dir { text-align: right; font-weight: 800; }
+  .item small { color: var(--apagado); font-weight: 600; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tag-produto { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px;
+                 margin-left: 6px; vertical-align: 1px; background: var(--cartao-forte); color: var(--suave); }
+  .tag-produto .ponto { width: 7px; height: 7px; }
+  .st-ok { color: var(--bom) !important; } .st-esp { color: var(--atencao) !important; } .st-ruim { color: var(--critico) !important; }
+  .zap { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 800; color: #08090a; background: var(--bom);
+         padding: 5px 10px; border-radius: 999px; text-decoration: none; }
+  .rolar { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { text-align: left; font-size: 11px; letter-spacing: .04em; color: var(--apagado); font-weight: 800; padding: 6px 8px; border-bottom: 1px solid var(--borda); white-space: nowrap; }
+  td { padding: 10px 8px; border-bottom: 1px solid var(--grade); white-space: nowrap; font-weight: 700; }
+  td.n, th.n { text-align: right; }
+  td:first-child, th:first-child { padding-left: 0; } td:last-child, th:last-child { padding-right: 0; }
+  details.numeros { margin-top: 10px; font-size: 12.5px; }
+  details.numeros summary { cursor: pointer; color: var(--limao); font-weight: 800; }
+
+  /* abas embaixo */
+  .abas { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); transform: translateX(-50%); z-index: 10;
+          display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(18, 20, 22, .86); border: 1px solid var(--borda);
+          backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+          max-width: calc(100% - 24px); }
+  .abas button { display: flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--suave); font-weight: 800; font-size: 13px;
+                 padding: 10px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; min-height: 44px; }
+  .abas button svg { width: 17px; height: 17px; flex: none; }
+  .abas button[aria-selected="true"] { color: #08090a; background: var(--limao); }
+  @media (max-width: 420px) { .abas button { padding: 10px 12px; } .abas button:not([aria-selected="true"]) span { display: none; } }
+
+  .dica { position: fixed; z-index: 20; pointer-events: none; background: #f2f3ef; color: #08090a; font-size: 12.5px; font-weight: 700;
+          padding: 7px 10px; border-radius: 9px; line-height: 1.35; max-width: 240px; opacity: 0; transition: opacity .12s; }
+  .dica.on { opacity: 1; }
+  .dica .ponto { display: inline-block; width: 8px; height: 8px; margin-right: 5px; }
+  .aviso { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translate(-50%, -160%); z-index: 30;
+           background: var(--limao); color: #08090a; font-weight: 800; padding: 12px 18px; border-radius: 14px;
+           box-shadow: 0 10px 30px rgba(0, 0, 0, .5); transition: transform .35s cubic-bezier(.2, .8, .2, 1); max-width: calc(100% - 32px); }
+  .aviso.on { transform: translate(-50%, 0); }
+  .rodape { text-align: center; color: var(--apagado); font-size: 12px; font-weight: 700; margin-top: 16px; }
+  .rodape button { border: 0; background: none; color: var(--limao); font-weight: 800; cursor: pointer; padding: 6px; }
+
+  /* login */
+  .login { min-height: 100dvh; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-left, 0px)); }
+  .login form { width: 100%; max-width: 340px; display: grid; gap: 12px; }
+  .login h1 { margin: 6px 0 0; font-size: 22px; font-weight: 800; }
+  .login p { margin: 0; color: var(--suave); font-size: 14px; }
+  .login input { font: inherit; font-size: 16px; padding: 13px 14px; border-radius: 13px; border: 1px solid var(--borda); background: var(--cartao-forte); color: var(--tinta); }
+  .login button { border: 0; background: var(--limao); color: #08090a; font-weight: 800; padding: 14px; border-radius: 13px; font-size: 16px; cursor: pointer; }
+  .login .erro { color: var(--critico); font-weight: 800; font-size: 13.5px; }
+
+  @media (min-width: 900px) {
+    .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .lucro, .meta { grid-column: auto; }
+    .lucro strong { font-size: 30px; }
+    .linha-principal { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
+    .duas { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+  <symbol id="i-casa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-vendas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+  <symbol id="i-anuncio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4h4l6 5V5L7 10z"/><path d="M17 8a5 5 0 0 1 0 8"/></symbol>
+  <symbol id="i-pessoas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></symbol>
+</svg>
+
+<section class="login" id="tela-login" hidden>
+  <form id="form-login">
+    <div class="selo"><b></b><b></b><b></b></div>
+    <h1>Painel FlowGeeks</h1>
+    <p>Digite a senha do painel. Ela fica salva neste aparelho.</p>
+    <input id="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
+    <div class="erro" id="erro-login" hidden>Senha incorreta.</div>
+    <button type="submit">Entrar</button>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <div class="moldura">
+    <header class="cabeca">
+      <div class="titulo">
+        <div class="selo"><b></b><b></b><b></b></div>
+        <div>
+          <h1 id="pergunta">Como foi a semana?</h1>
+          <p><span id="nome-filtro">FlowGeeks</span> · <span class="vivo" id="vivo">ao vivo</span> · <span id="atualizado">—</span></p>
+        </div>
+      </div>
+      <label class="pilula"><svg><use href="#i-cal"/></svg>
+        <select id="periodo" aria-label="Período">
+          <option value="hoje">Hoje</option>
+          <option value="7d">Últimos 7 dias</option>
+          <option value="30d">Últimos 30 dias</option>
+          <option value="tudo">Desde o início</option>
+        </select>
+      </label>
+    </header>
+    <nav class="produtos" id="produtos" aria-label="Produto"></nav>
+
+    <!-- ===== INÍCIO ===== -->
+    <section class="grade" data-aba="inicio">
+      <div class="kpis" id="kpis"></div>
+      <div class="cartao" id="cartao-produtos">
+        <div class="cabeca-cartao"><h2>Por produto</h2><small>toque para ver só um</small></div>
+        <div class="rolar" id="tabela-produtos"></div>
+      </div>
+      <div class="grade duas" id="dia-a-dia"></div>
+      <div class="grade linha-principal">
+        <div class="cartao grafico">
+          <div class="cabeca-cartao"><h2>Faturamento líquido por dia</h2><small>R$, após a Hotmart</small></div>
+          <div class="legenda" id="leg-fat"></div>
+          <div id="graf-fat"></div>
+          <details class="numeros"><summary>Ver em tabela</summary><div class="rolar" id="tab-fat"></div></details>
+        </div>
+        <div class="grade">
+          <div class="cartao atencao">
+            <h2><svg><use href="#i-alerta"/></svg>Precisa de atenção hoje <small id="qtd-alertas" class="num"></small></h2>
+            <div class="alertas" id="alertas"></div>
+          </div>
+          <div class="cartao">
+            <div class="cabeca-cartao"><h2>Receita por anúncio</h2><small>maior → menor</small></div>
+            <div class="barras" id="rank-anuncios"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VENDAS ===== -->
+    <section class="grade" data-aba="vendas" hidden>
+      <div class="cartao grafico">
+        <div class="cabeca-cartao"><h2>Pedidos por dia</h2><small>toque nas barras</small></div>
+        <div class="legenda" id="leg-pedidos"></div>
+        <div id="graf-pedidos"></div>
+      </div>
+      <div class="grade duas">
+        <div class="cartao"><div class="cabeca-cartao"><h2>Últimas vendas</h2><small>inclui boletos e bumps</small></div><div class="lista" id="ultimas"></div></div>
+        <div class="grade">
+          <div class="cartao"><div class="cabeca-cartao"><h2>Order bumps</h2><small>% dos pedidos que levaram</small></div><div class="barras" id="bumps"></div></div>
+          <div class="cartao"><div class="cabeca-cartao"><h2>Quando compram</h2><small>dia × hora</small></div><div id="mapa"></div></div>
+          <div class="cartao"><div class="cabeca-cartao"><h2>Forma de pagamento</h2></div><div class="barras" id="pagamentos"></div></div>
+          <div class="cartao"><div class="cabeca-cartao"><h2>Estados</h2><small>top 10</small></div><div class="barras" id="estados"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ANÚNCIOS ===== -->
+    <section class="grade" data-aba="anuncios" hidden>
+      <div class="cartao">
+        <div class="cabeca-cartao"><h2>Resultado por anúncio</h2><small>pela primeira visita</small></div>
+        <div class="rolar" id="tabela-anuncios"></div>
+      </div>
+      <div class="grade duas">
+        <div class="cartao"><div class="cabeca-cartao"><h2>Funil da página</h2><small>pessoas</small></div><div class="barras empilhadas" id="funil"></div></div>
+        <div class="grade">
+          <div class="cartao"><div class="cabeca-cartao"><h2>Aparelho dos visitantes</h2></div><div class="barras" id="dispositivos"></div></div>
+          <div class="cartao"><div class="cabeca-cartao"><h2>Dúvidas mais abertas</h2><small>FAQ</small></div><div class="barras" id="faq"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CLIENTES ===== -->
+    <section class="grade" data-aba="clientes" hidden>
+      <div class="cartao"><div class="cabeca-cartao"><h2>Carrinhos abandonados</h2><small>chame no WhatsApp</small></div><div class="lista" id="abandonos"></div></div>
+    </section>
+
+    <p class="rodape"><span id="rodape-info">Atualiza sozinho a cada 10 s · lucro é estimativa</span><br><button id="sair">Sair deste aparelho</button></p>
+  </div>
+
+  <nav class="abas" role="tablist" aria-label="Seções">
+    <button role="tab" data-ir="inicio" aria-selected="true"><svg><use href="#i-casa"/></svg><span>Início</span></button>
+    <button role="tab" data-ir="vendas" aria-selected="false"><svg><use href="#i-vendas"/></svg><span>Vendas</span></button>
+    <button role="tab" data-ir="anuncios" aria-selected="false"><svg><use href="#i-anuncio"/></svg><span>Anúncios</span></button>
+    <button role="tab" data-ir="clientes" aria-selected="false"><svg><use href="#i-pessoas"/></svg><span>Clientes</span></button>
+  </nav>
+</div>
+
+<div class="dica" id="dica" role="status"></div>
+<div class="aviso" id="aviso" role="alert"></div>
+
+<script>
+  const API = "https://zqolcoakhxabqviquybe.supabase.co/functions/v1/painel-flowgeeks";
+  const INTERVALO = 10000;
+
+  const $ = (id) => document.getElementById(id);
+  const ler = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const gravar = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} };
+
+  let senha = ler("fg_painel_senha");
+  let periodo = ler("fg_painel_periodo") || "7d";
+  let produto = ler("fg_painel_produto") || "";   // "" = todos
+  let aba = ler("fg_painel_aba") || "inicio";
+  let catalogo = null, versao = null, dados = null, pedidosAntes = null, ultimaAtualizacao = null;
+
+  const brl = (v) => (Number(v) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const reais = (v) => (Number(v) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const brlCurto = (v) => { v = Number(v) || 0; const s = v < 0 ? "-" : ""; v = Math.abs(v); return s + (v >= 1000 ? (v / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + " mil" : v.toLocaleString("pt-BR", { maximumFractionDigits: 0 })); };
+  const int = (v) => (Number(v) || 0).toLocaleString("pt-BR");
+  const pct = (a, b) => (b ? (100 * a / b).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%" : "—");
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const NOMES_PAG = { CREDIT_CARD: "Cartão", PIX: "Pix", BILLET: "Boleto", PAYPAL: "PayPal", HOTMART_BALANCE: "Saldo Hotmart",
+                      GOOGLE_PAY: "Google Pay", APPLE_PAY: "Apple Pay", DIRECT_DEBIT: "Débito" };
+  const STATUS = { APPROVED: ["Aprovada", "ok"], COMPLETE: ["Aprovada", "ok"], BILLET_PRINTED: ["Boleto gerado", "esp"],
+                   WAITING_PAYMENT: ["Aguardando", "esp"], DELAYED: ["Atrasada", "esp"], REFUNDED: ["Reembolsada", "ruim"],
+                   CHARGEBACK: ["Chargeback", "ruim"], CANCELED: ["Cancelada", "ruim"], CANCELLED: ["Cancelada", "ruim"],
+                   EXPIRED: ["Expirada", "ruim"], PROTESTED: ["Contestada", "ruim"] };
+  const DIAS = ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"];
+  const NOME_ANTERIOR = { hoje: "ontem", "7d": "7 dias antes", "30d": "30 dias antes" };
+  const hojeSP = () => new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+
+  // ---------- catálogo (produtos.json) ----------
+  const prod = (id) => catalogo.produtos.find((p) => p.id === id);
+  const nomeDe = (id) => prod(id)?.nome || id;
+  const corDe = (id) => prod(id)?.cor || "#8b9087";
+  const impostoDe = (id) => Number(prod(id)?.imposto_pct ?? catalogo.imposto_pct ?? 0) / 100;
+  const tagProduto = (id) => produto ? "" : `<span class="tag-produto"><i class="ponto" style="--cor:${corDe(id)}"></i>${esc(nomeDe(id))}</span>`;
+
+  async function carregarCatalogo() {
+    const r = await fetch("produtos.json", { cache: "no-store" });
+    if (!r.ok) throw new Error("rede");
+    catalogo = await r.json();
+    if (produto && !prod(produto)) produto = "";
+    desenharSeletor();
+  }
+
+  // Soma os números dos produtos escolhidos e calcula o lucro limpo (estimativa).
+  function somar(lista, ids) {
+    const t = { visitantes: 0, clicaram_comprar: 0, pedidos: 0, bumps: 0, receita: 0, receita_liquida: 0, gasto: 0,
+                reembolsos: 0, reembolsos_valor: 0, aguardando: 0, abandonos: 0, imposto: 0 };
+    for (const k of lista || []) {
+      if (ids && !ids.includes(k.id)) continue;
+      for (const c of Object.keys(t)) if (c !== "imposto") t[c] += Number(k[c]) || 0;
+      t.imposto += (Number(k.receita) || 0) * impostoDe(k.id);
+    }
+    t.lucro = t.receita_liquida - t.gasto - t.imposto;
+    return t;
+  }
+  const escolhidos = () => produto ? [produto] : catalogo.produtos.map((p) => p.id);
+
+  async function chamar(params, corpo) {
+    const r = await fetch(API + "?" + new URLSearchParams(params), {
+      method: corpo ? "POST" : "GET", cache: "no-store",
+      headers: { "x-painel-senha": senha || "", ...(corpo ? { "content-type": "application/json" } : {}) },
+      body: corpo ? JSON.stringify(corpo) : undefined,
+    });
+    if (r.status === 401) throw new Error("senha");
+    if (!r.ok) throw new Error("rede");
+    return r.json();
+  }
+
+  // ---------- login ----------
+  function mostrarLogin(erro) {
+    $("app").hidden = true; $("tela-login").hidden = false; $("erro-login").hidden = !erro;
+    setTimeout(() => $("senha").focus(), 50);
+  }
+  $("form-login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    senha = $("senha").value.trim();
+    $("erro-login").textContent = "Senha incorreta.";
+    try { await chamar({ versao: 1 }); gravar("fg_painel_senha", senha); iniciar(); }
+    catch (err) { mostrarLogin(true); if (err.message !== "senha") $("erro-login").textContent = "Sem conexão. Tente de novo."; }
+  });
+  $("sair").addEventListener("click", () => { gravar("fg_painel_senha", null); senha = null; mostrarLogin(false); });
+
+  // ---------- filtros e abas ----------
+  $("periodo").value = periodo;
+  $("periodo").addEventListener("change", () => { periodo = $("periodo").value; gravar("fg_painel_periodo", periodo); pedidosAntes = null; carregar(); });
+
+  function desenharSeletor() {
+    const botoes = [`<button class="pilula" data-produto="" aria-pressed="${!produto}">Todos</button>`].concat(
+      catalogo.produtos.map((p) => `<button class="pilula ${p.status === "à venda" ? "" : "fora"}" data-produto="${esc(p.id)}" aria-pressed="${produto === p.id}">` +
+        `<i class="ponto" style="--cor:${esc(p.cor)}"></i>${esc(p.nome)}${p.status === "à venda" ? "" : ` <small>${esc(p.status)}</small>`}</button>`));
+    $("produtos").innerHTML = botoes.join("");
+    $("nome-filtro").textContent = produto ? nomeDe(produto) : "FlowGeeks · todos os produtos";
+    $("cartao-produtos").hidden = !!produto;
+  }
+  function escolherProduto(id) {
+    produto = id; gravar("fg_painel_produto", id || null);
+    desenharSeletor(); scrollTo({ top: 0 });
+    if (dados) desenhar(dados);   // os números do topo já estão aqui; os detalhes chegam em seguida
+    carregar();
+  }
+  $("produtos").addEventListener("click", (e) => { const b = e.target.closest("[data-produto]"); if (b) escolherProduto(b.dataset.produto); });
+
+  function irPara(nome) {
+    aba = nome; gravar("fg_painel_aba", nome);
+    document.querySelectorAll("[data-aba]").forEach((s) => (s.hidden = s.dataset.aba !== nome));
+    document.querySelectorAll(".abas button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.ir === nome)));
+    scrollTo({ top: 0 });
+    if (dados) desenhar(dados);
+  }
+  document.querySelectorAll(".abas button").forEach((b) => b.addEventListener("click", () => irPara(b.dataset.ir)));
+
+  // ---------- dica ----------
+  const dica = $("dica");
+  document.addEventListener("pointerover", (e) => {
+    const a = e.target.closest("[data-dica]"); if (!a) return;
+    const r = a.getBoundingClientRect(); dica.innerHTML = a.dataset.dica; dica.classList.add("on");
+    const w = dica.offsetWidth, h = dica.offsetHeight;
+    dica.style.left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8) + "px";
+    dica.style.top = Math.max(8, r.top - h - 10) + "px";
+  });
+  document.addEventListener("pointerout", (e) => { if (e.target.closest("[data-dica]")) dica.classList.remove("on"); });
+  addEventListener("scroll", () => dica.classList.remove("on"), { passive: true });
+
+  // ---------- números do topo ----------
+  function variacao(atual, antes) {
+    if (antes == null || dados?.periodo === "tudo") return "";
+    if (!antes) return atual > 0 ? `<span class="etq sobe">▲ novo</span>` : "";
+    const p = (atual - antes) / Math.abs(antes) * 100;
+    if (Math.abs(p) < 0.5) return `<span class="etq">= ${NOME_ANTERIOR[dados.periodo]}</span>`;
+    return `<span class="etq ${p > 0 ? "sobe" : "desce"}">${p > 0 ? "▲" : "▼"} ${Math.abs(p).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}% vs ${NOME_ANTERIOR[dados.periodo]}</span>`;
+  }
+
+  // Meta de lucro: a do produto (se tiver) ou a da casa, quando a visão é de todos.
+  function ritmoMes(d) {
+    const m = d.mes, feito = somar(m.kpis, escolhidos()).lucro;
+    const meta = produto ? Number(prod(produto)?.meta_lucro_mensal) || 0 : Number(catalogo.meta_lucro_mensal) || 0;
+    const decorrido = (m.dia - 1) + Math.min(1, (m.horas_hoje || 0) / 24);
+    const proj = decorrido > 0.25 ? feito / decorrido * m.dias_mes : feito;
+    return { meta, feitoValor: feito, feito: meta ? Math.max(0, feito / meta) : 0, proj, projPct: meta ? Math.max(0, proj / meta) : 0 };
+  }
+
+  function kpis(d) {
+    const ids = escolhidos(), k = somar(d.kpis, ids), a = d.anterior ? somar(d.anterior, ids) : null;
+    const pctImp = produto ? `${(impostoDe(produto) * 100).toLocaleString("pt-BR")}%` : "o % de cada produto";
+    const conv = k.visitantes ? k.pedidos / k.visitantes : 0, convA = a?.visitantes ? a.pedidos / a.visitantes : null;
+    const ticket = k.pedidos ? k.receita / k.pedidos : 0, ticketA = a?.pedidos ? a.receita / a.pedidos : null;
+    const roas = k.gasto ? k.receita_liquida / k.gasto : null;
+    const r = ritmoMes(d);
+    const explica = esc(`Faturamento líquido ${brl(k.receita_liquida)}<br>− anúncios ${brl(k.gasto)}<br>− imposto estimado ${brl(k.imposto)} (${pctImp} do bruto)`);
+    let meta;
+    if (r.meta) {
+      // escala da barra: a meta fica em 100% ou, se a projeção passar dela, a marca recua
+      const escala = Math.max(1, r.projPct);
+      const feitoW = Math.min(100, r.feito / escala * 100), projW = Math.min(100, r.projPct / escala * 100), alvoW = 100 / escala;
+      meta = `<div class="cartao kpi meta"><span>Meta de lucro do mês · dia ${d.mes.dia} de ${d.mes.dias_mes}</span>
+        <strong class="num">${Math.round(r.projPct * 100)}%<em>projeção</em></strong>
+        <div class="barra-meta" data-dica="${esc(`Lucro do mês: ${brl(r.feitoValor)} de ${brl(r.meta)}<br>No ritmo atual: ${brl(r.proj)}`)}">
+          <span class="proj" style="left:${feitoW}%;width:${Math.max(0, projW - feitoW)}%"></span>
+          <span class="feito" style="width:${feitoW}%"></span>
+          <span class="alvo" style="left:calc(${alvoW}% - 2px)"></span>
+        </div>
+        <div class="rodape-meta"><span class="num">${Math.round(r.feito * 100)}% feito · ${brl(r.feitoValor)}</span><span class="num">meta ${brlCurto(r.meta)}</span></div></div>`;
+    } else {
+      const casa = Number(catalogo.meta_lucro_mensal) || 0;
+      meta = `<div class="cartao kpi meta"><span>Lucro do mês · dia ${d.mes.dia} de ${d.mes.dias_mes}</span>
+        <strong class="num ${r.feitoValor < 0 ? "negativo" : ""}"><small>R$</small>${reais(r.feitoValor)}</strong>
+        <div class="etiquetas"><span class="etq">no ritmo: ${brl(r.proj)}</span>${casa ? `<span class="etq">${pct(Math.max(0, r.proj), casa)} da meta da casa</span>` : ""}</div></div>`;
+    }
+    $("kpis").innerHTML = `
+      <div class="cartao kpi lucro" data-dica="${explica}"><span>Lucro limpo</span><strong class="num ${k.lucro < 0 ? "negativo" : ""}"><small>R$</small>${reais(k.lucro)}</strong>
+        <div class="etiquetas">${variacao(k.lucro, a?.lucro)}<span class="etq estimativa">estimativa</span></div></div>
+      <div class="cartao kpi"><span>Faturamento líquido</span><strong class="num"><small>R$</small>${reais(k.receita_liquida)}</strong>
+        <div class="etiquetas">${variacao(k.receita_liquida, a?.receita_liquida)}<span class="etq">${int(k.pedidos)} pedidos${k.bumps ? ` · ${int(k.bumps)} bumps` : ""}</span></div></div>
+      <div class="cartao kpi"><span>Gasto em anúncios</span><strong class="num"><small>R$</small>${reais(k.gasto)}</strong>
+        <div class="etiquetas"><span class="etq">${roas == null ? "sem gasto" : `retorno ${roas.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}×`}</span>${k.gasto && k.pedidos ? `<span class="etq">CPA ${brl(k.gasto / k.pedidos)}</span>` : ""}</div></div>
+      <div class="cartao kpi"><span>Conversão da página</span><strong class="num">${pct(k.pedidos, k.visitantes)}</strong>
+        <div class="etiquetas">${variacao(conv, convA)}<span class="etq">${int(k.visitantes)} visitantes</span></div></div>
+      <div class="cartao kpi" data-dica="Quanto cada pedido deixa, em média, contando os bumps (valor pago pelo cliente)"><span>Ticket por pedido</span><strong class="num"><small>R$</small>${k.pedidos ? reais(ticket) : "—"}</strong>
+        <div class="etiquetas">${variacao(ticket, ticketA)}<span class="etq">com os bumps</span></div></div>
+      ${meta}`;
+  }
+
+  function tabelaProdutos(d) {
+    const linhas = catalogo.produtos.map((p) => ({ p, k: somar(d.kpis, [p.id]) }))
+      .sort((x, y) => y.k.lucro - x.k.lucro || y.k.receita_liquida - x.k.receita_liquida);
+    const t = somar(d.kpis, null);
+    const celula = (v) => `<td class="n num ${v < 0 ? "negativo" : ""}">${brl(v)}</td>`;
+    $("tabela-produtos").innerHTML = `<table class="tabela-produtos"><thead><tr><th>Produto</th><th class="n">Pedidos</th><th class="n">Líquido</th><th class="n">Anúncios</th><th class="n">Lucro</th><th class="n">Conv.</th></tr></thead><tbody>${
+      linhas.map(({ p, k }) => `<tr data-produto="${esc(p.id)}" tabindex="0"><td><i class="ponto" style="--cor:${esc(p.cor)}"></i>${esc(p.nome)}${p.status === "à venda" ? "" : ` <span class="estado-produto">${esc(p.status)}</span>`}</td>` +
+        `<td class="n num">${int(k.pedidos)}</td><td class="n num">${brl(k.receita_liquida)}</td><td class="n num">${brl(k.gasto)}</td>${celula(k.lucro)}<td class="n num">${pct(k.pedidos, k.visitantes)}</td></tr>`).join("")
+    }</tbody><tfoot><tr><td>Total</td><td class="n num">${int(t.pedidos)}</td><td class="n num">${brl(t.receita_liquida)}</td><td class="n num">${brl(t.gasto)}</td>${celula(t.lucro)}<td class="n num">${pct(t.pedidos, t.visitantes)}</td></tr></tfoot></table>`;
+    $("tabela-produtos").querySelectorAll("[data-produto]").forEach((tr) => {
+      tr.addEventListener("click", () => escolherProduto(tr.dataset.produto));
+      tr.addEventListener("keydown", (e) => { if (e.key === "Enter") escolherProduto(tr.dataset.produto); });
+    });
+  }
+
+  // ---------- dia a dia ----------
+  // Os últimos 8 dias, a soma deles, o mês até agora e a projeção do mês, para o geral e para cada produto.
+  // ROAS = receita (sem os reembolsos) ÷ investimento; a cor segue os limites do produtos.json.
+  function faixaRoas(roas, id) {
+    const bom = Number(prod(id)?.roas_bom ?? catalogo.roas_bom ?? 2), atencao = Number(prod(id)?.roas_atencao ?? catalogo.roas_atencao ?? 1.45);
+    return roas == null ? "" : roas >= bom ? "bom" : roas >= atencao ? "atencao" : "ruim";
+  }
+  function quadroDiaADia(d, titulo, ids, cor) {
+    const porDia = {};
+    for (const x of d.diario) if (ids.includes(x.produto)) (porDia[x.dia] ||= []).push({ id: x.produto, ...x });
+    const fim = new Date(Date.now() - 3 * 3600e3), dias = [];
+    for (let i = 0; i < 8; i++) { const dia = new Date(fim - i * 864e5).toISOString().slice(0, 10); dias.push({ dia, ...somar(porDia[dia], null) }); }
+    const oito = somar(dias.map((x) => ({ ...x, id: null })), null);
+    oito.imposto = dias.reduce((s, x) => s + x.imposto, 0); oito.lucro = dias.reduce((s, x) => s + x.lucro, 0);
+    const mes = somar(d.mes.kpis, ids), m = d.mes;
+    const fator = m.dias_mes / Math.max(0.25, (m.dia - 1) + Math.min(1, (m.horas_hoje || 0) / 24));
+    const proj = Object.fromEntries(Object.entries(mes).map(([k, v]) => [k, v * fator]));
+    const idRoas = ids.length === 1 ? ids[0] : null;
+    // no celular, sem centavos, para a tabela inteira caber na tela
+    const v = matchMedia("(max-width: 560px)").matches ? (n) => (Number(n) || 0).toLocaleString("pt-BR", { maximumFractionDigits: 0 }) : reais;
+    const linha = (rot, x, cls = "") => {
+      const roas = x.gasto ? x.receita / x.gasto : null;
+      return `<tr class="${cls}"><td>${rot}</td><td class="n num">${v(x.gasto)}</td><td class="n num">${v(x.receita + x.reembolsos_valor)}</td>` +
+        `<td class="n num">${v(x.reembolsos_valor)}</td><td class="n num ${x.lucro < 0 ? "negativo" : ""}">${v(x.lucro)}</td>` +
+        `<td class="num roas ${faixaRoas(roas, idRoas)}">${roas == null ? "—" : roas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>`;
+    };
+    const hoje = dias[0];
+    return `<div class="cartao dia-a-dia"><div class="cabeca-cartao"><h2>${cor ? `<i class="ponto" style="--cor:${esc(cor)}"></i>` : ""}${esc(titulo)}` +
+      `<span class="etq" data-dica="Receita de hoje, sem reembolsos">hoje ${brl(hoje.receita)}</span><span class="etq ${hoje.lucro >= 0 ? "sobe" : "desce"}" data-dica="Lucro de hoje, depois de anúncios e imposto (estimativa)">lucro ${brl(hoje.lucro)}</span></h2><small>R$</small></div>` +
+      `<div class="rolar"><table><thead><tr><th>Data</th><th class="n">Invest.</th><th class="n">Receita</th><th class="n">Reemb.</th><th class="n" data-dica="Faturamento líquido − anúncios − imposto estimado">Lucro</th><th class="n">ROAS</th></tr></thead><tbody>` +
+      dias.map((x, i) => linha(i ? rotuloDia(x.dia) : "Hoje", x)).join("") +
+      linha("8 dias", oito, "soma") + linha("Mês (acum.)", mes, "soma") + linha("Projeção mês", proj, "soma projecao") +
+      `</tbody></table></div></div>`;
+  }
+  function diaADia(d) {
+    const comNumero = (id) => prod(id)?.status === "à venda" || d.diario.some((x) => x.produto === id) || (d.mes.kpis || []).some((k) => k.id === id && (k.receita || k.gasto));
+    const quadros = produto
+      ? [quadroDiaADia(d, nomeDe(produto), [produto], corDe(produto))]
+      : [quadroDiaADia(d, "Geral (todos os produtos)", escolhidos(), null)]
+          .concat(catalogo.produtos.filter((p) => comNumero(p.id)).map((p) => quadroDiaADia(d, p.nome, [p.id], p.cor)));
+    $("dia-a-dia").innerHTML = quadros.join("");
+  }
+
+  // ---------- gráficos ----------
+  // Uma linha por dia, com os números de cada produto escolhido em "por".
+  function serieDiaria(lista) {
+    const ids = escolhidos(), porDia = {};
+    for (const x of lista) {
+      if (!ids.includes(x.produto)) continue;
+      (porDia[x.dia] ||= {})[x.produto] = x;
+    }
+    const fim = new Date(Date.now() - 3 * 3600e3);
+    let qtd = { hoje: 7, "7d": 7, "30d": 30 }[dados.periodo];
+    if (!qtd) { const p = Object.keys(porDia).sort()[0]; qtd = p ? Math.min(90, Math.max(7, Math.round((fim - new Date(p + "T00:00:00Z")) / 864e5) + 1)) : 7; }
+    const saida = [];
+    for (let i = qtd - 1; i >= 0; i--) {
+      const dia = new Date(fim - i * 864e5).toISOString().slice(0, 10), por = porDia[dia] || {};
+      const lista = Object.entries(por).map(([id, x]) => ({ id, ...x }));
+      saida.push({ dia, por, ...somar(lista, null) });
+    }
+    return saida;
+  }
+  const rotuloDia = (iso) => iso.slice(8, 10) + "/" + iso.slice(5, 7);
+
+  // Produtos que aparecem no gráfico: os que têm número no período, na ordem do catálogo (a cor segue o produto).
+  function seriesDe(dias, campo) {
+    return escolhidos().filter((id) => dias.some((x) => Number(x.por[id]?.[campo]) > 0));
+  }
+  function legenda(el, ids) {
+    $(el).innerHTML = ids.length > 1 ? ids.map((id) => `<span><b style="background:${corDe(id)}"></b>${esc(nomeDe(id))}</span>`).join("") : "";
+  }
+
+  // Barras empilhadas por produto, com 2px de respiro entre as partes e só o topo arredondado.
+  function grafEmpilhado(elId, dias, campo, { formato, eixo, H = 230, info }) {
+    const ids = seriesDe(dias, campo);
+    const el = $(elId), W = Math.max(300, Math.round(el.clientWidth || 640)), mE = 40, mB = 26, mT = 10;
+    const totalDe = (x) => ids.reduce((s, id) => s + (Number(x.por[id]?.[campo]) || 0), 0);
+    let max = Math.max(...dias.map(totalDe), campo === "pedidos" ? 2 : 10);
+    if (campo === "pedidos") max = Math.ceil(max / 2) * 2;
+    else { const p = 10 ** Math.floor(Math.log10(max)); max = Math.ceil(max / p * 2) / 2 * p; }   // topo redondo: 465 → 500
+    const y = (v) => H - mB - (v / max) * (H - mB - mT);
+    const larg = (W - mE) / dias.length, bw = Math.max(4, Math.min(30, larg * 0.6)), r = Math.min(4, bw / 2);
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(el.closest(".cartao").querySelector("h2").textContent)}">`;
+    for (const t of [0, max / 2, max]) s += `<line class="linha-grade" x1="${mE}" x2="${W}" y1="${y(t)}" y2="${y(t)}"/><text class="eixo num" x="${mE - 6}" y="${y(t) + 4}" text-anchor="end">${eixo(t)}</text>`;
+    const passo = Math.ceil(dias.length / 8), hoje = hojeSP(), ultimo = dias.length - 1;
+    // rótulo a cada "passo" dias, sem encostar no do último dia
+    const comRotulo = (i) => i === ultimo || (i % passo === 0 && ultimo - i >= Math.ceil(passo * 0.7));
+    dias.forEach((x, i) => {
+      const cx = mE + larg * i + larg / 2, bx = cx - bw / 2;
+      const partes = ids.map((id) => [id, Number(x.por[id]?.[campo]) || 0]).filter(([, v]) => v > 0);
+      let base = 0;
+      partes.forEach(([id, v], j) => {
+        const topo = j === partes.length - 1;
+        const y0 = y(base) - (j ? 2 : 0), y1 = y(base + v), alto = Math.max(1, y0 - y1);
+        // retângulo com só os cantos de cima arredondados no último pedaço
+        s += topo && alto > r
+          ? `<path d="M${bx},${y0} V${y1 + r} Q${bx},${y1} ${bx + r},${y1} H${bx + bw - r} Q${bx + bw},${y1} ${bx + bw},${y1 + r} V${y0} Z" fill="${corDe(id)}"/>`
+          : `<rect x="${bx}" y="${y1}" width="${bw}" height="${alto}" fill="${corDe(id)}"/>`;
+        base += v;
+      });
+      if (!partes.length) s += `<rect x="${bx}" y="${y(0) - 2}" width="${bw}" height="2" rx="1" fill="rgba(255,255,255,.14)"/>`;
+      s += `<rect x="${mE + larg * i}" y="${mT}" width="${larg}" height="${H - mT - mB}" fill="transparent" data-dica="${esc(info(x, ids))}"/>`;
+      if (comRotulo(i)) s += `<text class="eixo num" x="${cx}" y="${H - 7}" text-anchor="middle" ${x.dia === hoje ? 'fill="#f2f3ef"' : ""}>${x.dia === hoje ? "Hoje" : rotuloDia(x.dia)}</text>`;
+    });
+    el.innerHTML = s + "</svg>";
+    return ids;
+  }
+
+  function grafFaturamento(d) {
+    const dias = serieDiaria(d.diario);
+    const ids = grafEmpilhado("graf-fat", dias, "receita_liquida", {
+      eixo: brlCurto,
+      info: (x, ids) => `<b>${x.dia === hojeSP() ? "Hoje" : rotuloDia(x.dia)}</b>` +
+        (ids.length > 1 ? ids.map((id) => `<br><i class="ponto" style="--cor:${corDe(id)}"></i>${esc(nomeDe(id))}: ${brl(x.por[id]?.receita_liquida)}`).join("") : "") +
+        `<br>Líquido ${brl(x.receita_liquida)} · anúncios ${brl(x.gasto)}<br>Lucro estimado ${brl(x.lucro)} · ${int(x.pedidos)} pedidos`,
+    });
+    legenda("leg-fat", ids);
+    $("tab-fat").innerHTML = `<table><thead><tr><th>Dia</th><th class="n">Visitantes</th><th class="n">Pedidos</th><th class="n">Líquido</th><th class="n">Anúncios</th><th class="n">Lucro est.</th></tr></thead><tbody>${
+      dias.slice().reverse().map((x) => `<tr><td>${rotuloDia(x.dia)}</td><td class="n num">${int(x.visitantes)}</td><td class="n num">${int(x.pedidos)}</td><td class="n num">${brl(x.receita_liquida)}</td><td class="n num">${brl(x.gasto)}</td><td class="n num ${x.lucro < 0 ? "negativo" : ""}">${brl(x.lucro)}</td></tr>`).join("")}</tbody></table>`;
+  }
+
+  function grafPedidos(d) {
+    const dias = serieDiaria(d.diario);
+    const ids = grafEmpilhado("graf-pedidos", dias, "pedidos", {
+      H: 210, eixo: (t) => int(t),
+      info: (x, ids) => `<b>${rotuloDia(x.dia)}</b>` + (ids.length > 1
+        ? ids.map((id) => `<br><i class="ponto" style="--cor:${corDe(id)}"></i>${esc(nomeDe(id))}: ${int(x.por[id]?.pedidos)}`).join("")
+        : `<br>${int(x.pedidos)} pedido${x.pedidos === 1 ? "" : "s"}`),
+    });
+    legenda("leg-pedidos", ids);
+  }
+
+  function barras(id, itens, { valor = (i) => int(i.n), vazio = "Sem dados no período." } = {}) {
+    if (!itens.length) { $(id).innerHTML = `<div class="vazio">${vazio}</div>`; return; }
+    const max = Math.max(1, ...itens.map((i) => i.n));
+    $(id).innerHTML = itens.map((i) => `<div class="bl"><span title="${esc(i.nome)}">${esc(i.nome)}</span><div class="trilho"><i style="width:${(100 * i.n / max).toFixed(1)}%;background:${i.cor || "var(--limao)"}"></i></div><span class="valor num ${i.classe || ""}">${valor(i)}</span></div>`).join("");
+  }
+
+  function rankAnuncios(d) {
+    const lista = d.anuncios.filter((a) => a.anuncio !== "(sem anúncio)" || a.pedidos);
+    if (!lista.length) { $("rank-anuncios").innerHTML = `<div class="vazio">Aparece quando os anúncios começarem.</div>`; return; }
+    const ord = lista.slice().sort((a, b) => b.receita_liquida - a.receita_liquida || b.visitantes - a.visitantes).slice(0, 6);
+    barras("rank-anuncios", ord.map((a, i) => {
+      const semVenda = a.gasto > 0 && !a.pedidos, melhor = i === 0 && a.pedidos > 0;
+      return { nome: produto ? a.anuncio : `${a.anuncio} · ${nomeDe(a.produto)}`,
+               n: Math.max(Number(a.receita_liquida) || 0, semVenda ? Number(a.gasto) : 0),
+               cor: semVenda ? "var(--critico)" : corDe(a.produto),
+               classe: semVenda ? "ruim" : melhor ? "bom" : "", rotulo: semVenda ? "sem venda" : "R$ " + brlCurto(a.receita_liquida) };
+    }), { valor: (i) => i.rotulo });
+  }
+
+  function alertas(d) {
+    const ids = escolhidos(), k = somar(d.kpis, ids), a = d.anterior ? somar(d.anterior, ids) : null, lista = [];
+    const cor = { cliente: "#e87ba4", pagamento: "#fab219", reembolso: "#e66767", "anúncio": "#ec835a", meta: "#b8f23a", "tráfego": "#ec835a", lucro: "#e66767", ok: "#4ade80" };
+    if (k.abandonos) lista.push(["cliente", `${k.abandonos} carrinho${k.abandonos > 1 ? "s" : ""} abandonado${k.abandonos > 1 ? "s" : ""} para chamar no WhatsApp`, "clientes"]);
+    if (k.aguardando) lista.push(["pagamento", `${k.aguardando} boleto${k.aguardando > 1 ? "s" : ""}/Pix aguardando pagamento`, "vendas"]);
+    if (k.reembolsos) lista.push(["reembolso", `${k.reembolsos} reembolso${k.reembolsos > 1 ? "s" : ""} no período`, "vendas"]);
+    if (k.gasto > 0 && k.lucro < 0) lista.push(["lucro", `Gastando mais do que volta: lucro de ${brl(k.lucro)} no período`, "anuncios"]);
+    for (const an of d.anuncios) if (an.gasto > 0 && !an.pedidos) lista.push(["anúncio", `${an.anuncio}${produto ? "" : ` (${nomeDe(an.produto)})`} gastou ${brl(an.gasto)} sem vender`, "anuncios"]);
+    if (a && a.visitantes >= 30 && k.visitantes >= 30) {
+      const c = k.pedidos / k.visitantes, ca = a.pedidos / a.visitantes;
+      if (ca > 0 && c < ca * 0.75) lista.push(["anúncio", `Conversão caiu de ${pct(a.pedidos, a.visitantes)} para ${pct(k.pedidos, k.visitantes)}`, "anuncios"]);
+    }
+    const r = ritmoMes(d);
+    if (r.meta && d.mes.dia >= 3 && r.projPct < 0.9) lista.push(["meta", `No ritmo atual o lucro do mês fecha em ${brl(r.proj)} (${Math.round(r.projPct * 100)}% da meta)`, ""]);
+    const aVenda = ids.filter((id) => prod(id)?.status === "à venda" && prod(id)?.paginas?.length);
+    const visHoje = d.diario.filter((x) => x.dia === hojeSP() && aVenda.includes(x.produto)).reduce((s, x) => s + x.visitantes, 0);
+    if (aVenda.length && !visHoje && (d.mes.horas_hoje || 0) >= 10) lista.push(["tráfego", "Nenhuma visita hoje até agora", "anuncios"]);
+    if (!lista.length) lista.push(["ok", "Tudo certo por aqui", ""]);
+    $("qtd-alertas").textContent = lista[0][0] === "ok" ? "" : lista.length;
+    $("alertas").innerHTML = lista.slice(0, 6).map(([t, txt, ir]) =>
+      `<div class="alerta" style="--cor:${cor[t]}" ${ir ? `role="button" tabindex="0" data-ir-aba="${ir}"` : ""}><span>${esc(txt)}</span><span class="tag">${t}</span></div>`).join("");
+    $("alertas").querySelectorAll("[data-ir-aba]").forEach((el) => {
+      el.addEventListener("click", () => irPara(el.dataset.irAba));
+      el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); irPara(el.dataset.irAba); } });
+    });
+  }
+
+  // Order bumps: quantos pedidos de cada produto levaram cada bump.
+  function bumps(d) {
+    const pedidos = {};
+    for (const i of d.itens) if (!i.bump) pedidos[i.produto] = (pedidos[i.produto] || 0) + i.n;
+    const lista = d.itens.filter((i) => i.bump).map((i) => ({
+      nome: produto ? i.nome : `${i.nome} · ${nomeDe(i.produto)}`, n: i.n, cor: corDe(i.produto),
+      rotulo: `${int(i.n)} · ${pct(i.n, pedidos[i.produto] || 0)}`,
+    }));
+    barras("bumps", lista, { valor: (i) => i.rotulo, vazio: "Aparece quando alguém levar um bump." });
+  }
+
+  function mapa(celulas) {
+    if (!celulas.length) { $("mapa").innerHTML = `<div class="vazio">Aparece quando houver vendas.</div>`; return; }
+    const g = {}; let max = 0;
+    for (const c of celulas) { g[c.dia + "-" + c.hora] = c.vendas; max = Math.max(max, c.vendas); }
+    const tons = ["#2c3a12", "#4a6419", "#6d9222", "#93c42c", "#b8f23a"];
+    const cor = (v) => !v ? "" : `background:${tons[Math.min(4, Math.floor((v / max) * 4.999))]}`;
+    let h = `<div class="mapa"><span></span>`;
+    for (let hr = 0; hr < 24; hr++) h += `<span class="h">${hr % 6 === 0 ? hr + "h" : ""}</span>`;
+    for (let d = 1; d <= 7; d++) {
+      h += `<span>${DIAS[d - 1]}</span>`;
+      for (let hr = 0; hr < 24; hr++) { const v = g[d + "-" + hr] || 0; h += `<span class="c" style="${cor(v)}" data-dica="${DIAS[d - 1]} ${hr}h: ${v} pedido${v === 1 ? "" : "s"}"></span>`; }
+    }
+    $("mapa").innerHTML = h + `</div><div class="escala"><span>menos</span><i style="background:rgba(255,255,255,.05)"></i><i style="background:${tons[0]}"></i><i style="background:${tons[2]}"></i><i style="background:${tons[4]}"></i><span>mais pedidos</span></div>`;
+  }
+
+  function quando(iso) {
+    if (!iso) return "";
+    const d = new Date(iso), seg = (Date.now() - d) / 1000;
+    if (seg < 60) return "agora";
+    if (seg < 3600) return `há ${Math.floor(seg / 60)} min`;
+    if (seg < 86400) return `há ${Math.floor(seg / 3600)} h`;
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) + " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function ultimas(lista) {
+    $("ultimas").innerHTML = lista.length ? lista.map((v) => {
+      const [txt, cls] = STATUS[v.status] || [v.status || "—", "esp"];
+      return `<div class="item"><b>${esc(v.nome || "Comprador")}${tagProduto(v.produto)}</b><span class="dir num">${brl(v.valor)}</span>
+        <small>${quando(v.data_pedido)} · ${esc(NOMES_PAG[v.forma_pagamento] || v.forma_pagamento || "")}${v.parcelas > 1 ? " " + v.parcelas + "x" : ""}${v.estado ? " · " + esc(v.estado) : ""}</small>
+        <small class="dir st-${cls}">${txt}</small><small style="grid-column:1/-1">${v.bump ? `bump: ${esc(v.item)} · ` : ""}origem: ${esc(v.anuncio)}</small></div>`;
+    }).join("") : `<div class="vazio">Nenhuma venda no período.</div>`;
+  }
+
+  function abandonos(lista) {
+    $("abandonos").innerHTML = lista.length ? lista.map((a) => {
+      const fone = String(a.telefone || "").replace(/\D/g, "");
+      const zap = fone ? `<a class="zap" href="https://wa.me/${fone.length <= 11 ? "55" + fone : fone}" target="_blank" rel="noopener">WhatsApp</a>` : "";
+      return `<div class="item"><b>${esc(a.nome || "Sem nome")}${tagProduto(a.produto)}</b><span class="dir">${a.comprou_depois ? '<small class="st-ok">comprou depois</small>' : zap}</span>
+        <small>${quando(a.criado_em)}${a.item ? " · " + esc(a.item) : ""}</small><small class="dir">${esc(a.email || "")}</small></div>`;
+    }).join("") : `<div class="vazio">Nenhum carrinho abandonado no período.</div>`;
+  }
+
+  function tabelaAnuncios(lista) {
+    if (!lista.length) { $("tabela-anuncios").innerHTML = `<div class="vazio">Sem visitas no período.</div>`; return; }
+    const colProduto = !produto;
+    $("tabela-anuncios").innerHTML = `<table><thead><tr><th>Anúncio</th>${colProduto ? "<th>Produto</th>" : ""}<th class="n">Visit.</th><th class="n">Cliques</th><th class="n">Pedidos</th><th class="n">Conv.</th><th class="n">Líquido</th><th class="n">Gasto</th><th class="n">CPA</th><th class="n">Retorno</th></tr></thead><tbody>${
+      lista.map((a) => `<tr><td title="${esc(a.campanha || "")}">${esc(a.anuncio)}</td>${colProduto ? `<td>${esc(nomeDe(a.produto))}</td>` : ""}<td class="n num">${int(a.visitantes)}</td><td class="n num">${int(a.cliques)}</td><td class="n num">${int(a.pedidos)}</td><td class="n num">${pct(a.pedidos, a.visitantes)}</td><td class="n num">${brl(a.receita_liquida)}</td><td class="n num">${a.gasto ? brl(a.gasto) : "—"}</td><td class="n num">${a.gasto && a.pedidos ? brl(a.gasto / a.pedidos) : "—"}</td><td class="n num">${a.gasto ? (a.receita_liquida / a.gasto).toLocaleString("pt-BR", { maximumFractionDigits: 2 }) + "×" : "—"}</td></tr>`).join("")}</tbody></table>`;
+  }
+
+  function desenhar(d) {
+    $("pergunta").textContent = { hoje: "Como está o dia?", "7d": "Como foi a semana?", "30d": "Como foi o mês?", tudo: "Como estamos até aqui?" }[d.periodo] || "Como está o mês?";
+    // os detalhes vêm filtrados pelo servidor: enquanto chegam os do produto novo, só o topo é redesenhado
+    const detalhesOk = (d.produto || "") === produto;
+    if (aba === "inicio") { kpis(d); if (!produto) tabelaProdutos(d); diaADia(d); grafFaturamento(d); if (detalhesOk) { rankAnuncios(d); alertas(d); } }
+    if (!detalhesOk) return;
+    if (aba === "vendas") {
+      grafPedidos(d); ultimas(d.ultimas_vendas); bumps(d); mapa(d.dia_hora);
+      barras("pagamentos", d.pagamentos.map((p) => ({ ...p, nome: NOMES_PAG[p.nome] || p.nome })), { vazio: "Aparece quando houver vendas." });
+      barras("estados", d.estados, { vazio: "Aparece quando houver vendas." });
+    }
+    if (aba === "anuncios") {
+      tabelaAnuncios(d.anuncios);
+      const total = d.funil[0]?.pessoas || 0;
+      const tons = ["#e3f9b5", "#cff57f", "#b8f23a", "#93c42c", "#6d9222"];
+      barras("funil", total ? d.funil.map((e, i) => ({ nome: e.etapa, n: e.pessoas, cor: tons[i] })) : [], { valor: (i) => `${int(i.n)} · ${pct(i.n, total)}`, vazio: "Ainda sem visitas no período." });
+      barras("dispositivos", d.dispositivos);
+      barras("faq", d.faq, { vazio: "Ninguém abriu o FAQ ainda." });
+    }
+    if (aba === "clientes") abandonos(d.abandonos_lista);
+  }
+
+  // ---------- atualização automática ----------
+  function avisar(texto) {
+    const a = $("aviso"); a.textContent = texto; a.classList.add("on");
+    try { navigator.vibrate && navigator.vibrate([80, 60, 80]); } catch (e) {}
+    setTimeout(() => a.classList.remove("on"), 5000);
+  }
+  function relogio(ok = true) {
+    $("vivo").classList.toggle("parado", !ok);
+    $("vivo").textContent = ok ? "ao vivo" : "sem conexão";
+    $("atualizado").textContent = ultimaAtualizacao ? "atualizado " + new Date(ultimaAtualizacao).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "—";
+  }
+  // Venda nova em qualquer produto: compara pedidos e bumps de cada um com a leitura anterior.
+  function vendaNova(d) {
+    const agora = Object.fromEntries((d.kpis || []).map((k) => [k.id, { n: k.pedidos + k.bumps, r: Number(k.receita) || 0 }]));
+    if (pedidosAntes) {
+      for (const [id, x] of Object.entries(agora)) {
+        const antes = pedidosAntes[id];
+        if (antes && x.n > antes.n) { avisar(`Nova venda! ${nomeDe(id)} · ${brl(x.r - antes.r)}`); break; }
+      }
+    }
+    pedidosAntes = agora;
+  }
+  let pedido = 0;
+  async function carregar() {
+    const meu = ++pedido;
+    try {
+      const d = await chamar({ periodo, ...(produto ? { produto } : {}) }, { catalogo: catalogo.produtos });
+      if (meu !== pedido) return;   // chegou depois de outro pedido mais novo
+      if (d.periodo === periodo) vendaNova(d);
+      dados = d; versao = d.versao; ultimaAtualizacao = Date.now();
+      desenhar(d); relogio(true);
+    } catch (e) {
+      if (e.message === "senha") return mostrarLogin(true);
+      relogio(false);
+    }
+  }
+  async function verificar() {
+    if (document.hidden || !senha) return;
+    try {
+      const { versao: v } = await chamar({ versao: 1 });
+      if (v !== versao) await carregar(); else { ultimaAtualizacao = Date.now(); relogio(true); }
+    } catch (e) { if (e.message === "senha") return mostrarLogin(true); relogio(false); }
+  }
+
+  let timer = null;
+  async function iniciar() {
+    $("tela-login").hidden = true; $("app").hidden = false;
+    try { await carregarCatalogo(); } catch (e) { relogio(false); return; }
+    irPara(aba); pedidosAntes = null; carregar();
+    clearInterval(timer); timer = setInterval(verificar, INTERVALO);
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && senha) { carregarCatalogo().catch(() => {}); verificar(); } });
+  let redim = null;
+  addEventListener("resize", () => { clearTimeout(redim); redim = setTimeout(() => dados && desenhar(dados), 150); });
+
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  senha ? iniciar() : mostrarLogin(false);
+</script>
+</body>
+</html>

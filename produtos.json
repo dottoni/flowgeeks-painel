@@ -1,0 +1,28 @@
+{
+  "meta_lucro_mensal": 10000,
+  "imposto_pct": 11.33,
+  "roas_bom": 2,
+  "roas_atencao": 1.45,
+  "produtos": [
+    {
+      "id": "raio-x",
+      "nome": "Raio-X do Imposto",
+      "cor": "#3987e5",
+      "status": "à venda",
+      "projeto": "simulador-tributario",
+      "paginas": ["https://dottoni.github.io/raio-x-do-imposto/"],
+      "hotmart": {
+        "8839713": "Raio-X do Imposto"
+      }
+    },
+    {
+      "id": "ciclo-leveza-21",
+      "nome": "Ciclo Leveza 21",
+      "cor": "#d95926",
+      "status": "em preparação",
+      "projeto": "ciclo-leveza-21",
+      "paginas": [],
+      "hotmart": {}
+    }
+  ]
+}
