@@ -10,9 +10,11 @@
       "cor": "#3987e5",
       "status": "à venda",
       "projeto": "simulador-tributario",
-      "paginas": ["https://raio-x-do-imposto.netlify.app/", "https://dottoni.github.io/raio-x-do-imposto/"],
+      "paginas": ["https://raioxdoimposto.com.br/", "https://raio-x-do-imposto.netlify.app/", "https://dottoni.github.io/raio-x-do-imposto/"],
       "hotmart": {
-        "8839713": "Raio-X do Imposto"
+        "8839713": "Raio-X do Imposto",
+        "8845254": "Pró-labore Ideal",
+        "8845267": "Preço 2027"
       }
     },
     {
