@@ -10,7 +10,7 @@
       "cor": "#3987e5",
       "status": "à venda",
       "projeto": "simulador-tributario",
-      "paginas": ["https://dottoni.github.io/raio-x-do-imposto/"],
+      "paginas": ["https://raio-x-do-imposto.netlify.app/", "https://dottoni.github.io/raio-x-do-imposto/"],
       "hotmart": {
         "8839713": "Raio-X do Imposto"
       }
