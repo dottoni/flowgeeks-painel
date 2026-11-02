@@ -83,7 +83,7 @@
     const destino = new URL(a.href);
     destino.searchParams.set("src", visitante);
     destino.searchParams.set("sck", [limpo(origem.utm_source) || "direto", limpo(origem.ad_id)].filter(Boolean).join("-"));
-    for (const c of ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]) {
+    for (const c of ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "fbclid"]) {
       if (origem[c]) destino.searchParams.set(c, origem[c]);
     }
     a.href = destino.toString();
