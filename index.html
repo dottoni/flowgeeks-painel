@@ -230,7 +230,72 @@
   .login button { border: 0; background: var(--limao); color: #08090a; font-weight: 800; padding: 14px; border-radius: 13px; font-size: 16px; cursor: pointer; }
   .login .erro { color: var(--critico); font-weight: 800; font-size: 13.5px; }
 
+  /* ---------- análise ---------- */
+  .sub-abas { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 4px; padding: 2px 16px; }
+  .sub-abas::-webkit-scrollbar { display: none; }
+  .sub-abas button { cursor: pointer; }
+  .sub-abas button[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: #08090a; }
+  .faixa-partida { padding: 11px 14px; border-radius: 13px; font-size: 13px; font-weight: 700; background: rgba(201, 164, 58, .14); color: #e6cd84; }
+  .placar-sim { display: grid; gap: 16px; border-color: rgba(184, 242, 58, .3); background: linear-gradient(135deg, rgba(184, 242, 58, .1), rgba(255, 255, 255, .03) 70%); }
+  .placar-sim .grande { font-size: 44px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  .placar-sim .grande small { font-size: 18px; color: var(--suave); font-weight: 700; letter-spacing: 0; }
+  .placar-sim .selo-portao { display: inline-block; margin-top: 8px; }
+  .placar-sim p { margin: 8px 0 0; color: var(--suave); font-weight: 600; font-size: 13.5px; max-width: 56ch; }
+  .placar-sim .op { font-size: 16px; font-weight: 800; color: var(--tinta); margin: 2px 0 0; }
+  .placar-sim .rot { font-size: 12px; font-weight: 800; color: var(--limao); }
+  .numeros-sim { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .numeros-sim span { display: block; font-size: 12px; font-weight: 700; color: var(--suave); }
+  .numeros-sim b { display: block; font-size: 21px; font-weight: 800; letter-spacing: -.02em; }
+  .numeros-sim small { font-size: 11.5px; font-weight: 700; color: var(--apagado); }
+  .acoes-sim { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .acoes-sim button { cursor: pointer; }
+  .acoes-sim label { gap: 8px; }
+  .acoes-sim input { width: 58px; background: none; border: 0; font: inherit; font-weight: 800; text-align: right; }
+  .esteira { display: flex; align-items: stretch; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .esteira .et { flex: 1 0 86px; min-width: 0; padding: 10px; border-radius: 12px; background: var(--cartao-forte); font-weight: 800; }
+  .esteira .et span { display: block; font-size: 11.5px; color: var(--suave); }
+  .esteira .et b { font-size: 18px; letter-spacing: -.02em; }
+  .esteira .et small { display: block; font-size: 11.5px; color: var(--apagado); font-weight: 700; }
+  .esteira .et.gargalo { background: rgba(230, 103, 103, .14); box-shadow: inset 0 0 0 1px rgba(230, 103, 103, .5); }
+  .esteira .et.gargalo small { color: #fca5a5; }
+  .alavancas { display: grid; gap: 12px; }
+  .grupo-alav h3 { margin: 0 0 2px; font-size: 14.5px; font-weight: 800; }
+  .grupo-alav > small { display: block; color: var(--apagado); font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+  .alav + .alav { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--grade); }
+  .alav-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .alav-top label { font-weight: 800; font-size: 13.5px; min-width: 0; }
+  .alav-top label small { display: block; font-weight: 600; font-size: 11.5px; color: var(--apagado); }
+  .campo-alav { display: flex; align-items: center; gap: 4px; flex: none; padding: 4px 8px; border-radius: 9px; background: var(--cartao-forte); font-weight: 800; font-size: 13px; color: var(--suave); }
+  .campo-alav input { width: 72px; background: none; border: 0; color: var(--tinta); font: inherit; font-size: 15px; text-align: right; -moz-appearance: textfield; }
+  .campo-alav input::-webkit-outer-spin-button, .campo-alav input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .trilho-alav { position: relative; margin: 10px 0 6px; }
+  .trilho-alav input[type=range] { width: 100%; margin: 0; display: block; accent-color: var(--limao); height: 24px; background: transparent; }
+  .pino { position: absolute; top: -2px; width: 2px; height: 28px; border-radius: 1px; pointer-events: none; transform: translateX(-1px); }
+  .pino.real { background: var(--tinta); opacity: .75; }
+  .pino.limite { background: #ef6fa6; }
+  .rodape-alav { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; font-weight: 700; color: var(--apagado); }
+  .rodape-alav .lim { color: #f19bc1; }
+  .delta-sobe { color: var(--bom) !important; } .delta-desce { color: var(--critico) !important; }
+  .fonte { font-size: 12px; font-weight: 600; color: var(--apagado); margin: 8px 0 0; }
+  tr.destaque td { background: rgba(184, 242, 58, .1); }
+  tr.destaque td:first-child { box-shadow: inset 2px 0 0 var(--limao); padding-left: 8px; }
+  .periodos { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .periodos fieldset { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; padding: 8px 10px; border: 1px solid var(--borda); border-radius: 13px; min-width: 0; }
+  .periodos legend { padding: 0 4px; font-size: 11.5px; font-weight: 800; }
+  .periodos input { font: inherit; font-size: 13px; font-weight: 700; background: none; border: 0; color: var(--tinta); color-scheme: dark; max-width: 128px; }
+  .botoes-trecho { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .botoes-trecho button { cursor: pointer; display: block; flex: 1 1 100%; min-width: 0; max-width: 100%; height: auto; min-height: 38px; padding: 8px 14px; border-radius: 14px; white-space: normal; text-align: left; }
+  .mudanca { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--grade); font-size: 13px; font-weight: 600; color: var(--suave); }
+  .mudanca:last-child { border-bottom: 0; }
+  .mudanca b { color: var(--tinta); font-weight: 800; }
+
   @media (min-width: 900px) {
+    .placar-sim { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; }
+    .numeros-sim { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .alavancas { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+    .alavancas .larga { grid-column: 1 / -1; }
+    .alavancas .larga .lista-alav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+    .alavancas .larga .alav:nth-child(2) { margin-top: 0; padding-top: 0; border-top: 0; }
     .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .lucro, .meta { grid-column: auto; }
     .lucro strong { font-size: 30px; }
@@ -248,6 +313,7 @@
   <symbol id="i-vendas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
   <symbol id="i-anuncio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4h4l6 5V5L7 10z"/><path d="M17 8a5 5 0 0 1 0 8"/></symbol>
   <symbol id="i-pessoas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></symbol>
+  <symbol id="i-analise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h8M16 18h4"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="14" cy="18" r="2"/></symbol>
   <symbol id="i-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></symbol>
 </svg>
 
@@ -344,6 +410,18 @@
       </div>
     </section>
 
+    <!-- ===== ANÁLISE ===== -->
+    <section class="grade" data-aba="analise" hidden>
+      <nav class="sub-abas" id="sub-abas" aria-label="Tipo de análise">
+        <button class="pilula" data-sub="simulador" aria-pressed="true">Simulador de funil</button>
+        <button class="pilula" data-sub="comparar" aria-pressed="false">Comparar períodos</button>
+        <button class="pilula" data-sub="escala" aria-pressed="false">Nível de escala</button>
+        <button class="pilula" data-sub="mensal" aria-pressed="false">Mês a mês</button>
+        <button class="pilula" data-sub="diario" aria-pressed="false">Métricas do dia</button>
+      </nav>
+      <div class="grade" id="analise"></div>
+    </section>
+
     <!-- ===== CLIENTES ===== -->
     <section class="grade" data-aba="clientes" hidden>
       <div class="cartao"><div class="cabeca-cartao"><h2>Carrinhos abandonados</h2><small>chame no WhatsApp</small></div><div class="lista" id="abandonos"></div></div>
@@ -356,6 +434,7 @@
     <button role="tab" data-ir="inicio" aria-selected="true"><svg><use href="#i-casa"/></svg><span>Início</span></button>
     <button role="tab" data-ir="vendas" aria-selected="false"><svg><use href="#i-vendas"/></svg><span>Vendas</span></button>
     <button role="tab" data-ir="anuncios" aria-selected="false"><svg><use href="#i-anuncio"/></svg><span>Anúncios</span></button>
+    <button role="tab" data-ir="analise" aria-selected="false"><svg><use href="#i-analise"/></svg><span>Análise</span></button>
     <button role="tab" data-ir="clientes" aria-selected="false"><svg><use href="#i-pessoas"/></svg><span>Clientes</span></button>
   </nav>
 </div>
@@ -398,6 +477,7 @@
   const nomeDe = (id) => prod(id)?.nome || id;
   const corDe = (id) => prod(id)?.cor || "#8b9087";
   const impostoDe = (id) => Number(prod(id)?.imposto_pct ?? catalogo.imposto_pct ?? 0) / 100;
+  const midiaDe = () => Number(catalogo?.imposto_midia_pct ?? 0) / 100;   // imposto cobrado em cima do gasto em anúncios
   const tagProduto = (id) => produto ? "" : `<span class="tag-produto"><i class="ponto" style="--cor:${corDe(id)}"></i>${esc(nomeDe(id))}</span>`;
 
   async function carregarCatalogo() {
@@ -417,7 +497,8 @@
       for (const c of Object.keys(t)) if (c !== "imposto") t[c] += Number(k[c]) || 0;
       t.imposto += (Number(k.receita) || 0) * impostoDe(k.id);
     }
-    t.lucro = t.receita_liquida - t.gasto - t.imposto;
+    t.imposto_midia = t.gasto * midiaDe();
+    t.lucro = t.receita_liquida - t.gasto - t.imposto_midia - t.imposto;
     return t;
   }
   const escolhidos = () => produto ? [produto] : catalogo.produtos.map((p) => p.id);
@@ -513,7 +594,7 @@
     const ticket = k.pedidos ? k.receita / k.pedidos : 0, ticketA = a?.pedidos ? a.receita / a.pedidos : null;
     const roas = k.gasto ? k.receita_liquida / k.gasto : null;
     const r = ritmoMes(d);
-    const explica = esc(`Faturamento líquido ${brl(k.receita_liquida)}<br>− anúncios ${brl(k.gasto)}<br>− imposto estimado ${brl(k.imposto)} (${pctImp} do bruto)`);
+    const explica = esc(`Faturamento líquido ${brl(k.receita_liquida)}<br>− anúncios ${brl(k.gasto)}<br>− imposto sobre a mídia ${brl(k.imposto_midia)}<br>− imposto estimado ${brl(k.imposto)} (${pctImp} do bruto)`);
     let meta;
     if (r.meta) {
       // escala da barra: a meta fica em 100% ou, se a projeção passar dela, a marca recua
@@ -591,7 +672,7 @@
     const hoje = dias[0];
     return `<div class="cartao dia-a-dia"><div class="cabeca-cartao"><h2>${cor ? `<i class="ponto" style="--cor:${esc(cor)}"></i>` : ""}${esc(titulo)}` +
       `<span class="etq" data-dica="Receita de hoje, sem reembolsos">hoje ${brl(hoje.receita)}</span><span class="etq ${hoje.lucro >= 0 ? "sobe" : "desce"}" data-dica="Lucro de hoje, depois de anúncios e imposto (estimativa)">lucro ${brl(hoje.lucro)}</span></h2><small>R$</small></div>` +
-      `<div class="rolar"><table><thead><tr><th>Data</th><th class="n">Invest.</th><th class="n">Receita</th><th class="n">Reemb.</th><th class="n" data-dica="Faturamento líquido − anúncios − imposto estimado">Lucro</th><th class="n">ROAS</th></tr></thead><tbody>` +
+      `<div class="rolar"><table><thead><tr><th>Data</th><th class="n">Invest.</th><th class="n">Receita</th><th class="n">Reemb.</th><th class="n" data-dica="Faturamento líquido − anúncios − imposto sobre a mídia − imposto estimado">Lucro</th><th class="n">ROAS</th></tr></thead><tbody>` +
       dias.map((x, i) => linha(i ? rotuloDia(x.dia) : "Hoje", x)).join("") +
       linha("8 dias", oito, "soma") + linha("Mês (acum.)", mes, "soma") + linha("Projeção mês", proj, "soma projecao") +
       `</tbody></table></div></div>`;
@@ -820,7 +901,361 @@
       barras("faq", d.faq, { vazio: "Ninguém abriu o FAQ ainda." });
     }
     if (aba === "clientes") abandonos(d.abandonos_lista);
+    if (aba === "analise") desenharAnalise(d);
   }
+
+  // ---------- análise ----------
+  // Tudo aqui sai do que o painel já recebe: os números do período (kpis) e o histórico diário.
+  let sub = ler("fg_painel_sub") || "simulador", historico = null, versaoHistorico = null;
+  const num = (v, c = 2) => (Number(v) || 0).toLocaleString("pt-BR", { minimumFractionDigits: c, maximumFractionDigits: c });
+  const pc = (v, c = 1) => num(v * 100, c) + "%";
+  const isoDe = (ms) => new Date(ms).toISOString().slice(0, 10);
+  const hojeMs = () => new Date(hojeSP() + "T00:00:00Z").getTime();
+  const diasEntre = (a, b) => Math.round((new Date(b + "T00:00:00Z") - new Date(a + "T00:00:00Z")) / 864e5) + 1;
+
+  async function garantirHistorico(d) {
+    if (historico && versaoHistorico === d.versao) return;
+    const h = await chamar({ periodo: "tudo" }, { catalogo: catalogo.produtos });
+    historico = h.diario || []; versaoHistorico = d.versao;
+  }
+  // Um dia com a soma dos produtos escolhidos.
+  function serieHistorica() {
+    const ids = escolhidos(), por = {};
+    for (const x of historico || []) if (ids.includes(x.produto)) (por[x.dia] ||= []).push({ id: x.produto, ...x });
+    const dias = Object.keys(por).sort();
+    if (!dias.length) return [];
+    const saida = [], fim = hojeMs();
+    for (let t = new Date(dias[0] + "T00:00:00Z").getTime(); t <= fim; t += 864e5) {
+      const dia = isoDe(t);
+      saida.push({ dia, ...somar(por[dia] || [], null) });
+    }
+    return saida;
+  }
+  function somaTrecho(serie, de, ate) {
+    const t = { visitantes: 0, pedidos: 0, receita: 0, receita_liquida: 0, reembolsos_valor: 0, gasto: 0, lucro: 0, dias: 0 };
+    for (const x of serie) if (x.dia >= de && x.dia <= ate) { for (const c of Object.keys(t)) if (c !== "dias") t[c] += x[c]; }
+    t.dias = Math.max(1, diasEntre(de, ate));
+    return t;
+  }
+  const roasDe = (x) => x.gasto ? x.receita / x.gasto : null;
+  const mudancas = () => (catalogo.mudancas || []).filter((m) => !produto || !m.produto || m.produto === produto).sort((a, b) => b.dia.localeCompare(a.dia));
+
+  // ----- conta do simulador: cada etapa multiplica a anterior -----
+  function simular(p) {
+    const visitas = p.cpv > 0 ? p.inv / p.cpv : 0, cliques = visitas * p.tCli / 100, pedidos = cliques * p.tConv / 100;
+    const ticket = p.base + p.tBump / 100 * p.pBump, bruto = pedidos * ticket, reembolsos = bruto * p.r / 100, receita = bruto - reembolsos;
+    const liquido = receita * (1 - p.taxa / 100), impostoMidia = p.inv * p.midia / 100, imposto = receita * p.imp / 100;
+    const lucro = liquido - p.inv - impostoMidia - imposto;
+    return { visitas, cliques, pedidos, ticket, bruto, reembolsos, receita, liquido, imposto, impostoMidia, lucro, roas: p.inv ? receita / p.inv : 0, cpa: pedidos ? p.inv / pedidos : 0 };
+  }
+  // Valor de cada alavanca que faz o ROAS bater no portão, com as outras paradas.
+  function limites(p, portao) {
+    const r0 = simular(p).roas;
+    if (!r0 || !portao) return {};
+    const f = portao / r0, tAlvo = (p.base + p.tBump / 100 * p.pBump) * f;
+    return { cpv: p.cpv / f, tCli: p.tCli * f, tConv: p.tConv * f, base: tAlvo - p.tBump / 100 * p.pBump,
+             tBump: p.pBump ? (tAlvo - p.base) / p.pBump * 100 : null, r: 100 - (100 - p.r) * f };
+  }
+  const ALAVANCAS = [
+    { grupo: "Tráfego", dica: "O quanto custa trazer uma pessoa para a página", itens: [
+      { id: "inv", nome: "Investimento", sub: "gasto no período", pre: "R$", max: (v) => Math.max(500, v * 3), passo: 10, livre: true, esforco: "" },
+      { id: "cpv", nome: "Custo por visita", sub: "gasto ÷ visitantes", pre: "R$", max: (v) => Math.max(5, v * 2.5), passo: .01, menor: true, esforco: "médio · criativos e público" } ] },
+    { grupo: "Página e checkout", dica: "Quem chega clica em comprar, e quem clica paga", itens: [
+      { id: "tCli", nome: "Clique em comprar", sub: "clicaram ÷ visitantes", pos: "%", max: (v) => Math.min(100, Math.max(30, v * 2.5)), passo: .1, esforco: "médio · página de vendas" },
+      { id: "tConv", nome: "Conversão do checkout", sub: "pedidos ÷ clicaram", pos: "%", max: (v) => Math.min(100, Math.max(80, v * 2)), passo: .1, esforco: "médio · checkout e recuperação" } ] },
+    { grupo: "Oferta e pós-venda", dica: "Quanto cada pedido deixa, sem custar mais tráfego", itens: [
+      { id: "base", nome: "Preço do produto", sub: "por pedido, sem os bumps", pre: "R$", max: (v) => Math.max(150, v * 2.5), passo: 1, esforco: "fácil · preço, testar com cuidado" },
+      { id: "tBump", nome: "Pedidos com bump", sub: "bumps ÷ pedidos", pos: "%", max: (v) => Math.min(100, Math.max(50, v * 2.5)), passo: .1, esforco: "fácil · oferta, não custa tráfego" },
+      { id: "pBump", nome: "Preço médio do bump", sub: "por bump vendido", pre: "R$", max: (v) => Math.max(100, v * 2.5), passo: 1, livre: true, esforco: "" },
+      { id: "r", nome: "Reembolso", sub: "reembolsos ÷ vendas", pos: "%", max: (v) => Math.max(20, v * 3), passo: .1, menor: true, esforco: "médio · produto e expectativa" } ] },
+  ];
+  const fmtAlav = (a, v) => (a.pre ? "R$ " : "") + num(v, a.passo >= 1 && a.pre ? 0 : a.pos ? 1 : 2) + (a.pos || "");
+
+  // Lê o funil real do período. Sem vendas ainda, entram números de partida, só para testar.
+  function funilReal(d) {
+    const k = somar(d.kpis, escolhidos());
+    const itensB = (d.itens || []).filter((i) => i.bump), liqB = itensB.reduce((s, i) => s + Number(i.receita_liquida || 0), 0), nB = itensB.reduce((s, i) => s + Number(i.n || 0), 0);
+    const imp = k.receita ? k.imposto / k.receita * 100 : impostoDe(produto || catalogo.produtos[0]?.id) * 100;
+    const midia = midiaDe() * 100;
+    const temDados = k.pedidos > 0 && k.gasto > 0 && k.visitantes > 0 && k.clicaram_comprar > 0;
+    if (!temDados) return { temDados, k, p: { inv: k.gasto || 3000, cpv: 2, tCli: 10, tConv: 35, base: 67, tBump: 15, pBump: 32, r: 5, taxa: 10, imp, midia } };
+    const taxa = k.receita ? (1 - k.receita_liquida / k.receita) * 100 : 10;
+    const pBump = nB ? liqB / nB / (1 - taxa / 100) : 32;
+    const ticket = k.receita / k.pedidos * (1 + k.reembolsos_valor / Math.max(1, k.receita));
+    const tBump = k.bumps / k.pedidos * 100;
+    return { temDados, k, p: { inv: k.gasto, cpv: k.gasto / k.visitantes, tCli: k.clicaram_comprar / k.visitantes * 100, tConv: k.pedidos / k.clicaram_comprar * 100,
+      base: Math.max(0, ticket - tBump / 100 * pBump), tBump, pBump, r: k.reembolsos_valor / Math.max(1, k.receita + k.reembolsos_valor) * 100, taxa, imp, midia } };
+  }
+  // Melhor semana corrida do histórico em cada parte do funil: a maior distância é a maior oportunidade.
+  function oportunidade(serie, p) {
+    if (serie.length < 14) return null;
+    let cpv = Infinity, conv = 0, ticket = 0;
+    for (let i = 6; i < serie.length; i++) {
+      const s = somaTrecho(serie, serie[i - 6].dia, serie[i].dia);
+      if (s.visitantes >= 30 && s.gasto > 0) cpv = Math.min(cpv, s.gasto / s.visitantes);
+      if (s.visitantes >= 30) conv = Math.max(conv, s.pedidos / s.visitantes * 100);
+      if (s.pedidos >= 5) ticket = Math.max(ticket, s.receita / s.pedidos);
+    }
+    const hoje = { cpv: p.cpv, conv: p.tCli * p.tConv / 100, ticket: p.base + p.tBump / 100 * p.pBump };
+    const lista = [];
+    if (isFinite(cpv) && cpv > 0) lista.push({ onde: "Tráfego", txt: "Cada visita já custou menos", agora: "R$ " + num(hoje.cpv), melhor: "R$ " + num(cpv), dist: hoje.cpv / cpv - 1, como: "criativos e público" });
+    if (conv) lista.push({ onde: "Página e checkout", txt: "Mais visitas já viraram pedido", agora: num(hoje.conv) + "%", melhor: num(conv) + "%", dist: conv / hoje.conv - 1, como: "página, checkout e recuperação" });
+    if (ticket) lista.push({ onde: "Oferta", txt: "Cada pedido já deixou mais", agora: "R$ " + num(hoje.ticket), melhor: "R$ " + num(ticket), dist: ticket / hoje.ticket - 1, como: "bumps e preço" });
+    return lista.filter((x) => x.dist > .02).sort((a, b) => b.dist - a.dist)[0] || null;
+  }
+
+  let sim = null;   // { chave, real, p, base, portao, temDados }
+  function montarSimulador(d) {
+    const chave = `${produto}|${d.periodo}`, roasCasa = Number(prod(produto)?.roas_bom ?? catalogo.roas_bom ?? 2);
+    if (!sim || sim.chave !== chave) {
+      const f = funilReal(d);
+      sim = { chave, real: { ...f.p }, p: { ...f.p }, base: null, portao: sim?.portao ?? roasCasa, temDados: f.temDados };
+    }
+    const faixa = sim.temDados ? "" : `<div class="faixa-partida">Ainda não há venda e gasto no período, então estes são números de partida para você testar, não resultados. Mude os valores à vontade.</div>`;
+    const grupos = ALAVANCAS.map((g) => `<div class="cartao grupo-alav ${g.itens.length > 2 ? "larga" : ""}"><h3>${g.grupo}</h3><small>${g.dica}</small><div class="lista-alav">${g.itens.map((a) => `
+      <div class="alav" data-alav="${a.id}">
+        <div class="alav-top"><label for="al-${a.id}">${a.nome}<small>${a.sub}</small></label>
+          <span class="campo-alav">${a.pre || ""}<input id="al-${a.id}" type="number" inputmode="decimal" step="${a.passo}" min="0">${a.pos || ""}</span></div>
+        <div class="trilho-alav"><input type="range" aria-label="${a.nome}" step="${a.passo}" min="0"><i class="pino real" data-dica="${sim.temDados ? "Real do período" : "Número de partida"}"></i><i class="pino limite" hidden></i></div>
+        <div class="rodape-alav"><span class="r-real num"></span><span class="lim num"></span></div>
+      </div>`).join("")}</div></div>`).join("");
+    $("analise").innerHTML = `${faixa}
+      <div class="cartao placar-sim" id="placar-sim"></div>
+      <div class="acoes-sim">
+        <label class="pilula">Portão de ROAS<input id="portao" class="num" type="number" step=".05" min="0" inputmode="decimal" aria-label="Portão de ROAS"></label>
+        <button class="pilula" id="fixar-base" type="button">Fixar como base</button>
+        <button class="pilula" id="voltar-real" type="button">${sim.temDados ? "Voltar ao real" : "Voltar ao início"}</button>
+      </div>
+      <div class="cartao"><div class="esteira" id="esteira"></div></div>
+      <div class="alavancas">${grupos}</div>
+      <div class="cartao"><div class="cabeca-cartao"><h2 id="tit-folga">Folga até o portão</h2><small>uma alavanca por vez</small></div>
+        <div class="rolar" id="folga"></div>
+        <p class="fonte">Mexer em uma etapa recalcula tudo o que vem depois. O simulador não prevê queda de ROAS ao aumentar a verba: para isso, veja Nível de escala.</p></div>
+      <p class="fonte">Lucro = faturamento líquido − anúncios − imposto sobre a mídia (${num(sim.p.midia, 1)}%) − imposto da venda (${num(sim.p.imp, 2)}%). Taxa da plataforma usada: ${num(sim.p.taxa, 1)}%. Período: o escolhido no alto.</p>`;
+    for (const g of ALAVANCAS) for (const a of g.itens) {
+      const el = document.querySelector(`[data-alav="${a.id}"]`), n = el.querySelector("input[type=number]"), r = el.querySelector("input[type=range]");
+      r.max = a.max(sim.real[a.id]);
+      const mudar = (v) => { sim.p[a.id] = Math.max(0, Number(v) || 0); atualizarSim(a.id); };
+      r.addEventListener("input", () => mudar(r.value));
+      n.addEventListener("input", () => { if (n.value !== "") mudar(n.value); });
+    }
+    $("portao").value = sim.portao;
+    $("portao").addEventListener("input", () => { sim.portao = Number($("portao").value) || 0; atualizarSim(); });
+    $("fixar-base").addEventListener("click", () => { sim.base = { ...sim.p }; atualizarSim(); });
+    $("voltar-real").addEventListener("click", () => { sim.p = { ...sim.real }; sim.base = null; atualizarSim(); });
+    atualizarSim();
+  }
+  function atualizarSim(mexido) {
+    const p = sim.p, c = simular(p), base = simular(sim.base || sim.real), lim = limites(p, sim.portao);
+    const abaixo = c.roas < sim.portao, folgaPct = sim.portao ? (c.roas / sim.portao - 1) * 100 : 0;
+    const op = oportunidade(serieHistorica(), p);
+    const delta = (a, b, fmt) => Math.abs(a - b) < .005 ? "" : `<small class="${a > b ? "delta-sobe" : "delta-desce"}">${a > b ? "+" : "−"}${fmt(Math.abs(a - b))}</small>`;
+    $("placar-sim").innerHTML = `<div><span class="rot" style="display:block;color:var(--suave);margin-bottom:6px">ROAS ${sim.temDados ? "do período" : "de partida"} / portão</span><div class="grande num">${num(c.roas)} <small>/ ${num(sim.portao)}</small></div>
+        <span class="etq selo-portao ${abaixo ? "desce" : "sobe"}">${abaixo ? "Abaixo" : "Acima"} do portão · ${abaixo ? "falta" : "folga de"} ${num(Math.abs(folgaPct), 1)}%</span>
+        ${op ? `<p class="rot">Maior oportunidade · ${op.onde}</p><p class="op">${op.txt}</p><p>Hoje ${op.agora}; a melhor semana do histórico chegou a ${op.melhor}. Mexer em ${op.como}.</p>` :
+               `<p>Com pelo menos 2 semanas de histórico, aparece aqui a parte do funil mais longe da sua melhor semana.</p>`}</div>
+      <div class="numeros-sim">
+        <div><span>Pedidos</span><b class="num">${num(c.pedidos, 0)}</b>${delta(c.pedidos, base.pedidos, (v) => num(v, 0))}</div>
+        <div><span>CPA</span><b class="num">R$ ${num(c.cpa)}</b>${delta(base.cpa, c.cpa, (v) => "R$ " + num(v))}</div>
+        <div><span>Ticket</span><b class="num">R$ ${num(c.ticket)}</b>${delta(c.ticket, base.ticket, (v) => "R$ " + num(v))}</div>
+        <div><span>Lucro após impostos</span><b class="num ${c.lucro < 0 ? "delta-desce" : "delta-sobe"}">R$ ${num(c.lucro, 0)}</b>${delta(c.lucro, base.lucro, (v) => "R$ " + num(v, 0))}</div>
+      </div>`;
+    const ets = [["Visitas", num(c.visitas, 0), `R$ ${num(p.cpv)} cada`, "cpv"], ["Clicaram comprar", num(c.cliques, 0), `${num(p.tCli)}% das visitas`, "pag"],
+                 ["Pedidos", num(c.pedidos, 0), `${num(p.tConv)}% dos cliques`, "pag"], ["Bumps", num(c.pedidos * p.tBump / 100, 0), `${num(p.tBump)}% dos pedidos`, "of"], ["Ticket", "R$ " + num(c.ticket), `reembolso ${num(p.r)}%`, "of"]];
+    const gargalo = op ? { "Tráfego": "cpv", "Página e checkout": "pag", "Oferta": "of" }[op.onde] : null;
+    $("esteira").innerHTML = ets.map(([t, v, s, g]) => `<div class="et ${g === gargalo ? "gargalo" : ""}"><span>${t}</span><b class="num">${v}</b><small>${s}</small></div>`).join("");
+    const linhas = [];
+    for (const g of ALAVANCAS) for (const a of g.itens) {
+      const el = document.querySelector(`[data-alav="${a.id}"]`); if (!el) continue;
+      const n = el.querySelector("input[type=number]"), r = el.querySelector("input[type=range]"), v = p[a.id];
+      if (mexido !== a.id || document.activeElement !== n) n.value = a.id === "inv" ? Math.round(v) : Math.round(v * 100) / 100;
+      if (Number(r.max) < v) r.max = v * 1.5;
+      r.value = v;
+      const em = (x) => Math.min(100, Math.max(0, x / Number(r.max) * 100));
+      el.querySelector(".pino.real").style.left = `calc(${em(sim.real[a.id])}% )`;
+      const pl = el.querySelector(".pino.limite"), l = lim[a.id], temLim = !a.livre && l != null && isFinite(l) && l >= 0 && (a.id !== "r" || l <= 100) && (!a.pos || l <= 100);
+      pl.hidden = !temLim; if (temLim) pl.style.left = em(l) + "%";
+      el.querySelector(".r-real").textContent = `${sim.temDados ? "real" : "partida"} ${fmtAlav(a, sim.real[a.id])}`;
+      el.querySelector(".lim").textContent = temLim ? `${abaixo ? "precisa de" : "pode ir até"} ${fmtAlav(a, l)}` : "";
+      if (!a.livre) {
+        const impossivel = l == null || !isFinite(l) || l < 0 || (a.pos && l > 100);
+                linhas.push(`<tr><td>${a.nome}<br><small style="color:var(--apagado)">${g.grupo}</small></td><td class="n num">${fmtAlav(a, v)}</td><td class="n num"><b>${impossivel ? (abaixo ? "não alcança sozinha" : "qualquer valor") : fmtAlav(a, l)}</b></td>` +
+          `<td class="n num">${impossivel ? "—" : (a.pre ? (l - v >= 0 ? "+" : "−") + "R$ " + num(Math.abs(l - v)) : (l - v >= 0 ? "+" : "−") + num(Math.abs(l - v)) + " pontos")}</td><td style="color:var(--suave)">${a.esforco}</td></tr>`);
+      }
+    }
+    $("tit-folga").textContent = abaixo ? "Quanto falta para o portão" : "Folga até o portão";
+    $("folga").innerHTML = `<table><thead><tr><th>Alavanca</th><th class="n">Hoje</th><th class="n">${abaixo ? "Precisa de" : "Pode ir até"}</th><th class="n">Diferença</th><th>Esforço</th></tr></thead><tbody>${linhas.join("")}</tbody></table>`;
+  }
+
+  // ----- comparar períodos -----
+  let cmp = null;
+  function presetCmp(nome) {
+    const h = hojeMs(), r = (a, b) => [isoDe(h - a * 864e5), isoDe(h - b * 864e5)];
+    if (nome === "mes") {
+      const agora = new Date(h), ini = Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth(), 1), iniA = Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth() - 1, 1);
+      return { a: [isoDe(iniA), isoDe(ini - 864e5)], b: [isoDe(ini), isoDe(h)], nome };
+    }
+    const n = Number(nome);
+    return { a: r(2 * n, n + 1), b: r(n, 1), nome };
+  }
+  function desenharComparar() {
+    cmp ||= presetCmp("7");
+    const serie = serieHistorica();
+    const janela = serie.slice(-Math.max(60, Math.min(120, diasEntre(cmp.a[0], hojeSP()))));
+    if (!janela.some((x) => x.gasto || x.receita)) {
+      $("analise").innerHTML = `<div class="cartao"><div class="vazio">Aparece quando houver vendas ou gasto. Aqui você vai ver dois períodos lado a lado, o que mudou entre eles e o lucro por dia.</div></div>`; return;
+    }
+    const A = somaTrecho(serie, ...cmp.a), B = somaTrecho(serie, ...cmp.b);
+    const linha = (rot, fa, fb, fmt, bomSubir = true) => {
+      const a = fa(A), b = fb(B), dif = (a == null || b == null) ? null : b - a;
+      const cl = dif == null || Math.abs(dif) < 1e-6 ? "" : ((dif > 0) === bomSubir ? "delta-sobe" : "delta-desce");
+      return `<tr><td>${rot}</td><td class="n num">${a == null ? "—" : fmt(a)}</td><td class="n num">${b == null ? "—" : fmt(b)}</td><td class="n num ${cl}">${dif == null ? "—" : (dif > 0 ? "+" : dif < 0 ? "−" : "") + fmt(Math.abs(dif))}</td></tr>`;
+    };
+    const dia = (c) => (x) => x[c] / x.dias, conv = (x) => x.visitantes ? x.pedidos / x.visitantes * 100 : null;
+    const cpa = (x) => x.pedidos && x.gasto ? x.gasto / x.pedidos : null, tk = (x) => x.pedidos ? x.receita / x.pedidos : null;
+    const mud = mudancas().filter((m) => m.dia >= cmp.a[0] && m.dia <= cmp.b[1]);
+    // melhor e pior semana corrida
+    let melhor = null, pior = null;
+    for (let i = 6; i < serie.length; i++) {
+      const s = somaTrecho(serie, serie[i - 6].dia, serie[i].dia); if (!s.gasto && !s.receita) continue;
+      const m = { de: serie[i - 6].dia, ate: serie[i].dia, lucro: s.lucro / 7 };
+      if (!melhor || m.lucro > melhor.lucro) melhor = m; if (!pior || m.lucro < pior.lucro) pior = m;
+    }
+    $("analise").innerHTML = `
+      <div class="cartao grafico"><div class="cabeca-cartao"><h2>Lucro após impostos por dia</h2><small>A e B sombreados</small></div>
+        <div class="legenda"><span><b style="background:#9085e9"></b>Período A</span><span><b style="background:#e8934a"></b>Período B</span><span><b style="background:#f2f3ef;height:2px;vertical-align:3px"></b>média de 7 dias</span>${mud.length ? `<span><b style="background:#ef6fa6;width:2px"></b>mudança registrada</span>` : ""}</div>
+        <div id="graf-cmp"></div>
+        ${melhor && pior && melhor.de !== pior.de ? `<div class="botoes-trecho"><button class="pilula" type="button" id="btn-trechos">Comparar a pior semana (${rotuloDia(pior.de)} a ${rotuloDia(pior.ate)}) com a melhor (${rotuloDia(melhor.de)} a ${rotuloDia(melhor.ate)})</button></div>` : ""}
+      </div>
+      <div class="cartao"><div class="periodos">
+        <label class="pilula"><select id="preset-cmp" aria-label="Atalho de período">
+          <option value="7">7 dias × 7 anteriores</option><option value="14">14 dias × 14 anteriores</option><option value="30">30 dias × 30 anteriores</option><option value="mes">Este mês × mês passado</option><option value="livre">Escolher as datas</option></select></label>
+        <fieldset><legend style="color:#b5adf2">Período A (antes)</legend><input type="date" id="a-de" aria-label="A: início" value="${cmp.a[0]}"><input type="date" id="a-ate" aria-label="A: fim" value="${cmp.a[1]}"></fieldset>
+        <fieldset><legend style="color:#f0b27f">Período B (depois)</legend><input type="date" id="b-de" aria-label="B: início" value="${cmp.b[0]}"><input type="date" id="b-ate" aria-label="B: fim" value="${cmp.b[1]}"></fieldset>
+      </div></div>
+      <div class="grade duas">
+        <div class="cartao"><div class="cabeca-cartao"><h2>Resultado</h2><small>médias por dia</small></div><div class="rolar"><table><thead><tr><th></th><th class="n">A</th><th class="n">B</th><th class="n">Diferença</th></tr></thead><tbody>
+          ${linha("Investimento/dia", dia("gasto"), dia("gasto"), (v) => brl(v), false)}
+          ${linha("Faturamento/dia", dia("receita"), dia("receita"), (v) => brl(v))}
+          ${linha("Lucro/dia", dia("lucro"), dia("lucro"), (v) => brl(v))}
+          ${linha("ROAS", roasDe, roasDe, (v) => num(v))}
+          ${linha("Pedidos/dia", dia("pedidos"), dia("pedidos"), (v) => num(v, 1))}
+          ${linha("Visitas/dia", dia("visitantes"), dia("visitantes"), (v) => num(v, 0))}
+          ${linha("Visita → pedido", conv, conv, (v) => num(v) + "%")}
+          ${linha("CPA", cpa, cpa, (v) => brl(v), false)}
+          ${linha("Ticket", tk, tk, (v) => brl(v))}
+          ${linha("Reembolso/dia", dia("reembolsos_valor"), dia("reembolsos_valor"), (v) => brl(v), false)}
+        </tbody></table></div></div>
+        <div class="cartao"><div class="cabeca-cartao"><h2>Mudanças fora dos anúncios</h2><small>nesses dias</small></div>
+          <p class="fonte" style="margin:0 0 6px">Mudança de página, preço ou checkout tem efeito no mesmo dia. Se a virada coincidir com uma data daqui, confira isso antes de culpar um anúncio.</p>
+          ${mud.length ? mud.map((m) => `<div class="mudanca"><b class="num">${rotuloDia(m.dia)}</b><span>${esc(m.texto)}${!produto && m.produto ? ` <span class="tag-produto">${esc(nomeDe(m.produto))}</span>` : ""}</span></div>`).join("") : `<div class="vazio">Nenhuma mudança registrada nesses dias.</div>`}
+        </div>
+      </div>`;
+    grafComparar(janela, mud);
+    $("preset-cmp").value = cmp.nome;
+    $("preset-cmp").addEventListener("change", (e) => { if (e.target.value !== "livre") { cmp = presetCmp(e.target.value); desenharComparar(); } });
+    for (const [id, g, i] of [["a-de", "a", 0], ["a-ate", "a", 1], ["b-de", "b", 0], ["b-ate", "b", 1]])
+      $(id).addEventListener("change", (e) => { if (e.target.value) { cmp[g][i] = e.target.value; cmp.nome = "livre"; desenharComparar(); } });
+    $("btn-trechos")?.addEventListener("click", () => { cmp = { a: [pior.de, pior.ate], b: [melhor.de, melhor.ate], nome: "livre" }; desenharComparar(); });
+  }
+  function grafComparar(serie, mud) {
+    const el = $("graf-cmp"), W = Math.max(300, Math.round(el.clientWidth || 640)), H = 240, mE = 44, mB = 24, mT = 8;
+    const v = serie.map((x) => x.lucro);
+    let max = Math.max(10, ...v), min = Math.min(0, ...v); const amp = (max - min) * .08; max += amp; if (min < 0) min -= amp;
+    const y = (t) => mT + (max - t) / (max - min) * (H - mT - mB), larg = (W - mE) / serie.length, bw = Math.max(2, Math.min(20, larg * .68));
+    const faixa = (de, ate, cor) => { const i = serie.findIndex((x) => x.dia >= de); let j = -1; serie.forEach((x, k) => { if (x.dia <= ate) j = k; }); return i < 0 || j < i ? "" : `<rect x="${mE + i * larg}" y="${mT}" width="${(j - i + 1) * larg}" height="${H - mT - mB}" fill="${cor}"/>`; };
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lucro após impostos por dia">` + faixa(...cmp.a, "rgba(144,133,233,.16)") + faixa(...cmp.b, "rgba(232,147,74,.16)");
+    for (const t of [max, (max + min) / 2, min]) s += `<text class="eixo num" x="${mE - 6}" y="${y(t) + 4}" text-anchor="end">${brlCurto(t)}</text>`;
+    s += `<line class="linha-grade" x1="${mE}" x2="${W}" y1="${y(0)}" y2="${y(0)}" style="stroke:rgba(255,255,255,.22)"/>`;
+    serie.forEach((x, i) => {
+      const cx = mE + larg * i + larg / 2, y0 = y(0), y1 = y(x.lucro);
+      s += `<rect x="${cx - bw / 2}" y="${Math.min(y0, y1)}" width="${bw}" height="${Math.max(1, Math.abs(y1 - y0))}" rx="2" fill="${x.lucro < 0 ? "#e66767" : "#7fa24a"}"/>`;
+      s += `<rect x="${mE + larg * i}" y="${mT}" width="${larg}" height="${H - mT - mB}" fill="transparent" data-dica="${esc(`<b>${rotuloDia(x.dia)}</b><br>Lucro ${brl(x.lucro)}<br>Anúncios ${brl(x.gasto)} · ${int(x.pedidos)} pedidos`)}"/>`;
+      if (i % Math.ceil(serie.length / 7) === 0) s += `<text class="eixo num" x="${cx}" y="${H - 6}" text-anchor="middle">${rotuloDia(x.dia)}</text>`;
+    });
+    const med = serie.map((_, i) => { const t = serie.slice(Math.max(0, i - 6), i + 1); return t.reduce((a, b) => a + b.lucro, 0) / t.length; });
+    s += `<polyline fill="none" stroke="#f2f3ef" stroke-width="2" stroke-linejoin="round" points="${med.map((m, i) => `${mE + larg * i + larg / 2},${y(m)}`).join(" ")}"/>`;
+    for (const m of mud) { const i = serie.findIndex((x) => x.dia === m.dia); if (i >= 0) s += `<line x1="${mE + larg * i + larg / 2}" x2="${mE + larg * i + larg / 2}" y1="${mT}" y2="${H - mB}" stroke="#ef6fa6" stroke-dasharray="3 3"><title>${esc(m.texto)}</title></line>`; }
+    el.innerHTML = s + "</svg>";
+  }
+
+  // ----- nível de escala: em que faixa de gasto por dia o lucro é melhor -----
+  let escalaCfg = { dias: "90", amostra: 4 };
+  function desenharEscala() {
+    let serie = serieHistorica().filter((x) => x.gasto > 0);
+    if (escalaCfg.dias !== "tudo") { const de = isoDe(hojeMs() - (Number(escalaCfg.dias) - 1) * 864e5); serie = serie.filter((x) => x.dia >= de); }
+    const controles = `<div class="acoes-sim"><label class="pilula"><select id="esc-dias" aria-label="Período"><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="tudo">Desde o início</option></select></label>
+      <label class="pilula">Mínimo de dias<input id="esc-amostra" class="num" type="number" min="1" step="1" inputmode="numeric" aria-label="Mínimo de dias para destacar"></label></div>`;
+    if (!serie.length) {
+      $("analise").innerHTML = controles + `<div class="cartao"><div class="vazio">Aparece quando os anúncios rodarem. Mostra em que faixa de gasto por dia o lucro é melhor, para saber até onde escalar.</div></div>`;
+    } else {
+      const maior = Math.max(...serie.map((x) => x.gasto)), passo = maior < 300 ? 25 : maior < 1000 ? 50 : 100, faixas = {};
+      for (const x of serie) { const f = Math.floor(x.gasto / passo) * passo; const t = (faixas[f] ||= { f, dias: 0, gasto: 0, receita: 0, lucro: 0, pedidos: 0 }); t.dias++; t.gasto += x.gasto; t.receita += x.receita; t.lucro += x.lucro; t.pedidos += x.pedidos; }
+      const lista = Object.values(faixas).sort((a, b) => b.f - a.f);
+      const validas = lista.filter((t) => t.dias >= escalaCfg.amostra), topo = validas.length ? Math.max(...validas.map((t) => t.lucro / t.dias)) : null;
+      $("analise").innerHTML = controles + `
+        <div class="cartao"><div class="cabeca-cartao"><h2>Lucro por faixa de gasto</h2><small>${serie.length} dias com anúncio</small></div>
+          <div class="rolar"><table><thead><tr><th>Gasto por dia</th><th class="n">Dias</th><th class="n">Faturamento médio</th><th class="n">Lucro médio</th><th class="n">ROAS</th><th class="n">CPA</th></tr></thead><tbody>${
+            lista.map((t) => `<tr class="${topo != null && t.dias >= escalaCfg.amostra && t.lucro / t.dias === topo ? "destaque" : ""}"><td class="num">${int(t.f)} a ${int(t.f + passo - 1)}</td><td class="n num">${t.dias}</td><td class="n num">${brl(t.receita / t.dias)}</td><td class="n num ${t.lucro < 0 ? "negativo" : ""}">${brl(t.lucro / t.dias)}</td>` +
+              `<td class="num roas ${faixaRoas(t.receita / t.gasto, produto || null)}">${num(t.receita / t.gasto)}</td><td class="n num">${t.pedidos ? brl(t.gasto / t.pedidos) : "—"}</td></tr>`).join("")}</tbody></table></div>
+          <p class="fonte">O destaque é a faixa com maior lucro médio entre as que têm pelo menos ${escalaCfg.amostra} dias. Com poucos dias, pode ser sorte.</p></div>
+        <div class="cartao grafico"><div class="cabeca-cartao"><h2>Lucro × investimento</h2><small>R$ por dia, média de 7 dias</small></div><div id="graf-disp"></div>
+          <p class="fonte">Cada ponto é uma semana corrida. A linha verde liga o melhor lucro já visto em cada nível de gasto: abaixo dela, dá para fazer melhor com a mesma verba.</p></div>`;
+      grafDispersao(serieHistorica());
+    }
+    $("esc-dias").value = escalaCfg.dias; $("esc-amostra").value = escalaCfg.amostra;
+    $("esc-dias").addEventListener("change", (e) => { escalaCfg.dias = e.target.value; desenharEscala(); });
+    $("esc-amostra").addEventListener("change", (e) => { escalaCfg.amostra = Math.max(1, Number(e.target.value) || 1); desenharEscala(); });
+  }
+  function grafDispersao(serie) {
+    const pts = [];
+    for (let i = 6; i < serie.length; i++) { const s = somaTrecho(serie, serie[i - 6].dia, serie[i].dia); if (s.gasto > 0) pts.push({ x: s.gasto / 7, y: s.lucro / 7, dia: serie[i].dia }); }
+    const el = $("graf-disp"); if (!pts.length) { el.innerHTML = `<div class="vazio">Aparece depois de 7 dias com anúncio.</div>`; return; }
+    const W = Math.max(300, Math.round(el.clientWidth || 640)), H = 240, mE = 44, mB = 30, mT = 8;
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y), x0 = Math.min(...xs) * .95, x1 = Math.max(...xs) * 1.05 || 1, y0 = Math.min(0, ...ys), y1 = Math.max(10, ...ys) * 1.08;
+    const X = (v) => mE + (v - x0) / (x1 - x0 || 1) * (W - mE - 8), Y = (v) => mT + (y1 - v) / (y1 - y0 || 1) * (H - mT - mB);
+    const ord = pts.slice().sort((a, b) => b.x - a.x), fr = []; let topo = -Infinity;
+    for (const p of ord) if (p.y > topo) { fr.unshift(p); topo = p.y; }
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lucro por dia contra investimento por dia">`;
+    for (const t of [y1, (y1 + y0) / 2, y0]) s += `<line class="linha-grade" x1="${mE}" x2="${W}" y1="${Y(t)}" y2="${Y(t)}"/><text class="eixo num" x="${mE - 6}" y="${Y(t) + 4}" text-anchor="end">${brlCurto(t)}</text>`;
+    for (const t of [x0, (x0 + x1) / 2, x1]) s += `<text class="eixo num" x="${Math.min(W - 24, Math.max(mE, X(t)))}" y="${H - 12}" text-anchor="middle">${brlCurto(t)}</text>`;
+    s += `<polyline fill="none" stroke="#4ade80" stroke-width="2" stroke-dasharray="4 4" points="${fr.map((p) => `${X(p.x)},${Y(p.y)}`).join(" ")}"/>`;
+    for (const p of pts) s += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="${fr.includes(p) ? 5 : 4}" fill="${fr.includes(p) ? "#4ade80" : "rgba(255,255,255,.3)"}" data-dica="${esc(`Semana até ${rotuloDia(p.dia)}<br>Gasto ${brl(p.x)}/dia<br>Lucro ${brl(p.y)}/dia`)}"/>`;
+    el.innerHTML = s + `<text></text></svg>`;
+  }
+
+  // ----- mês a mês -----
+  function desenharMensal() {
+    const meses = {};
+    for (const x of serieHistorica()) { const m = x.dia.slice(0, 7), t = (meses[m] ||= { m, gasto: 0, receita: 0, receita_liquida: 0, reembolsos_valor: 0, lucro: 0, pedidos: 0, visitantes: 0 }); for (const c of Object.keys(t)) if (c !== "m") t[c] += x[c]; }
+    const lista = Object.values(meses).filter((t) => t.gasto || t.receita || t.visitantes).sort((a, b) => b.m.localeCompare(a.m));
+    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Mês a mês</h2><small>desde o início</small></div>${lista.length ? `<div class="rolar"><table><thead><tr><th>Mês</th><th class="n">Investimento</th><th class="n">Faturamento</th><th class="n">Reembolsos</th><th class="n">Líquido</th><th class="n">Lucro após impostos</th><th class="n">ROAS</th><th class="n">Pedidos</th><th class="n">CPA</th></tr></thead><tbody>${
+      lista.map((t) => `<tr><td class="num">${t.m.slice(5)}/${t.m.slice(0, 4)}</td><td class="n num">${brl(t.gasto)}</td><td class="n num">${brl(t.receita + t.reembolsos_valor)}</td><td class="n num">${brl(t.reembolsos_valor)}</td><td class="n num">${brl(t.receita_liquida)}</td><td class="n num ${t.lucro < 0 ? "negativo" : ""}">${brl(t.lucro)}</td><td class="num roas ${faixaRoas(roasDe(t), produto || null)}">${roasDe(t) == null ? "—" : num(roasDe(t))}</td><td class="n num">${int(t.pedidos)}</td><td class="n num">${t.pedidos && t.gasto ? brl(t.gasto / t.pedidos) : "—"}</td></tr>`).join("")}</tbody></table></div><p class="fonte">O mês atual está em andamento.</p>` : `<div class="vazio">Aparece quando houver vendas ou gasto.</div>`}</div>`;
+  }
+
+  // ----- métricas do dia -----
+  function desenharDiario() {
+    const serie = serieHistorica().slice(-45).reverse(), mud = mudancas();
+    const tem = serie.some((x) => x.gasto || x.receita || x.visitantes);
+    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Métricas do dia</h2><small>até 45 dias</small></div>${tem ? `<div class="rolar"><table><thead><tr><th>Dia</th><th class="n">Invest.</th><th class="n">Fatur.</th><th class="n">Reemb.</th><th class="n">Lucro</th><th class="n">ROAS</th><th class="n">Visitas</th><th class="n">Custo/visita</th><th class="n">Pedidos</th><th class="n">CPA</th><th class="n">Conv.</th><th class="n">Ticket</th><th>Mudanças</th></tr></thead><tbody>${
+      serie.map((x) => { const r = roasDe(x), mx = mud.filter((m) => m.dia === x.dia); return `<tr><td class="num">${rotuloDia(x.dia)}</td><td class="n num">${brl(x.gasto)}</td><td class="n num">${brl(x.receita + x.reembolsos_valor)}</td><td class="n num">${brl(x.reembolsos_valor)}</td><td class="n num ${x.lucro < 0 ? "negativo" : ""}">${brl(x.lucro)}</td><td class="num roas ${faixaRoas(r, produto || null)}">${r == null ? "—" : num(r)}</td><td class="n num">${int(x.visitantes)}</td><td class="n num">${x.gasto && x.visitantes ? brl(x.gasto / x.visitantes) : "—"}</td><td class="n num">${int(x.pedidos)}</td><td class="n num">${x.gasto && x.pedidos ? brl(x.gasto / x.pedidos) : "—"}</td><td class="n num">${pct(x.pedidos, x.visitantes)}</td><td class="n num">${x.pedidos ? brl(x.receita / x.pedidos) : "—"}</td><td style="white-space:normal;min-width:160px;color:var(--suave);font-size:12px">${mx.map((m) => esc(m.texto)).join("<br>")}</td></tr>`; }).join("")}</tbody></table></div>` : `<div class="vazio">Aparece quando houver visitas, vendas ou gasto.</div>`}</div>`;
+  }
+
+  async function desenharAnalise(d) {
+    document.querySelectorAll("#sub-abas button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sub === sub)));
+    if (sub === "simulador" && sim?.chave === `${produto}|${d.periodo}` && $("placar-sim")) return;   // não atrapalha quem está mexendo
+    if (sub !== "simulador") {
+      const foco = document.activeElement?.closest?.("#analise");   // nem quem está escolhendo data
+      if (foco && historico && versaoHistorico === d.versao) return;
+    }
+    try { await garantirHistorico(d); } catch (e) { if (!historico) { $("analise").innerHTML = `<div class="cartao"><div class="vazio">Não deu para carregar o histórico. Tente de novo.</div></div>`; return; } }
+    if (aba !== "analise") return;
+    ({ simulador: () => montarSimulador(d), comparar: desenharComparar, escala: desenharEscala, mensal: desenharMensal, diario: desenharDiario })[sub]();
+  }
+  $("sub-abas").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-sub]"); if (!b) return;
+    sub = b.dataset.sub; gravar("fg_painel_sub", sub); $("analise").innerHTML = ""; if (dados) desenharAnalise(dados);
+  });
 
   // ---------- atualização automática ----------
   function avisar(texto) {

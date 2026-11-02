@@ -1,6 +1,7 @@
 {
   "meta_lucro_mensal": 10000,
   "imposto_pct": 11.33,
+  "imposto_midia_pct": 12.5,
   "roas_bom": 2,
   "roas_atencao": 1.45,
   "produtos": [
@@ -10,7 +11,11 @@
       "cor": "#3987e5",
       "status": "à venda",
       "projeto": "simulador-tributario",
-      "paginas": ["https://raioxdoimposto.com.br/", "https://raio-x-do-imposto.netlify.app/", "https://dottoni.github.io/raio-x-do-imposto/"],
+      "paginas": [
+        "https://raioxdoimposto.com.br/",
+        "https://raio-x-do-imposto.netlify.app/",
+        "https://dottoni.github.io/raio-x-do-imposto/"
+      ],
       "hotmart": {
         "8839713": "Raio-X do Imposto",
         "8845254": "Pró-labore Ideal",
@@ -25,6 +30,18 @@
       "projeto": "ciclo-leveza-21",
       "paginas": [],
       "hotmart": {}
+    }
+  ],
+  "mudancas": [
+    {
+      "dia": "2026-10-30",
+      "produto": "raio-x",
+      "texto": "Checkout personalizado e página nova no ar"
+    },
+    {
+      "dia": "2026-11-02",
+      "produto": "raio-x",
+      "texto": "Página nova em verde no domínio próprio; checkout com banners verdes e 2 bônus"
     }
   ]
 }
