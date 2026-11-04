@@ -42,6 +42,11 @@
       "dia": "2026-11-02",
       "produto": "raio-x",
       "texto": "Página nova em verde no domínio próprio; checkout com banners verdes e 2 bônus"
+    },
+    {
+      "dia": "2026-11-04",
+      "produto": "raio-x",
+      "texto": "Site passa do Netlify para a Cloudflare; página mais rápida; contagem errada do Simples removida; prazos e frases de confiança corrigidos"
     }
   ]
 }

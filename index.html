@@ -285,11 +285,33 @@
   .periodos input { font: inherit; font-size: 13px; font-weight: 700; background: none; border: 0; color: var(--tinta); color-scheme: dark; max-width: 128px; }
   .botoes-trecho { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
   .botoes-trecho button { cursor: pointer; display: block; flex: 1 1 100%; min-width: 0; max-width: 100%; height: auto; min-height: 38px; padding: 8px 14px; border-radius: 14px; white-space: normal; text-align: left; }
+  .campo-linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .campo-linha input, .campo-linha select { font: inherit; font-size: 13.5px; font-weight: 700; color: var(--tinta); color-scheme: dark; padding: 9px 12px; border-radius: 11px; border: 1px solid var(--borda); background: var(--cartao-forte); min-width: 0; }
+  .campo-linha input.cresce { flex: 1 1 220px; }
+  .campo-linha button, .botao { cursor: pointer; border: 0; background: var(--limao); color: #08090a; font: inherit; font-weight: 800; font-size: 13.5px; padding: 10px 16px; border-radius: 11px; }
+  .campo-linha button:disabled, .botao:disabled { opacity: .45; cursor: default; }
+  .apagar { cursor: pointer; border: 0; background: none; color: var(--apagado); font: inherit; font-weight: 800; padding: 0 4px; }
+  .abre { cursor: pointer; border: 0; background: none; color: var(--suave); font: inherit; font-weight: 800; padding: 0 6px 0 0; }
+  tr.filho td:first-child { padding-left: 22px; color: var(--suave); font-weight: 600; }
+  th[data-ordem] { cursor: pointer; }
+  .fichas { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .fichas button { cursor: pointer; border: 1px solid var(--borda); background: none; color: var(--suave); font: inherit; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
+  .fichas button[aria-pressed="true"] { background: var(--tinta); color: #08090a; border-color: var(--tinta); }
+  .leitura { display: inline-block; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 6px; margin-right: 3px; background: var(--cartao-forte); color: var(--suave); }
+  .leitura.Novo { background: rgba(57, 135, 229, .18); color: #9cc5f5; }
+  .leitura.Parou { background: rgba(230, 103, 103, .16); color: #fca5a5; }
+  .leitura.Piorou { background: rgba(250, 178, 25, .15); color: #fcd34d; }
+  .leitura.Melhorou { background: rgba(74, 222, 128, .14); color: #86efac; }
+  .leitura.Menos { background: rgba(236, 131, 90, .16); color: #f3b193; }
+  .ajustes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .ajustes span { display: block; font-size: 12px; font-weight: 700; color: var(--suave); }
+  .ajustes b { font-size: 19px; font-weight: 800; }
   .mudanca { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--grade); font-size: 13px; font-weight: 600; color: var(--suave); }
   .mudanca:last-child { border-bottom: 0; }
   .mudanca b { color: var(--tinta); font-weight: 800; }
 
   @media (min-width: 900px) {
+    .sub-abas { flex-wrap: wrap; overflow: visible; }
     .placar-sim { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; }
     .numeros-sim { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .alavancas { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
@@ -418,6 +440,11 @@
         <button class="pilula" data-sub="escala" aria-pressed="false">Nível de escala</button>
         <button class="pilula" data-sub="mensal" aria-pressed="false">Mês a mês</button>
         <button class="pilula" data-sub="diario" aria-pressed="false">Métricas do dia</button>
+        <button class="pilula" data-sub="anuncios" aria-pressed="false">Anúncios</button>
+        <button class="pilula" data-sub="hora" aria-pressed="false">ROAS por hora</button>
+        <button class="pilula" data-sub="origem" aria-pressed="false">Origem de vendas</button>
+        <button class="pilula" data-sub="pais" aria-pressed="false">Por país</button>
+        <button class="pilula" data-sub="config" aria-pressed="false">Importar e ajustes</button>
       </nav>
       <div class="grade" id="analise"></div>
     </section>
@@ -907,6 +934,7 @@
   // ---------- análise ----------
   // Tudo aqui sai do que o painel já recebe: os números do período (kpis) e o histórico diário.
   let sub = ler("fg_painel_sub") || "simulador", historico = null, versaoHistorico = null;
+  let extras = null, chaveExtras = null, janela = "30";
   const num = (v, c = 2) => (Number(v) || 0).toLocaleString("pt-BR", { minimumFractionDigits: c, maximumFractionDigits: c });
   const pc = (v, c = 1) => num(v * 100, c) + "%";
   const isoDe = (ms) => new Date(ms).toISOString().slice(0, 10);
@@ -938,10 +966,11 @@
     return t;
   }
   const roasDe = (x) => x.gasto ? x.receita / x.gasto : null;
-  const mudancas = () => (catalogo.mudancas || []).filter((m) => !produto || !m.produto || m.produto === produto).sort((a, b) => b.dia.localeCompare(a.dia));
+  const mudancas = () => [...(catalogo.mudancas || []), ...(extras?.mudancas || [])].filter((m) => !produto || !m.produto || m.produto === produto).sort((a, b) => b.dia.localeCompare(a.dia));
 
   // ----- conta do simulador: cada etapa multiplica a anterior -----
   function simular(p) {
+    if (p.cpm != null) p = { ...p, cpv: (p.ctr > 0 && p.con > 0) ? (p.cpm / 1000) / (p.ctr / 100) / (p.con / 100) : 0 };
     const visitas = p.cpv > 0 ? p.inv / p.cpv : 0, cliques = visitas * p.tCli / 100, pedidos = cliques * p.tConv / 100;
     const ticket = p.base + p.tBump / 100 * p.pBump, bruto = pedidos * ticket, reembolsos = bruto * p.r / 100, receita = bruto - reembolsos;
     const liquido = receita * (1 - p.taxa / 100), impostoMidia = p.inv * p.midia / 100, imposto = receita * p.imp / 100;
@@ -953,13 +982,16 @@
     const r0 = simular(p).roas;
     if (!r0 || !portao) return {};
     const f = portao / r0, tAlvo = (p.base + p.tBump / 100 * p.pBump) * f;
-    return { cpv: p.cpv / f, tCli: p.tCli * f, tConv: p.tConv * f, base: tAlvo - p.tBump / 100 * p.pBump,
+    return { cpm: p.cpm / f, ctr: p.ctr * f, con: p.con * f, cpv: p.cpv / f, tCli: p.tCli * f, tConv: p.tConv * f, base: tAlvo - p.tBump / 100 * p.pBump,
              tBump: p.pBump ? (tAlvo - p.base) / p.pBump * 100 : null, r: 100 - (100 - p.r) * f };
   }
   const ALAVANCAS = [
     { grupo: "Tráfego", dica: "O quanto custa trazer uma pessoa para a página", itens: [
       { id: "inv", nome: "Investimento", sub: "gasto no período", pre: "R$", max: (v) => Math.max(500, v * 3), passo: 10, livre: true, esforco: "" },
-      { id: "cpv", nome: "Custo por visita", sub: "gasto ÷ visitantes", pre: "R$", max: (v) => Math.max(5, v * 2.5), passo: .01, menor: true, esforco: "médio · criativos e público" } ] },
+      { id: "cpv", nome: "Custo por visita", sub: "gasto ÷ visitantes", pre: "R$", max: (v) => Math.max(5, v * 2.5), passo: .01, menor: true, sem: true, esforco: "médio · criativos e público" },
+      { id: "cpm", nome: "CPM", sub: "R$ por mil impressões", pre: "R$", max: (v) => Math.max(100, v * 2.5), passo: .01, menor: true, meta: true, esforco: "difícil · conta, público e leilão" },
+      { id: "ctr", nome: "CTR de link", sub: "cliques no link ÷ impressões", pos: "%", max: (v) => Math.min(100, Math.max(5, v * 2.5)), passo: .01, meta: true, esforco: "médio · criativos e ganchos" },
+      { id: "con", nome: "Taxa de conexão", sub: "visitantes ÷ cliques no link", pos: "%", max: (v) => Math.min(100, Math.max(100, v * 1.2)), passo: .1, meta: true, esforco: "fácil · velocidade da página" } ] },
     { grupo: "Página e checkout", dica: "Quem chega clica em comprar, e quem clica paga", itens: [
       { id: "tCli", nome: "Clique em comprar", sub: "clicaram ÷ visitantes", pos: "%", max: (v) => Math.min(100, Math.max(30, v * 2.5)), passo: .1, esforco: "médio · página de vendas" },
       { id: "tConv", nome: "Conversão do checkout", sub: "pedidos ÷ clicaram", pos: "%", max: (v) => Math.min(100, Math.max(80, v * 2)), passo: .1, esforco: "médio · checkout e recuperação" } ] },
@@ -969,6 +1001,7 @@
       { id: "pBump", nome: "Preço médio do bump", sub: "por bump vendido", pre: "R$", max: (v) => Math.max(100, v * 2.5), passo: 1, livre: true, esforco: "" },
       { id: "r", nome: "Reembolso", sub: "reembolsos ÷ vendas", pos: "%", max: (v) => Math.max(20, v * 3), passo: .1, menor: true, esforco: "médio · produto e expectativa" } ] },
   ];
+  const alavancas = (comMeta) => ALAVANCAS.map((g) => ({ ...g, itens: g.itens.filter((a) => comMeta ? !a.sem : !a.meta) }));
   const fmtAlav = (a, v) => (a.pre ? "R$ " : "") + num(v, a.passo >= 1 && a.pre ? 0 : a.pos ? 1 : 2) + (a.pos || "");
 
   // Lê o funil real do período. Sem vendas ainda, entram números de partida, só para testar.
@@ -978,12 +1011,18 @@
     const imp = k.receita ? k.imposto / k.receita * 100 : impostoDe(produto || catalogo.produtos[0]?.id) * 100;
     const midia = midiaDe() * 100;
     const temDados = k.pedidos > 0 && k.gasto > 0 && k.visitantes > 0 && k.clicaram_comprar > 0;
+    const ids = escolhidos(), hoje = hojeSP(), nDias = { hoje: 1, "7d": 7, "30d": 30 }[d.periodo];
+    const inicioP = nDias ? isoDe(hojeMs() - (nDias - 1) * 864e5) : "2000-01-01";
+    const tm = { impressoes: 0, cliques_link: 0 };
+    for (const m of extras?.metricas || []) if (ids.includes(m.produto) && m.dia >= inicioP && m.dia <= hoje) { tm.impressoes += m.impressoes || 0; tm.cliques_link += m.cliques_link || 0; }
+    const meta = temDados && tm.impressoes > 0 && tm.cliques_link > 0
+      ? { cpm: k.gasto / tm.impressoes * 1000, ctr: tm.cliques_link / tm.impressoes * 100, con: k.visitantes / tm.cliques_link * 100 } : {};
     if (!temDados) return { temDados, k, p: { inv: k.gasto || 3000, cpv: 2, tCli: 10, tConv: 35, base: 67, tBump: 15, pBump: 32, r: 5, taxa: 10, imp, midia } };
     const taxa = k.receita ? (1 - k.receita_liquida / k.receita) * 100 : 10;
     const pBump = nB ? liqB / nB / (1 - taxa / 100) : 32;
     const ticket = k.receita / k.pedidos * (1 + k.reembolsos_valor / Math.max(1, k.receita));
     const tBump = k.bumps / k.pedidos * 100;
-    return { temDados, k, p: { inv: k.gasto, cpv: k.gasto / k.visitantes, tCli: k.clicaram_comprar / k.visitantes * 100, tConv: k.pedidos / k.clicaram_comprar * 100,
+    return { temDados, k, p: { ...meta, inv: k.gasto, cpv: k.gasto / k.visitantes, tCli: k.clicaram_comprar / k.visitantes * 100, tConv: k.pedidos / k.clicaram_comprar * 100,
       base: Math.max(0, ticket - tBump / 100 * pBump), tBump, pBump, r: k.reembolsos_valor / Math.max(1, k.receita + k.reembolsos_valor) * 100, taxa, imp, midia } };
   }
   // Melhor semana corrida do histórico em cada parte do funil: a maior distância é a maior oportunidade.
@@ -1012,7 +1051,8 @@
       sim = { chave, real: { ...f.p }, p: { ...f.p }, base: null, portao: sim?.portao ?? roasCasa, temDados: f.temDados };
     }
     const faixa = sim.temDados ? "" : `<div class="faixa-partida">Ainda não há venda e gasto no período, então estes são números de partida para você testar, não resultados. Mude os valores à vontade.</div>`;
-    const grupos = ALAVANCAS.map((g) => `<div class="cartao grupo-alav ${g.itens.length > 2 ? "larga" : ""}"><h3>${g.grupo}</h3><small>${g.dica}</small><div class="lista-alav">${g.itens.map((a) => `
+    const comMeta = sim.real.cpm != null;
+    const grupos = alavancas(comMeta).map((g) => `<div class="cartao grupo-alav ${g.itens.length > 2 ? "larga" : ""}"><h3>${g.grupo}</h3><small>${g.dica}</small><div class="lista-alav">${g.itens.map((a) => `
       <div class="alav" data-alav="${a.id}">
         <div class="alav-top"><label for="al-${a.id}">${a.nome}<small>${a.sub}</small></label>
           <span class="campo-alav">${a.pre || ""}<input id="al-${a.id}" type="number" inputmode="decimal" step="${a.passo}" min="0">${a.pos || ""}</span></div>
@@ -1032,7 +1072,7 @@
         <div class="rolar" id="folga"></div>
         <p class="fonte">Mexer em uma etapa recalcula tudo o que vem depois. O simulador não prevê queda de ROAS ao aumentar a verba: para isso, veja Nível de escala.</p></div>
       <p class="fonte">Lucro = faturamento líquido − anúncios − imposto sobre a mídia (${num(sim.p.midia, 1)}%) − imposto da venda (${num(sim.p.imp, 2)}%). Taxa da plataforma usada: ${num(sim.p.taxa, 1)}%. Período: o escolhido no alto.</p>`;
-    for (const g of ALAVANCAS) for (const a of g.itens) {
+    for (const g of alavancas(comMeta)) for (const a of g.itens) {
       const el = document.querySelector(`[data-alav="${a.id}"]`), n = el.querySelector("input[type=number]"), r = el.querySelector("input[type=range]");
       r.max = a.max(sim.real[a.id]);
       const mudar = (v) => { sim.p[a.id] = Math.max(0, Number(v) || 0); atualizarSim(a.id); };
@@ -1046,6 +1086,7 @@
     atualizarSim();
   }
   function atualizarSim(mexido) {
+    if (sim.p.cpm != null) sim.p.cpv = (sim.p.ctr > 0 && sim.p.con > 0) ? (sim.p.cpm / 1000) / (sim.p.ctr / 100) / (sim.p.con / 100) : 0;
     const p = sim.p, c = simular(p), base = simular(sim.base || sim.real), lim = limites(p, sim.portao);
     const abaixo = c.roas < sim.portao, folgaPct = sim.portao ? (c.roas / sim.portao - 1) * 100 : 0;
     const op = oportunidade(serieHistorica(), p);
@@ -1060,12 +1101,12 @@
         <div><span>Ticket</span><b class="num">R$ ${num(c.ticket)}</b>${delta(c.ticket, base.ticket, (v) => "R$ " + num(v))}</div>
         <div><span>Lucro após impostos</span><b class="num ${c.lucro < 0 ? "delta-desce" : "delta-sobe"}">R$ ${num(c.lucro, 0)}</b>${delta(c.lucro, base.lucro, (v) => "R$ " + num(v, 0))}</div>
       </div>`;
-    const ets = [["Visitas", num(c.visitas, 0), `R$ ${num(p.cpv)} cada`, "cpv"], ["Clicaram comprar", num(c.cliques, 0), `${num(p.tCli)}% das visitas`, "pag"],
+    const ets = [...(p.cpm != null ? [["Impressões", num(p.inv / p.cpm * 1000, 0), `CPM R$ ${num(p.cpm)}`, "cpv"], ["Cliques no link", num(p.inv / p.cpm * 1000 * p.ctr / 100, 0), `CTR ${num(p.ctr)}%`, "cpv"]] : []), ["Visitas", num(c.visitas, 0), `R$ ${num(p.cpv)} cada`, "cpv"], ["Clicaram comprar", num(c.cliques, 0), `${num(p.tCli)}% das visitas`, "pag"],
                  ["Pedidos", num(c.pedidos, 0), `${num(p.tConv)}% dos cliques`, "pag"], ["Bumps", num(c.pedidos * p.tBump / 100, 0), `${num(p.tBump)}% dos pedidos`, "of"], ["Ticket", "R$ " + num(c.ticket), `reembolso ${num(p.r)}%`, "of"]];
     const gargalo = op ? { "Tráfego": "cpv", "Página e checkout": "pag", "Oferta": "of" }[op.onde] : null;
     $("esteira").innerHTML = ets.map(([t, v, s, g]) => `<div class="et ${g === gargalo ? "gargalo" : ""}"><span>${t}</span><b class="num">${v}</b><small>${s}</small></div>`).join("");
     const linhas = [];
-    for (const g of ALAVANCAS) for (const a of g.itens) {
+    for (const g of alavancas(p.cpm != null)) for (const a of g.itens) {
       const el = document.querySelector(`[data-alav="${a.id}"]`); if (!el) continue;
       const n = el.querySelector("input[type=number]"), r = el.querySelector("input[type=range]"), v = p[a.id];
       if (mexido !== a.id || document.activeElement !== n) n.value = a.id === "inv" ? Math.round(v) : Math.round(v * 100) / 100;
@@ -1150,8 +1191,10 @@
           <p class="fonte" style="margin:0 0 6px">Mudança de página, preço ou checkout tem efeito no mesmo dia. Se a virada coincidir com uma data daqui, confira isso antes de culpar um anúncio.</p>
           ${mud.length ? mud.map((m) => `<div class="mudanca"><b class="num">${rotuloDia(m.dia)}</b><span>${esc(m.texto)}${!produto && m.produto ? ` <span class="tag-produto">${esc(nomeDe(m.produto))}</span>` : ""}</span></div>`).join("") : `<div class="vazio">Nenhuma mudança registrada nesses dias.</div>`}
         </div>
-      </div>`;
+      </div>
+      <div class="cartao" id="anuncios-ab"></div>`;
     grafComparar(janela, mud);
+    desenharAnunciosAB();
     $("preset-cmp").value = cmp.nome;
     $("preset-cmp").addEventListener("change", (e) => { if (e.target.value !== "livre") { cmp = presetCmp(e.target.value); desenharComparar(); } });
     for (const [id, g, i] of [["a-de", "a", 0], ["a-ate", "a", 1], ["b-de", "b", 0], ["b-ate", "b", 1]])
@@ -1233,24 +1276,302 @@
       lista.map((t) => `<tr><td class="num">${t.m.slice(5)}/${t.m.slice(0, 4)}</td><td class="n num">${brl(t.gasto)}</td><td class="n num">${brl(t.receita + t.reembolsos_valor)}</td><td class="n num">${brl(t.reembolsos_valor)}</td><td class="n num">${brl(t.receita_liquida)}</td><td class="n num ${t.lucro < 0 ? "negativo" : ""}">${brl(t.lucro)}</td><td class="num roas ${faixaRoas(roasDe(t), produto || null)}">${roasDe(t) == null ? "—" : num(roasDe(t))}</td><td class="n num">${int(t.pedidos)}</td><td class="n num">${t.pedidos && t.gasto ? brl(t.gasto / t.pedidos) : "—"}</td></tr>`).join("")}</tbody></table></div><p class="fonte">O mês atual está em andamento.</p>` : `<div class="vazio">Aparece quando houver vendas ou gasto.</div>`}</div>`;
   }
 
-  // ----- métricas do dia -----
+  // ----- métricas do dia: o funil inteiro, da impressão à venda -----
+  function serieMetricas() {
+    const ids = escolhidos(), por = {};
+    for (const m of extras?.metricas || []) if (ids.includes(m.produto)) {
+      const t = (por[m.dia] ||= { impressoes: 0, cliques_link: 0, visualizacoes_pagina: 0, video_3s: 0, video_thruplay: 0, checkouts_fb: 0, compras_fb: 0, receita_fb: 0, clicaram: 0, bumps: 0 });
+      for (const c of Object.keys(t)) t[c] += Number(m[c]) || 0;
+    }
+    return por;
+  }
+  const div = (a, b) => b ? a / b : null;
+  const fPct = (v) => v == null ? "—" : num(v * 100) + "%", fBrl = (v) => v == null ? "—" : brl(v), fInt = (v) => v ? int(v) : "—";
+  async function postar(params, corpo) { const r = await chamar(params, corpo); if (!r.ok) throw new Error("servidor"); return r; }
   function desenharDiario() {
-    const serie = serieHistorica().slice(-45).reverse(), mud = mudancas();
+    const serie = serieHistorica().slice(-45).reverse(), mud = mudancas(), met = serieMetricas();
     const tem = serie.some((x) => x.gasto || x.receita || x.visitantes);
-    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Métricas do dia</h2><small>até 45 dias</small></div>${tem ? `<div class="rolar"><table><thead><tr><th>Dia</th><th class="n">Invest.</th><th class="n">Fatur.</th><th class="n">Reemb.</th><th class="n">Lucro</th><th class="n">ROAS</th><th class="n">Visitas</th><th class="n">Custo/visita</th><th class="n">Pedidos</th><th class="n">CPA</th><th class="n">Conv.</th><th class="n">Ticket</th><th>Mudanças</th></tr></thead><tbody>${
-      serie.map((x) => { const r = roasDe(x), mx = mud.filter((m) => m.dia === x.dia); return `<tr><td class="num">${rotuloDia(x.dia)}</td><td class="n num">${brl(x.gasto)}</td><td class="n num">${brl(x.receita + x.reembolsos_valor)}</td><td class="n num">${brl(x.reembolsos_valor)}</td><td class="n num ${x.lucro < 0 ? "negativo" : ""}">${brl(x.lucro)}</td><td class="num roas ${faixaRoas(r, produto || null)}">${r == null ? "—" : num(r)}</td><td class="n num">${int(x.visitantes)}</td><td class="n num">${x.gasto && x.visitantes ? brl(x.gasto / x.visitantes) : "—"}</td><td class="n num">${int(x.pedidos)}</td><td class="n num">${x.gasto && x.pedidos ? brl(x.gasto / x.pedidos) : "—"}</td><td class="n num">${pct(x.pedidos, x.visitantes)}</td><td class="n num">${x.pedidos ? brl(x.receita / x.pedidos) : "—"}</td><td style="white-space:normal;min-width:160px;color:var(--suave);font-size:12px">${mx.map((m) => esc(m.texto)).join("<br>")}</td></tr>`; }).join("")}</tbody></table></div>` : `<div class="vazio">Aparece quando houver visitas, vendas ou gasto.</div>`}</div>`;
+    const form = `<div class="cartao"><div class="cabeca-cartao"><h2>Registrar mudança</h2><small>página, preço ou checkout</small></div>
+      <form class="campo-linha" id="form-mudanca">
+        <input type="date" id="mud-dia" value="${hojeSP()}" aria-label="Dia da mudança" required>
+        <select id="mud-prod" aria-label="Produto">${catalogo.produtos.map((p) => `<option value="${esc(p.id)}" ${p.id === produto ? "selected" : ""}>${esc(p.nome)}</option>`).join("")}</select>
+        <input class="cresce" id="mud-texto" maxlength="300" placeholder="O que mudou?" aria-label="O que mudou" required>
+        <button type="submit">Registrar</button>
+      </form></div>`;
+    const cols = ["Dia", "Mudanças", "Invest.", "Fatur.", "Reemb.", "Lucro", "ROAS", "CPM", "Impressões", "Gancho", "Retenção", "CTR", "CPC", "Custo checkout", "Cliques link", "Visualiz. página", "Conexão", "Clicaram comprar", "Clique/visita", "Conv. checkout", "Conv. venda", "Vendas", "CPA", "Bumps", "% bump", "% vendas Meta", "% fatur. Meta"];
+    $("analise").innerHTML = form + `<div class="cartao"><div class="cabeca-cartao"><h2>Métricas do dia</h2><small>até 45 dias · role para o lado</small></div>${tem ? `<div class="rolar"><table><thead><tr>${cols.map((c, i) => `<th class="${i > 1 ? "n" : ""}">${c}</th>`).join("")}</tr></thead><tbody>${
+      serie.map((x) => {
+        const r = roasDe(x), mx = mud.filter((m) => m.dia === x.dia), m = met[x.dia] || {}, imp = m.impressoes || 0, lk = m.cliques_link || 0, cl = m.clicaram || 0;
+        return `<tr><td class="num">${rotuloDia(x.dia)}</td><td style="white-space:normal;min-width:150px;color:var(--suave);font-size:12px">${mx.map((q) => esc(q.texto) + (q.id ? ` <button class="apagar" data-apagar="${q.id}" aria-label="Apagar mudança">×</button>` : "")).join("<br>")}</td>` +
+          `<td class="n num">${brl(x.gasto)}</td><td class="n num">${brl(x.receita + x.reembolsos_valor)}</td><td class="n num">${brl(x.reembolsos_valor)}</td><td class="n num ${x.lucro < 0 ? "negativo" : ""}">${brl(x.lucro)}</td><td class="num roas ${faixaRoas(r, produto || null)}">${r == null ? "—" : num(r)}</td>` +
+          `<td class="n num">${fBrl(imp ? x.gasto / imp * 1000 : null)}</td><td class="n num">${fInt(imp)}</td><td class="n num">${fPct(div(m.video_3s, imp))}</td><td class="n num">${fPct(div(m.video_thruplay, m.video_3s))}</td><td class="n num">${fPct(div(lk, imp))}</td><td class="n num">${fBrl(div(x.gasto, lk))}</td>` +
+          `<td class="n num">${fBrl(div(x.gasto, cl))}</td><td class="n num">${fInt(lk)}</td><td class="n num">${fInt(m.visualizacoes_pagina)}</td><td class="n num">${fPct(div(x.visitantes, lk))}</td><td class="n num">${fInt(cl)}</td><td class="n num">${fPct(div(cl, x.visitantes))}</td><td class="n num">${fPct(div(x.pedidos, cl))}</td><td class="n num">${fPct(div(x.pedidos, x.visitantes))}</td>` +
+          `<td class="n num">${int(x.pedidos)}</td><td class="n num">${x.gasto && x.pedidos ? brl(x.gasto / x.pedidos) : "—"}</td><td class="n num">${fInt(m.bumps)}</td><td class="n num">${fPct(div(m.bumps, x.pedidos))}</td><td class="n num">${fPct(div(m.compras_fb, x.pedidos))}</td><td class="n num">${fPct(div(m.receita_fb, x.receita))}</td></tr>`;
+      }).join("")}</tbody></table></div><p class="fonte">Impressão, gancho, CTR e cliques vêm do relatório do Gerenciador de Anúncios (em Importar e ajustes). Vendas e faturamento vêm da Hotmart.</p>` : `<div class="vazio">Aparece quando houver visitas, vendas ou gasto.</div>`}</div>`;
+    $("form-mudanca").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try { await postar({ mudanca: 1 }, { dia: $("mud-dia").value, produto: $("mud-prod").value, texto: $("mud-texto").value }); chaveExtras = null; await garantirExtras(); desenharDiario(); avisar("Mudança registrada"); }
+      catch (err) { avisar("Não deu para registrar. Tente de novo."); }
+    });
+    $("analise").querySelectorAll("[data-apagar]").forEach((b) => b.addEventListener("click", async () => {
+      try { await postar({ mudanca_apagar: 1 }, { id: Number(b.dataset.apagar) }); chaveExtras = null; await garantirExtras(); desenharDiario(); } catch (err) { avisar("Não deu para apagar."); }
+    }));
+  }
+
+  // ----- anúncios por variação -----
+  // "AD82V3H398" e "AD82V3H417" são o mesmo corpo; no nosso padrão, é o nome sem o último [colchete].
+  const corpoDe = (nome) => {
+    const n = String(nome || "");
+    const h = n.match(/^(.*?V\d+)H\d.*$/i); if (h) return h[1];
+    const c = n.match(/^(.*)\[[^\]]*\]\s*$/); if (c && c[1].trim()) return c[1].trim();
+    return n;
+  };
+  const somaAd = (lista) => { const t = { gasto: 0, impressoes: 0, cliques_link: 0, visualizacoes_pagina: 0, video_3s: 0, video_thruplay: 0, checkouts_fb: 0, compras: 0, bumps: 0, receita: 0, receita_liquida: 0, compras_fb: 0, receita_fb: 0 };
+    for (const a of lista) for (const c of Object.keys(t)) t[c] += Number(a[c]) || 0; return t; };
+  let adsCfg = { busca: "", roas: "", gasto: "", ordem: "gasto", abertos: {} };
+  const seletorJanela = () => `<label class="pilula"><select id="janela" aria-label="Período"><option value="7">Últimos 7 dias</option><option value="14">Últimos 14 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="tudo">Desde o início</option></select></label>`;
+  function ligarJanela() {
+    $("janela").value = janela;
+    $("janela").addEventListener("change", async (e) => { janela = e.target.value; await garantirExtras(); ({ anuncios: desenharAnuncios, hora: desenharHora, pais: desenharPais })[sub](); });
+  }
+  function desenharAnuncios() {
+    const lista = (extras?.anuncios || []).filter((a) => !produto || a.produto === produto);
+    const grupos = {};
+    for (const a of lista) (grupos[corpoDe(a.nome)] ||= []).push(a);
+    let linhas = Object.entries(grupos).map(([corpo, itens]) => ({ corpo, itens, ...somaAd(itens), primeiro: itens.map((i) => i.primeiro_dia).filter(Boolean).sort()[0], status: itens.some((i) => /ativ|active/i.test(i.status || "")) ? "Ativo" : (itens[0].status || "") }));
+    const b = adsCfg.busca.toLowerCase();
+    if (b) linhas = linhas.filter((l) => l.corpo.toLowerCase().includes(b) || l.itens.some((i) => i.nome.toLowerCase().includes(b)));
+    const ro = (x) => x.gasto ? x.receita / x.gasto : 0;
+    if (adsCfg.roas) linhas = linhas.filter((l) => adsCfg.roas === "bom" ? ro(l) >= 2 : adsCfg.roas === "medio" ? ro(l) >= 1.45 && ro(l) < 2 : ro(l) < 1.45);
+    if (adsCfg.gasto) linhas = linhas.filter((l) => l.gasto >= Number(adsCfg.gasto));
+    const ord = { gasto: (x) => x.gasto, receita: (x) => x.receita, roas: ro, compras: (x) => x.compras }[adsCfg.ordem];
+    linhas.sort((x, y) => ord(y) - ord(x));
+    const celulas = (x) => `<td class="n num">${brl(x.gasto)}</td><td class="n num">${brl(x.receita)}</td><td class="num roas ${x.gasto ? faixaRoas(ro(x), produto || null) : ""}">${x.gasto ? num(ro(x)) : "—"}</td><td class="n num">${int(x.compras)}</td><td class="n num">${x.compras && x.gasto ? brl(x.gasto / x.compras) : "—"}</td>` +
+      `<td class="n num">${fBrl(x.impressoes ? x.gasto / x.impressoes * 1000 : null)}</td><td class="n num">${fPct(div(x.video_3s, x.impressoes))}</td><td class="n num">${fPct(div(x.video_thruplay, x.video_3s))}</td><td class="n num">${fPct(div(x.cliques_link, x.impressoes))}</td><td class="n num">${fBrl(div(x.gasto, x.cliques_link))}</td>`;
+    const opt = (v, t, at) => `<option value="${v}" ${at === v ? "selected" : ""}>${t}</option>`;
+    $("analise").innerHTML = `<div class="acoes-sim">${seletorJanela()}</div>
+      <div class="cartao"><div class="cabeca-cartao"><h2>Anúncios por variação</h2><small>${lista.length} anúncios</small></div>
+        <div class="campo-linha" style="margin-bottom:12px">
+          <input class="cresce" id="ad-busca" placeholder="Filtrar pelo nome" aria-label="Filtrar pelo nome" value="${esc(adsCfg.busca)}">
+          <select id="ad-roas" aria-label="Filtrar ROAS">${opt("", "Qualquer ROAS", adsCfg.roas)}${opt("bom", "ROAS bom", adsCfg.roas)}${opt("medio", "ROAS em atenção", adsCfg.roas)}${opt("ruim", "ROAS ruim", adsCfg.roas)}</select>
+          <select id="ad-gasto" aria-label="Filtrar gasto">${opt("", "Qualquer gasto", adsCfg.gasto)}${opt("50", "Acima de R$ 50", adsCfg.gasto)}${opt("200", "Acima de R$ 200", adsCfg.gasto)}${opt("1000", "Acima de R$ 1.000", adsCfg.gasto)}</select>
+        </div>
+        ${linhas.length ? `<div class="rolar"><table><thead><tr><th>Anúncio</th><th class="n" data-ordem="gasto">Invest. ${adsCfg.ordem === "gasto" ? "↓" : ""}</th><th class="n" data-ordem="receita">Fatur. ${adsCfg.ordem === "receita" ? "↓" : ""}</th><th class="n" data-ordem="roas">ROAS ${adsCfg.ordem === "roas" ? "↓" : ""}</th><th class="n" data-ordem="compras">Compras ${adsCfg.ordem === "compras" ? "↓" : ""}</th><th class="n">CPA</th><th class="n">CPM</th><th class="n">Gancho</th><th class="n">Retenção</th><th class="n">CTR</th><th class="n">CPC</th><th class="n">Desde</th><th>Copy</th><th>Status</th></tr></thead><tbody>${
+          linhas.map((l) => {
+            const mais = l.itens.length > 1, aberto = adsCfg.abertos[l.corpo];
+            return `<tr><td>${mais ? `<button class="abre" data-abre="${esc(l.corpo)}" aria-expanded="${!!aberto}" aria-label="Ver variações">${aberto ? "▾" : "▸"}</button>` : ""}<span title="${esc(l.itens[0].campanha || "")}">${esc(l.corpo)}</span>${mais ? ` <small style="color:var(--apagado)">(${l.itens.length} variações)</small>` : ""}</td>${celulas(l)}<td class="n num">${l.primeiro ? rotuloDia(l.primeiro) : "—"}</td><td style="white-space:normal;min-width:120px;font-size:12px;color:var(--suave)">${mais ? "" : esc(l.itens[0].copy || "")}</td><td>${esc(l.status)}</td></tr>` +
+              (aberto ? l.itens.map((i) => `<tr class="filho"><td>${esc(i.nome)}</td>${celulas(i)}<td class="n num">${i.primeiro_dia ? rotuloDia(i.primeiro_dia) : "—"}</td><td style="white-space:normal;min-width:120px;font-size:12px;color:var(--suave)">${esc(i.copy || "")}</td><td>${esc(i.status || "")}</td></tr>`).join("") : "");
+          }).join("")}</tbody></table></div>
+          <p class="fonte">Faturamento e compras vêm da Hotmart, pelo anúncio que trouxe a pessoa. Toque no título da coluna para ordenar.</p>` :
+          `<div class="vazio">Aparece depois de importar o relatório do Gerenciador de Anúncios (em Importar e ajustes), com anúncios que já levaram visitas à página.</div>`}
+      </div>`;
+    ligarJanela();
+    $("ad-busca").addEventListener("change", (e) => { adsCfg.busca = e.target.value; desenharAnuncios(); });
+    $("ad-roas").addEventListener("change", (e) => { adsCfg.roas = e.target.value; desenharAnuncios(); });
+    $("ad-gasto").addEventListener("change", (e) => { adsCfg.gasto = e.target.value; desenharAnuncios(); });
+    $("analise").querySelectorAll("[data-ordem]").forEach((t) => t.addEventListener("click", () => { adsCfg.ordem = t.dataset.ordem; desenharAnuncios(); }));
+    $("analise").querySelectorAll("[data-abre]").forEach((t) => t.addEventListener("click", () => { adsCfg.abertos[t.dataset.abre] = !adsCfg.abertos[t.dataset.abre]; desenharAnuncios(); }));
+  }
+
+  // Comparar períodos: o que mudou nos anúncios de A para B.
+  let adsAB = { chave: null, a: [], b: [], corpo: true, minimo: 0, filtro: "" };
+  async function desenharAnunciosAB() {
+    const chave = `${cmp.a}|${cmp.b}|${versaoHistorico}`;
+    if (adsAB.chave !== chave) {
+      try {
+        const pedir = (r) => chamar({ anuncios: 1, de: r[0], ate: r[1] }, { catalogo: catalogo.produtos }).then((x) => (x.anuncios || []).filter((a) => a.ad_id));
+        const [a, b] = await Promise.all([pedir(cmp.a), pedir(cmp.b)]);
+        Object.assign(adsAB, { chave, a, b });
+      } catch (e) { adsAB.a = []; adsAB.b = []; }
+    }
+    const el = $("anuncios-ab"); if (!el) return;
+    const dA = diasEntre(...cmp.a), dB = diasEntre(...cmp.b), m = midiaDe();
+    const chaveDe = (x) => adsAB.corpo ? corpoDe(x.nome) : x.nome, grupos = {};
+    const noProd = (x) => !produto || x.produto === produto;
+    for (const x of adsAB.a) if (noProd(x)) ((grupos[chaveDe(x)] ||= { a: [], b: [] }).a).push(x);
+    for (const x of adsAB.b) if (noProd(x)) ((grupos[chaveDe(x)] ||= { a: [], b: [] }).b).push(x);
+    const luc = (t, dias, id) => (t.receita_liquida - t.receita * impostoDe(id) - t.gasto * (1 + m)) / dias;
+    let linhas = Object.entries(grupos).map(([nome, g]) => {
+      const A = somaAd(g.a), B = somaAd(g.b), id = (g.b[0] || g.a[0]).produto;
+      const ra = A.gasto ? A.receita / A.gasto : null, rb = B.gasto ? B.receita / B.gasto : null, ga = A.gasto / dA, gb = B.gasto / dB;
+      const leitura = !A.gasto ? "Novo" : !B.gasto ? "Parou" : gb < ga * .6 ? "Menos" : ra && rb < ra * .9 ? "Piorou" : rb > ra * 1.1 ? "Melhorou" : "Estável";
+      return { nome, n: Math.max(g.a.length, g.b.length), A, B, ra, rb, ga, gb, leitura, impacto: luc(B, dB, id) - luc(A, dA, id) };
+    });
+    const totalA = linhas.reduce((s, l) => s + l.ga, 0) || 1, totalB = linhas.reduce((s, l) => s + l.gb, 0) || 1;
+    const nomes = { Novo: "Novo", Parou: "Parou", Menos: "Perdeu verba", Piorou: "Piorou", Melhorou: "Melhorou", "Estável": "Estável" };
+    const conta = {}; for (const l of linhas) conta[l.leitura] = (conta[l.leitura] || 0) + 1;
+    const queda = linhas.filter((l) => l.impacto < 0).sort((x, y) => x.impacto - y.impacto).slice(0, 3), soma = linhas.reduce((s, l) => s + l.impacto, 0);
+    linhas = linhas.filter((l) => Math.max(l.ga, l.gb) >= adsAB.minimo && (!adsAB.filtro || l.leitura === adsAB.filtro)).sort((x, y) => x.impacto - y.impacto);
+    el.innerHTML = `<div class="cabeca-cartao"><h2>Anúncios: o que mudou de A para B</h2><small>por dia</small></div>
+      ${Object.keys(grupos).length ? `<p class="fonte" style="margin:0 0 10px">Lucro atribuído aos anúncios ${soma < 0 ? "caiu" : "subiu"} <b style="color:${soma < 0 ? "var(--critico)" : "var(--bom)"}">${brl(Math.abs(soma))} por dia</b>.${queda.length ? ` Quem mais puxou para baixo: ${queda.map((q) => `<b>${esc(q.nome)}</b> (${brl(q.impacto)})`).join(", ")}.` : ""}</p>
+      <div class="fichas"><button type="button" data-f="" aria-pressed="${!adsAB.filtro}">Todos</button>${Object.entries(nomes).filter(([k]) => conta[k]).map(([k, t]) => `<button type="button" data-f="${k}" aria-pressed="${adsAB.filtro === k}">${t} · ${conta[k]}</button>`).join("")}</div>
+      <div class="campo-linha" style="margin-bottom:10px"><label class="fonte" style="margin:0;display:flex;gap:6px;align-items:center"><input type="checkbox" id="ab-corpo" ${adsAB.corpo ? "checked" : ""} style="padding:0"> Agrupar por corpo</label>
+        <label class="fonte" style="margin:0;display:flex;gap:6px;align-items:center">Esconder gasto abaixo de R$ <input type="number" id="ab-min" min="0" step="5" value="${adsAB.minimo}" style="width:70px;padding:4px 8px">/dia</label></div>
+      <div class="rolar"><table><thead><tr><th>Corpo / anúncio</th><th>Leitura</th><th class="n" style="color:#b5adf2">Gasto A</th><th class="n" style="color:#b5adf2">% verba</th><th class="n" style="color:#b5adf2">ROAS A</th><th class="n" style="color:#b5adf2">Vendas</th><th class="n" style="color:#f0b27f">Gasto B</th><th class="n" style="color:#f0b27f">% verba</th><th class="n" style="color:#f0b27f">ROAS B</th><th class="n" style="color:#f0b27f">Vendas</th><th class="n">Impacto lucro/dia</th></tr></thead><tbody>${
+        linhas.map((l) => `<tr><td>${esc(l.nome)}${l.n > 1 ? ` <small style="color:var(--apagado)">${l.n} variações</small>` : ""}</td><td><span class="leitura ${l.leitura}">${nomes[l.leitura]}</span></td><td class="n num">${l.A.gasto ? brl(l.ga) : "—"}</td><td class="n num">${l.A.gasto ? pc(l.ga / totalA, 0) : "—"}</td><td class="n num">${l.ra == null ? "—" : num(l.ra)}</td><td class="n num">${l.A.gasto ? int(l.A.compras) : "—"}</td><td class="n num">${l.B.gasto ? brl(l.gb) : "—"}</td><td class="n num">${l.B.gasto ? pc(l.gb / totalB, 0) : "—"}</td><td class="n num ${l.ra != null && l.rb != null ? (l.rb < l.ra ? "delta-desce" : "delta-sobe") : ""}">${l.rb == null ? "—" : num(l.rb)}</td><td class="n num">${l.B.gasto ? int(l.B.compras) : "—"}</td><td class="n num ${l.impacto < 0 ? "delta-desce" : "delta-sobe"}">${l.impacto < 0 ? "−" : "+"}${brl(Math.abs(l.impacto))}</td></tr>`).join("")}</tbody></table></div>` :
+      `<div class="vazio">Aparece depois de importar o relatório do Gerenciador de Anúncios.</div>`}`;
+    el.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { adsAB.filtro = b.dataset.f; desenharAnunciosAB(); }));
+    $("ab-corpo")?.addEventListener("change", (e) => { adsAB.corpo = e.target.checked; desenharAnunciosAB(); });
+    $("ab-min")?.addEventListener("change", (e) => { adsAB.minimo = Number(e.target.value) || 0; desenharAnunciosAB(); });
+  }
+
+  // ----- ROAS por hora -----
+  function desenharHora() {
+    const h = extras?.hora || [];
+    const temGasto = h.some((x) => Number(x.gasto) > 0), temVenda = h.some((x) => Number(x.vendas) > 0);
+    $("analise").innerHTML = `<div class="acoes-sim">${seletorJanela()}</div><div class="cartao"><div class="cabeca-cartao"><h2>ROAS por hora</h2><small>horário de Brasília</small></div>${temGasto || temVenda ? `<div class="rolar"><table><thead><tr><th>Hora</th><th class="n">Investimento</th><th class="n">Faturamento</th><th class="n">ROAS</th><th class="n">CPA</th><th class="n">Vendas</th></tr></thead><tbody>${
+      h.map((x) => { const g = Number(x.gasto), r = Number(x.receita), v = Number(x.vendas), ro = g ? r / g : null; return `<tr><td class="num">${String(x.hora).padStart(2, "0")}:00</td><td class="n num">${g ? brl(g) : "—"}</td><td class="n num">${brl(r)}</td><td class="num roas ${faixaRoas(ro, produto || null)}">${ro == null ? "—" : num(ro) + "×"}</td><td class="n num">${g && v ? brl(g / v) : "—"}</td><td class="n num">${int(v)}</td></tr>`; }).join("")}</tbody></table></div>${temGasto ? "" : `<p class="fonte">Por enquanto só as vendas. O gasto por hora entra importando o relatório do Gerenciador com a coluna de hora.</p>`}` : `<div class="vazio">Aparece quando houver vendas ou gasto no período.</div>`}</div>`;
+    ligarJanela();
+  }
+
+  // ----- origem de vendas -----
+  const CANAIS = { trafego: "Tráfego", organico: "Orgânico", recuperacao: "Recuperação", email: "E-mail", whatsapp: "WhatsApp", outros: "Outros", nao_rastreada: "Não rastreada" };
+  function desenharOrigem() {
+    const ids = escolhidos(), o = extras?.origem || { meses: [], bumps: [] }, meses = {};
+    for (const l of o.meses) if (ids.includes(l.produto)) { const t = (meses[l.mes] ||= { total: 0 }); t[l.canal] = (t[l.canal] || 0) + Number(l.vendas); t.total += Number(l.vendas); }
+    const usados = Object.keys(CANAIS).filter((c) => Object.values(meses).some((t) => t[c]));
+    const lista = Object.keys(meses).sort().reverse();
+    const bumps = o.bumps.filter((b) => ids.includes(b.produto) && (Number(b.pedidos) || Number(b.bumps)));
+    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Origem das vendas</h2><small>mês a mês</small></div>${lista.length ? `<div class="rolar"><table><thead><tr><th>Mês</th><th class="n">Vendas</th>${usados.map((c) => `<th class="n">${CANAIS[c]}</th><th class="n">%</th>`).join("")}</tr></thead><tbody>${
+      lista.map((m) => { const t = meses[m]; return `<tr><td class="num">${m.slice(5)}/${m.slice(0, 4)}</td><td class="n num">${int(t.total)}</td>${usados.map((c) => `<td class="n num">${int(t[c] || 0)}</td><td class="n num" style="color:var(--suave)">${pct(t[c] || 0, t.total)}</td>`).join("")}</tr>`; }).join("")}</tbody></table></div>
+      <p class="fonte">A origem sai do link: anúncio ou utm_source. Use utm_source=bio, email, whatsapp ou recuperacao nos links que não são anúncio, para a venda não cair em "Não rastreada".</p>` : `<div class="vazio">Aparece quando houver vendas.</div>`}</div>
+      <div class="cartao"><div class="cabeca-cartao"><h2>Origem dos bumps</h2><small>de onde vieram os pedidos que levaram bump</small></div>${bumps.length ? `<div class="rolar"><table><thead><tr><th>Origem</th><th class="n">Pedidos</th><th class="n">Bumps</th><th class="n">% com bump</th><th class="n">Receita dos bumps</th></tr></thead><tbody>${
+      bumps.map((b) => `<tr><td>${esc(b.origem)}${tagProduto(b.produto)}</td><td class="n num">${int(b.pedidos)}</td><td class="n num">${int(b.bumps)}</td><td class="n num">${pct(b.bumps, b.pedidos)}</td><td class="n num">${brl(b.receita_bumps)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="vazio">Aparece quando alguém levar um bump.</div>`}</div>`;
+  }
+
+  // ----- por país -----
+  const nomePais = (() => {
+    const pt = new Intl.DisplayNames(["pt-BR"], { type: "region" }), en = new Intl.DisplayNames(["en"], { type: "region" }), porIngles = {};
+    for (let a = 65; a <= 90; a++) for (let b = 65; b <= 90; b++) { const c = String.fromCharCode(a, b); try { const n = en.of(c); if (n && n !== c) porIngles[n.toLowerCase()] = c; } catch (e) {} }
+    const nome = (t) => { const v = String(t || "?").trim(); const c = v.length === 2 ? v.toUpperCase() : porIngles[v.toLowerCase()]; try { return c ? pt.of(c) : v; } catch (e) { return v; } };
+    return nome;
+  })();
+  function desenharPais() {
+    const ids = escolhidos(), p = extras?.pais || { meta: [], hotmart: [] }, g = {};
+    const de = (n) => (g[nomePais(n)] ||= { gasto: 0, impressoes: 0, cliques_link: 0, visualizacoes_pagina: 0, video_3s: 0, checkouts_fb: 0, compras_fb: 0, receita_fb: 0, receita: 0, vendas: 0 });
+    for (const l of p.meta) if (ids.includes(l.produto)) { const t = de(l.pais); for (const c of ["gasto", "impressoes", "cliques_link", "visualizacoes_pagina", "video_3s", "checkouts_fb", "compras_fb", "receita_fb"]) t[c] += Number(l[c]) || 0; }
+    for (const l of p.hotmart) if (ids.includes(l.produto)) { const t = de(l.pais); t.receita += Number(l.receita) || 0; t.vendas += Number(l.vendas) || 0; }
+    const lista = Object.entries(g).sort((a, b) => b[1].gasto - a[1].gasto || b[1].receita - a[1].receita);
+    $("analise").innerHTML = `<div class="acoes-sim">${seletorJanela()}</div><div class="cartao"><div class="cabeca-cartao"><h2>Resultados por país</h2><small>${lista.length} países</small></div>${lista.length ? `<div class="rolar"><table><thead><tr><th>País</th><th class="n">Investimento</th><th class="n">Fatur. Meta</th><th class="n">ROAS Meta</th><th class="n">Fatur. Hotmart</th><th class="n">ROAS Hotmart</th><th class="n">Vendas</th><th class="n">Gancho</th><th class="n">CTR</th><th class="n">CPM</th><th class="n">CPC</th><th class="n">Conexão</th><th class="n">Checkouts</th><th class="n">Custo/checkout</th><th class="n">Conv. checkout</th></tr></thead><tbody>${
+      lista.map(([n, t]) => { const rm = div(t.receita_fb, t.gasto), rh = div(t.receita, t.gasto); return `<tr><td>${esc(n)}</td><td class="n num">${t.gasto ? brl(t.gasto) : "—"}</td><td class="n num">${t.receita_fb ? brl(t.receita_fb) : "—"}</td><td class="n num">${rm == null ? "—" : num(rm)}</td><td class="n num">${brl(t.receita)}</td><td class="num roas ${faixaRoas(rh, produto || null)}">${rh == null ? "—" : num(rh)}</td><td class="n num">${int(t.vendas)}</td><td class="n num">${fPct(div(t.video_3s, t.impressoes))}</td><td class="n num">${fPct(div(t.cliques_link, t.impressoes))}</td><td class="n num">${fBrl(t.impressoes ? t.gasto / t.impressoes * 1000 : null)}</td><td class="n num">${fBrl(div(t.gasto, t.cliques_link))}</td><td class="n num">${fPct(div(t.visualizacoes_pagina, t.cliques_link))}</td><td class="n num">${fInt(t.checkouts_fb)}</td><td class="n num">${fBrl(div(t.gasto, t.checkouts_fb))}</td><td class="n num">${fPct(div(t.vendas, t.checkouts_fb))}</td></tr>`; }).join("")}</tbody></table></div>` : `<div class="vazio">Aparece quando houver vendas. O gasto por país entra importando o relatório do Gerenciador com a coluna de país.</div>`}</div>`;
+    ligarJanela();
+  }
+
+  // ----- importar e ajustes -----
+  function lerCSV(texto) {
+    texto = texto.replace(/^﻿/, "");
+    const primeira = texto.split(/\r?\n/, 1)[0] || "", sep = (primeira.match(/;/g) || []).length > (primeira.match(/,/g) || []).length ? ";" : primeira.includes("\t") ? "\t" : ",";
+    const linhas = []; let c = "", l = [], asp = false;
+    for (let i = 0; i < texto.length; i++) {
+      const ch = texto[i];
+      if (asp) { if (ch === '"' && texto[i + 1] === '"') { c += '"'; i++; } else if (ch === '"') asp = false; else c += ch; }
+      else if (ch === '"') asp = true;
+      else if (ch === sep) { l.push(c); c = ""; }
+      else if (ch === "\n" || ch === "\r") { if (ch === "\r" && texto[i + 1] === "\n") i++; l.push(c); c = ""; if (l.some((x) => x !== "")) linhas.push(l); l = []; }
+      else c += ch;
+    }
+    l.push(c); if (l.some((x) => x !== "")) linhas.push(l);
+    return linhas;
+  }
+  // "1.234,56" e "1234.56" viram 1234.56
+  const numeroCSV = (t) => {
+    let v = String(t ?? "").replace(/[^\d,.-]/g, ""); if (!v) return null;
+    if (v.includes(",") && v.includes(".")) v = v.lastIndexOf(",") > v.lastIndexOf(".") ? v.replace(/\./g, "").replace(",", ".") : v.replace(/,/g, "");
+    else if (v.includes(",")) v = v.replace(",", ".");
+    const n = Number(v); return isFinite(n) ? n : null;
+  };
+  const dataCSV = (t) => { const v = String(t || "").trim(); let m = v.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return `${m[1]}-${m[2]}-${m[3]}`; m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; };
+  const COLUNAS = {
+    dia: ["início dos relatórios", "inicio dos relatorios", "reporting starts", "dia", "day", "date"],
+    ad_id: ["identificação do anúncio", "identificacao do anuncio", "id do anúncio", "ad id", "ad_id"],
+    ad_nome: ["nome do anúncio", "nome do anuncio", "ad name", "anúncios", "anuncios"],
+    adset_id: ["identificação do conjunto de anúncios", "ad set id", "adset_id"],
+    adset_nome: ["nome do conjunto de anúncios", "ad set name", "adset_nome"],
+    campaign_id: ["identificação da campanha", "campaign id", "campaign_id"],
+    campaign_nome: ["nome da campanha", "campaign name", "campaign_nome"],
+    gasto: ["valor usado (brl)", "valor usado", "amount spent (brl)", "amount spent", "gasto", "spend"],
+    impressoes: ["impressões", "impressoes", "impressions"],
+    cliques: ["cliques (todos)", "clicks (all)"],
+    cliques_link: ["cliques no link", "link clicks"],
+    visualizacoes_pagina: ["visualizações da página de destino", "visualizacoes da pagina de destino", "landing page views"],
+    video_3s: ["reproduções de vídeo de 3 segundos", "visualizações de vídeo de 3 segundos", "3-second video plays", "3-second video views", "reproducoes de video de 3 segundos"],
+    video_thruplay: ["thruplays", "thruplay"],
+    checkouts_fb: ["finalizações de compra iniciadas", "finalizacoes de compra iniciadas", "checkouts initiated", "checkouts iniciados"],
+    compras_fb: ["compras", "purchases"],
+    receita_fb: ["valor de conversão da compra", "valor de conversao da compra", "purchases conversion value", "valor de conversão de compras"],
+    status: ["veiculação do anúncio", "veiculacao do anuncio", "ad delivery", "status"],
+    copy: ["corpo", "body", "copy"],
+    hora: ["hora do dia (fuso horário da conta de anúncios)", "hora do dia", "time of day (ad account time zone)", "time of day", "hourly stats aggregated by advertiser time zone", "hora"],
+    pais: ["país", "pais", "country"],
+  };
+  function interpretarCSV(texto) {
+    const t = lerCSV(texto); if (t.length < 2) throw new Error("O arquivo está vazio.");
+    const cab = t[0].map((x) => x.trim().toLowerCase()), onde = {};
+    for (const [campo, nomes] of Object.entries(COLUNAS)) { const i = cab.findIndex((c) => nomes.includes(c)); if (i >= 0) onde[campo] = i; }
+    const faltam = ["dia", "ad_id", "gasto"].filter((c) => onde[c] == null);
+    if (faltam.length) throw new Error("Faltam colunas no relatório: " + faltam.map((c) => ({ dia: "dia (detalhar por dia)", ad_id: "identificação do anúncio", gasto: "valor usado" }[c])).join(", ") + ".");
+    const tipo = onde.hora != null ? "hora" : onde.pais != null ? "pais" : "dia";
+    const permitidos = { dia: ["ad_nome", "adset_id", "adset_nome", "campaign_id", "campaign_nome", "impressoes", "cliques", "cliques_link", "visualizacoes_pagina", "video_3s", "video_thruplay", "checkouts_fb", "compras_fb", "receita_fb", "status", "copy"],
+                         hora: ["impressoes", "cliques_link"], pais: ["impressoes", "cliques_link", "visualizacoes_pagina", "video_3s", "checkouts_fb", "compras_fb", "receita_fb"] }[tipo];
+    const textos = ["ad_nome", "adset_id", "adset_nome", "campaign_id", "campaign_nome", "status", "copy"], inteiros = ["impressoes", "cliques", "cliques_link", "visualizacoes_pagina", "video_3s", "video_thruplay", "checkouts_fb", "compras_fb"];
+    const linhas = [];
+    for (const l of t.slice(1)) {
+      const dia = dataCSV(l[onde.dia]), ad_id = String(l[onde.ad_id] || "").trim(); if (!dia || !ad_id) continue;
+      const r = { dia, ad_id, gasto: numeroCSV(l[onde.gasto]) || 0 };
+      if (tipo === "hora") { const h = String(l[onde.hora] || "").match(/\d{1,2}/); if (!h) continue; r.hora = Number(h[0]); }
+      if (tipo === "pais") { r.pais = String(l[onde.pais] || "").trim(); if (!r.pais) continue; }
+      for (const c of permitidos) { if (onde[c] == null) continue; const v = l[onde[c]]; if (textos.includes(c)) { if (String(v || "").trim()) r[c] = String(v).trim().slice(0, 2000); } else { const n = numeroCSV(v); if (n != null) r[c] = inteiros.includes(c) ? Math.round(n) : n; } }
+      linhas.push(r);
+    }
+    if (!linhas.length) throw new Error("Nenhuma linha válida no arquivo.");
+    return { tipo, linhas };
+  }
+  function desenharConfig() {
+    const c = catalogo, nomeTipo = { dia: "por dia", hora: "por hora", pais: "por país" };
+    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Importar do Gerenciador de Anúncios</h2><small>arquivo CSV</small></div>
+        <p class="fonte" style="margin:0 0 12px">No Gerenciador, detalhe por dia e exporte em CSV, com a coluna Identificação do anúncio. O painel reconhece sozinho se é por dia, por hora ou por país. Importar o mesmo dia de novo só atualiza os números. Só contam anúncios que já levaram visitas à página de um produto.</p>
+        <div class="campo-linha"><input type="file" id="arq-csv" accept=".csv,text/csv" aria-label="Arquivo CSV"><button type="button" id="enviar-csv" disabled>Enviar</button></div>
+        <p class="fonte" id="res-csv" role="status"></p></div>
+      <div class="cartao"><div class="cabeca-cartao"><h2>Ajustes em uso</h2><small>no catálogo do painel</small></div><div class="ajustes num">
+        <div><span>Imposto da venda</span><b>${num(c.imposto_pct, 2)}%</b></div><div><span>Imposto sobre a mídia</span><b>${num(c.imposto_midia_pct, 1)}%</b></div>
+        <div><span>ROAS bom a partir de</span><b>${num(c.roas_bom)}</b></div><div><span>ROAS em atenção a partir de</span><b>${num(c.roas_atencao)}</b></div>
+        <div><span>Meta de lucro do mês</span><b>${brl(c.meta_lucro_mensal)}</b></div><div><span>Produtos no painel</span><b>${c.produtos.length}</b></div>
+      </div><p class="fonte">Para mudar um destes números, peça no chat: eles ficam no produtos.json.</p></div>`;
+    let lido = null;
+    $("arq-csv").addEventListener("change", async (e) => {
+      const f = e.target.files[0]; lido = null; $("enviar-csv").disabled = true; if (!f) return;
+      try { lido = interpretarCSV(await f.text()); const ds = lido.linhas.map((l) => l.dia).sort(); $("res-csv").textContent = `${int(lido.linhas.length)} linhas ${nomeTipo[lido.tipo]}, de ${rotuloDia(ds[0])} a ${rotuloDia(ds[ds.length - 1])}, somando ${brl(lido.linhas.reduce((s, l) => s + l.gasto, 0))}. Confira e toque em Enviar.`; $("enviar-csv").disabled = false; }
+      catch (err) { $("res-csv").textContent = err.message; }
+    });
+    $("enviar-csv").addEventListener("click", async () => {
+      if (!lido) return; $("enviar-csv").disabled = true; $("res-csv").textContent = "Enviando…";
+      try { const r = await postar({ importar: 1 }, lido); historico = null; chaveExtras = null; $("res-csv").textContent = `Pronto: ${int(r.linhas)} linhas importadas.`; lido = null; carregar(); }
+      catch (err) { $("res-csv").textContent = "Não deu para enviar. Tente de novo."; $("enviar-csv").disabled = false; }
+    });
+  }
+
+  // Dados extras da aba: período comum a anúncios, hora e país.
+  async function garantirExtras() {
+    const ate = hojeSP(), de = janela === "tudo" ? "2026-01-01" : isoDe(hojeMs() - (Number(janela) - 1) * 864e5), chave = `${de}|${versaoHistorico}`;
+    if (extras && chaveExtras === chave) return;
+    const r = await chamar({ analise: 1, de, ate }, { catalogo: catalogo.produtos });
+    extras = Array.isArray(r.metricas) ? r : null;   // servidor antigo: as telas ficam vazias, sem erro
+    chaveExtras = chave;
   }
 
   async function desenharAnalise(d) {
     document.querySelectorAll("#sub-abas button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sub === sub)));
     if (sub === "simulador" && sim?.chave === `${produto}|${d.periodo}` && $("placar-sim")) return;   // não atrapalha quem está mexendo
+    if (sub === "config" && $("arq-csv")) return;
     if (sub !== "simulador") {
       const foco = document.activeElement?.closest?.("#analise");   // nem quem está escolhendo data
       if (foco && historico && versaoHistorico === d.versao) return;
     }
     try { await garantirHistorico(d); } catch (e) { if (!historico) { $("analise").innerHTML = `<div class="cartao"><div class="vazio">Não deu para carregar o histórico. Tente de novo.</div></div>`; return; } }
+    try { await garantirExtras(); } catch (e) { extras ||= null; }
     if (aba !== "analise") return;
-    ({ simulador: () => montarSimulador(d), comparar: desenharComparar, escala: desenharEscala, mensal: desenharMensal, diario: desenharDiario })[sub]();
+    ({ simulador: () => montarSimulador(d), comparar: desenharComparar, escala: desenharEscala, mensal: desenharMensal, diario: desenharDiario,
+       anuncios: desenharAnuncios, hora: desenharHora, origem: desenharOrigem, pais: desenharPais, config: desenharConfig })[sub]();
   }
   $("sub-abas").addEventListener("click", (e) => {
     const b = e.target.closest("[data-sub]"); if (!b) return;
