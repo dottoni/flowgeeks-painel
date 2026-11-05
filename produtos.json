@@ -77,6 +77,11 @@
       "dia": "2026-11-05",
       "produto": "raio-x",
       "texto": "Página: MEI do exemplo aparece como \"acima do limite\"; valores do exemplo sem quebra de linha no celular"
+    },
+    {
+      "dia": "2026-11-05",
+      "produto": "raio-x",
+      "texto": "Login com código de 6 números por e-mail; FAQ, termos e privacidade atualizados"
     }
   ]
 }
