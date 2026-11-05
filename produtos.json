@@ -52,6 +52,11 @@
       "dia": "2026-11-04",
       "produto": "raio-x",
       "texto": "App e página atualizados para a LC 238/2026 (limites do MEI em 2027 e 2028); frases de confiança passam a 50 checagens"
+    },
+    {
+      "dia": "2026-11-05",
+      "produto": "raio-x",
+      "texto": "App corrige o Simples acima de R$ 3,6 milhões por ano; página ganha aviso do contador perto da compra e passa a 67 checagens"
     }
   ]
 }
