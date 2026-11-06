@@ -706,10 +706,11 @@
   }
   function diaADia(d) {
     const comNumero = (id) => prod(id)?.status === "à venda" || d.diario.some((x) => x.produto === id) || (d.mes.kpis || []).some((k) => k.id === id && (k.receita || k.gasto));
+    const comNum = catalogo.produtos.filter((p) => comNumero(p.id));
     const quadros = produto
       ? [quadroDiaADia(d, nomeDe(produto), [produto], corDe(produto))]
       : [quadroDiaADia(d, "Geral (todos os produtos)", escolhidos(), null)]
-          .concat(catalogo.produtos.filter((p) => comNumero(p.id)).map((p) => quadroDiaADia(d, p.nome, [p.id], p.cor)));
+          .concat(comNum.length > 1 ? comNum.map((p) => quadroDiaADia(d, p.nome, [p.id], p.cor)) : []);   // um só produto: o geral já é ele
     $("dia-a-dia").innerHTML = quadros.join("");
   }
 
@@ -1567,6 +1568,7 @@
       const foco = document.activeElement?.closest?.("#analise");   // nem quem está escolhendo data
       if (foco && historico && versaoHistorico === d.versao) return;
     }
+    if (!$("analise").innerHTML) $("analise").innerHTML = `<div class="cartao"><div class="vazio">Carregando a análise…</div></div>`;
     try { await garantirHistorico(d); } catch (e) { if (!historico) { $("analise").innerHTML = `<div class="cartao"><div class="vazio">Não deu para carregar o histórico. Tente de novo.</div></div>`; return; } }
     try { await garantirExtras(); } catch (e) { extras ||= null; }
     if (aba !== "analise") return;
