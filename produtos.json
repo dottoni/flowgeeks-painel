@@ -30,6 +30,15 @@
       "projeto": "ciclo-leveza-21",
       "paginas": [],
       "hotmart": {}
+    },
+    {
+      "id": "videos-com-ia",
+      "nome": "Vídeos com IA (nome a definir)",
+      "cor": "#8a6fd1",
+      "status": "em preparação",
+      "projeto": "videos-com-ia",
+      "paginas": [],
+      "hotmart": {}
     }
   ],
   "mudancas": [
