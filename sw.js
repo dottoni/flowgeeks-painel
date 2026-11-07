@@ -20,3 +20,13 @@ self.addEventListener("fetch", (e) => {
       .catch(() => caches.match(e.request)),
   );
 });
+
+// Aviso de venda (Web Push mandado pelo servidor): mostra a notificação; tocar abre o painel.
+self.addEventListener("push", (e) => {
+  const d = e.data ? e.data.json() : {};
+  e.waitUntil(self.registration.showNotification(d.titulo || "Nova venda", { body: d.texto || "", icon: "icone-192.png", badge: "icone-192.png" }));
+});
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: "window" }).then((cs) => (cs.length ? cs[0].focus() : self.clients.openWindow("./"))));
+});

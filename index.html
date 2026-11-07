@@ -454,7 +454,7 @@
       <div class="cartao"><div class="cabeca-cartao"><h2>Carrinhos abandonados</h2><small>chame no WhatsApp</small></div><div class="lista" id="abandonos"></div></div>
     </section>
 
-    <p class="rodape"><span id="rodape-info">Atualiza sozinho a cada 10 s · lucro é estimativa</span><br><button id="sair">Sair deste aparelho</button></p>
+    <p class="rodape"><span id="rodape-info">Atualiza sozinho a cada 10 s · lucro é estimativa</span><br><button id="avisos" hidden>Ativar avisos de venda</button><br><button id="sair">Sair deste aparelho</button></p>
   </div>
 
   <nav class="abas" role="tablist" aria-label="Seções">
@@ -1636,6 +1636,31 @@
   addEventListener("resize", () => { clearTimeout(redim); redim = setTimeout(() => dados && desenhar(dados), 150); });
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  // Avisos de venda no celular. No iPhone o aviso só existe com o painel aberto pelo ícone da tela de início.
+  const botaoAvisos = $("avisos");
+  const avisosLigados = () => { botaoAvisos.textContent = "Avisos de venda ligados neste aparelho"; botaoAvisos.disabled = true; };
+  if ("PushManager" in window && "Notification" in window && "serviceWorker" in navigator) {
+    botaoAvisos.hidden = false;
+    if (Notification.permission === "granted") navigator.serviceWorker.ready.then((r) => r.pushManager.getSubscription()).then((s) => s && avisosLigados()).catch(() => {});
+    botaoAvisos.addEventListener("click", async () => {
+      botaoAvisos.textContent = "Ligando…";
+      try {
+        if ((await Notification.requestPermission()) !== "granted") throw new Error("negado");
+        const reg = await navigator.serviceWorker.ready;
+        const { chave } = await chamar({ push_chave: 1 }, {});
+        const bytes = Uint8Array.from(atob(chave.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
+        const inscricao = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: bytes }));
+        await chamar({ push_inscrever: 1 }, { inscricao: inscricao.toJSON() });
+        avisosLigados();
+      } catch (e) {
+        botaoAvisos.textContent = Notification.permission === "denied" ? "Avisos bloqueados: libere em Ajustes → Notificações → Painel" : "Não deu para ligar os avisos. Tocar de novo";
+      }
+    });
+  } else if (/iPhone|iPad/.test(navigator.userAgent)) {
+    botaoAvisos.hidden = false; botaoAvisos.disabled = true;
+    botaoAvisos.textContent = "Avisos de venda: abra o painel pelo ícone da tela de início";
+  }
   senha ? iniciar() : mostrarLogin(false);
 </script>
 </body>
