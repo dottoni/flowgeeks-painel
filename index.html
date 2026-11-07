@@ -341,7 +341,9 @@
     <img class="selo" src="icone-192.png?v=2" alt="">
     <h1>Painel FlowGeeks</h1>
     <p>Digite a senha do painel. Ela fica salva neste aparelho.</p>
-    <input id="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
+    <!-- usuário fixo e invisível: sem ele o Chaveiro do iPhone não oferece salvar a senha nem preencher com Face ID -->
+    <input name="usuario" autocomplete="username" value="Painel FlowGeeks" readonly tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+    <input id="senha" name="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
     <div class="erro" id="erro-login" hidden>Senha incorreta.</div>
     <button type="submit">Entrar</button>
   </form>
