@@ -1636,11 +1636,18 @@
 
   // Avisos de venda no celular. No iPhone o aviso só existe com o painel aberto pelo ícone da tela de início.
   const botaoAvisos = $("avisos");
-  const avisosLigados = () => { botaoAvisos.textContent = "Avisos de venda ligados neste aparelho"; botaoAvisos.disabled = true; };
+  let ligados = false;
+  const avisosLigados = (texto = "Avisos de venda ligados · tocar para mandar um teste") => { ligados = true; botaoAvisos.textContent = texto; };
   if ("PushManager" in window && "Notification" in window && "serviceWorker" in navigator) {
     botaoAvisos.hidden = false;
     if (Notification.permission === "granted") navigator.serviceWorker.ready.then((r) => r.pushManager.getSubscription()).then((s) => s && avisosLigados()).catch(() => {});
     botaoAvisos.addEventListener("click", async () => {
+      if (ligados) {
+        botaoAvisos.textContent = "Mandando o teste…";
+        try { const r = await chamar({ push_teste: 1 }, {}); avisosLigados(r.falhas.length ? `Teste falhou (${r.falhas.join(", ")}). Tocar de novo` : `Teste enviado para ${r.aparelhos} aparelho(s) · tocar para outro`); }
+        catch (e) { avisosLigados("Não deu para mandar o teste. Tocar de novo"); }
+        return;
+      }
       botaoAvisos.textContent = "Ligando…";
       try {
         if ((await Notification.requestPermission()) !== "granted") throw new Error("negado");
