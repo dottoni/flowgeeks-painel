@@ -6,8 +6,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Painel FlowGeeks</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icone-192.png">
-<link rel="apple-touch-icon" href="icone-180.png">
+<link rel="icon" href="icone-192.png?v=2">
+<link rel="apple-touch-icon" href="icone-180.png?v=2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FlowGeeks">
@@ -54,10 +54,7 @@
   /* ---------- cabeçalho ---------- */
   .cabeca { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
   .titulo { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .selo { width: 42px; height: 42px; border-radius: 13px; flex: none; display: flex; align-items: flex-end; justify-content: center; gap: 3px;
-          padding: 10px 0; background: #16181a; border: 1px solid rgba(184, 242, 58, .35); }
-  .selo b { width: 5px; border-radius: 2px; background: var(--limao); }
-  .selo b:nth-child(1) { height: 9px; } .selo b:nth-child(2) { height: 15px; } .selo b:nth-child(3) { height: 21px; }
+  .selo { width: 42px; height: 42px; border-radius: 13px; flex: none; border: 1px solid rgba(184, 242, 58, .35); }
   .titulo h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
   .titulo p { margin: 1px 0 0; font-size: 12.5px; color: var(--apagado); font-weight: 600; }
   .titulo p .vivo { color: var(--limao); }
@@ -341,7 +338,7 @@
 
 <section class="login" id="tela-login" hidden>
   <form id="form-login">
-    <div class="selo"><b></b><b></b><b></b></div>
+    <img class="selo" src="icone-192.png?v=2" alt="">
     <h1>Painel FlowGeeks</h1>
     <p>Digite a senha do painel. Ela fica salva neste aparelho.</p>
     <input id="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
@@ -354,7 +351,7 @@
   <div class="moldura">
     <header class="cabeca">
       <div class="titulo">
-        <div class="selo"><b></b><b></b><b></b></div>
+        <img class="selo" src="icone-192.png?v=2" alt="">
         <div>
           <h1 id="pergunta">Como foi a semana?</h1>
           <p><span id="nome-filtro">FlowGeeks</span> · <span class="vivo" id="vivo">ao vivo</span> · <span id="atualizado">—</span></p>
