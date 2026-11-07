@@ -91,6 +91,11 @@
       "dia": "2026-11-05",
       "produto": "raio-x",
       "texto": "Login com código de 6 números por e-mail; FAQ, termos e privacidade atualizados"
+    },
+    {
+      "dia": "2026-11-07",
+      "produto": "raio-x",
+      "texto": "Página: pixel da Meta no início da página (19h56), a visita passa a ser contada ~0,7 s mais cedo; visitas por clique sobem sem ser melhora do anúncio"
     }
   ]
 }
