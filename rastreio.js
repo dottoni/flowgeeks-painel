@@ -2,7 +2,7 @@
 //   <script src="https://dottoni.github.io/flowgeeks-painel/rastreio.js" defer></script>
 // Grava a visita (com o anúncio de origem), a rolagem, o tempo na página, as dúvidas abertas (<details>)
 // e o clique em comprar, na função "rastrear" do Supabase. No clique, leva o visitante e a origem
-// para o checkout da Hotmart (src e sck), e o webhook liga a venda ao anúncio.
+// para o checkout da Hotmart ou da Greenn (src e sck), e o webhook liga a venda ao anúncio.
 // O visitante é só um ID aleatório: nada de nome, e-mail ou IP.
 (() => {
   const RASTREIO = "https://zqolcoakhxabqviquybe.supabase.co/functions/v1/rastrear";
@@ -75,11 +75,11 @@
     if (d.tagName === "DETAILS" && d.open) enviar({ tipo: "faq", detalhe: (d.querySelector("summary")?.textContent || "").trim().slice(0, 120) });
   }, true);
 
-  // ---- botões de compra: levam o visitante e a origem para a Hotmart ----
+  // ---- botões de compra: levam o visitante e a origem para o checkout ----
   const limpo = (t) => String(t || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40);
   document.addEventListener("click", (e) => {
     const a = e.target.closest("a[href]");
-    if (!a || !/(^|\.)hotmart\.com$/.test(new URL(a.href, location.href).hostname)) return;
+    if (!a || !/(^|\.)(hotmart\.com|greenn\.com\.br)$/.test(new URL(a.href, location.href).hostname)) return;
     const destino = new URL(a.href);
     destino.searchParams.set("src", visitante);
     destino.searchParams.set("sck", [limpo(origem.utm_source) || "direto", limpo(origem.ad_id)].filter(Boolean).join("-"));

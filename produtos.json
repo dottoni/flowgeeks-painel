@@ -33,11 +33,13 @@
     },
     {
       "id": "videos-com-ia",
-      "nome": "Vídeos com IA (nome a definir)",
+      "nome": "Estúdio de Bolso",
       "cor": "#8a6fd1",
       "status": "em preparação",
       "projeto": "videos-com-ia",
-      "paginas": [],
+      "paginas": [
+    "https://dottoni.github.io/estudio-de-bolso/"
+   ],
       "hotmart": {}
     }
   ],
