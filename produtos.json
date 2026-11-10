@@ -39,6 +39,15 @@
       "projeto": "mapa-botox",
       "paginas": [],
       "hotmart": {}
+    },
+    {
+      "id": "enxoval",
+      "nome": "Enxoval (nome provisório)",
+      "cor": "#c98500",
+      "status": "em preparação",
+      "projeto": "enxoval",
+      "paginas": [],
+      "hotmart": {}
     }
   ],
   "mudancas": [
