@@ -30,6 +30,15 @@
       "projeto": "ciclo-leveza-21",
       "paginas": [],
       "hotmart": {}
+    },
+    {
+      "id": "mapa-botox",
+      "nome": "Mapa do Botox (nome provisório)",
+      "cor": "#199e70",
+      "status": "em preparação",
+      "projeto": "mapa-botox",
+      "paginas": [],
+      "hotmart": {}
     }
   ],
   "mudancas": [
