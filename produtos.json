@@ -57,6 +57,15 @@
       "projeto": "orie",
       "paginas": [],
       "hotmart": {}
+    },
+    {
+      "id": "kit-sublimacao",
+      "nome": "Kit de Sublimação (nome provisório)",
+      "cor": "#8a6fd1",
+      "status": "em preparação",
+      "projeto": "kit-sublimacao",
+      "paginas": [],
+      "hotmart": {}
     }
   ],
   "mudancas": [
