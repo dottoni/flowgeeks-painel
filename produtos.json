@@ -48,6 +48,15 @@
       "projeto": "enxoval",
       "paginas": [],
       "hotmart": {}
+    },
+    {
+      "id": "orie",
+      "nome": "OriE (nome provisório)",
+      "cor": "#d55181",
+      "status": "em preparação",
+      "projeto": "orie",
+      "paginas": [],
+      "hotmart": {}
     }
   ],
   "mudancas": [
