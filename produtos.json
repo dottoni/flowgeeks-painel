@@ -9,7 +9,7 @@
       "id": "raio-x",
       "nome": "Raio-X do Imposto",
       "cor": "#3987e5",
-      "status": "à venda",
+      "status": "pausado",
       "projeto": "simulador-tributario",
       "paginas": [
         "https://raioxdoimposto.com.br/",
