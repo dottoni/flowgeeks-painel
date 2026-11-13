@@ -43,6 +43,20 @@
     } catch (e) {}
   };
 
+  // ---- quiz (bebenapontadolapis.com.br/quiz) ----
+  // Funil: só o tipo e o número da pergunta, com o visitante, como os outros eventos. Nunca a resposta (VETO-5, revisão do quiz, item 2).
+  window.fgEvento = (tipo, valor) => { if (tipo === "etapa" || tipo === "resultado") enviar({ tipo, valor: Number(valor) || null }); };
+  // Respostas anônimas (tabela respostas_quiz): direto, SEM visitante_id e sem sessao_id, para nada ligar a resposta à visita,
+  // à compra ou ao anúncio. A função rastrear aceita só os campos e valores da lista dela.
+  window.fgRespostas = (obj) => {
+    const corpo = JSON.stringify({ ...obj, tipo: "respostas_quiz" });
+    try {
+      if (!navigator.sendBeacon || !navigator.sendBeacon(RASTREIO, new Blob([corpo], { type: "text/plain" }))) {
+        fetch(RASTREIO, { method: "POST", body: corpo, keepalive: true, headers: { "content-type": "text/plain" } });
+      }
+    } catch (e) {}
+  };
+
   enviar({
     tipo: "visita", pagina: location.pathname, url: location.href.slice(0, 500),
     referrer: document.referrer, dispositivo, navegador, largura_tela: innerWidth,

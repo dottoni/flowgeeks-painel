@@ -42,12 +42,17 @@
     },
     {
       "id": "enxoval",
-      "nome": "Enxoval (nome provisório)",
+      "nome": "Bebê na Ponta do Lápis",
       "cor": "#c98500",
       "status": "em preparação",
       "projeto": "enxoval",
-      "paginas": [],
-      "hotmart": {}
+      "paginas": ["https://bebenapontadolapis.com.br/"],
+      "hotmart": {
+        "204455": "Essencial",
+        "204456": "Chá de Fraldas na Conta Certa",
+        "204458": "Gold",
+        "204459": "Troca para o Gold"
+      }
     },
     {
       "id": "orie",
@@ -60,12 +65,18 @@
     },
     {
       "id": "kit-sublimacao",
-      "nome": "Kit de Sublimação (nome provisório)",
+      "nome": "Fornada de Natal",
       "cor": "#8a6fd1",
       "status": "em preparação",
       "projeto": "kit-sublimacao",
-      "paginas": [],
-      "hotmart": {}
+      "paginas": ["https://fornada-natal.pages.dev/"],
+      "hotmart": {
+        "204395": "Fornada de Natal",
+        "204483": "Forno Cheio",
+        "204453": "Mensagens de venda de dezembro",
+        "204464": "Mockups animados",
+        "204451": "Clube Fornada - Plano anual 2027"
+      }
     },
     {
       "id": "kit-clinica",
