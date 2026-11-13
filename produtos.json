@@ -66,6 +66,24 @@
       "projeto": "kit-sublimacao",
       "paginas": [],
       "hotmart": {}
+    },
+    {
+      "id": "kit-clinica",
+      "nome": "Kit da Clínica (nome provisório)",
+      "cor": "#4f9db8",
+      "status": "em preparação",
+      "projeto": "kit-clinica",
+      "paginas": [],
+      "hotmart": {}
+    },
+    {
+      "id": "plataforma-esteticistas",
+      "nome": "Plataforma das Esteticistas (nome provisório)",
+      "cor": "#9a7b4f",
+      "status": "em preparação",
+      "projeto": "plataforma-esteticistas",
+      "paginas": [],
+      "hotmart": {}
     }
   ],
   "mudancas": [
