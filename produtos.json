@@ -9,7 +9,7 @@
       "id": "raio-x",
       "nome": "Raio-X do Imposto",
       "cor": "#3987e5",
-      "status": "pausado",
+      "status": "encerrado",
       "projeto": "simulador-tributario",
       "paginas": [
         "https://raioxdoimposto.com.br/",
@@ -44,7 +44,7 @@
       "id": "enxoval",
       "nome": "Bebê na Ponta do Lápis",
       "cor": "#c98500",
-      "status": "em preparação",
+      "status": "à venda",
       "projeto": "enxoval",
       "paginas": ["https://bebenapontadolapis.com.br/"],
       "hotmart": {
