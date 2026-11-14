@@ -91,8 +91,6 @@
   .produtos::-webkit-scrollbar { display: none; }
   .produtos button { cursor: pointer; }
   .produtos button[aria-pressed="true"] { background: var(--limao); border-color: var(--limao); color: #08090a; box-shadow: 0 6px 22px -6px rgba(184, 242, 58, .7); }
-  .produtos button.fora { color: var(--apagado); }
-  .produtos button[aria-pressed="true"].fora { color: #08090a; }
   .ponto { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--cor); }
   .produtos button[aria-pressed="true"] .ponto { box-shadow: 0 0 0 2px #08090a; }
   .produtos small { font-size: 11px; font-weight: 700; opacity: .75; }
@@ -197,7 +195,6 @@
   .tabela-produtos tbody tr[data-produto]:hover td { background: rgba(255, 255, 255, .03); }
   .tabela-produtos td:first-child { display: flex; align-items: center; gap: 8px; }
   .tabela-produtos tfoot td { border-bottom: 0; border-top: 1px solid var(--borda); font-weight: 800; }
-  .estado-produto { font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: var(--cartao-forte); color: var(--apagado); }
   td.negativo { color: var(--critico); }
 
   /* dia a dia: um quadro para o geral e um por produto */
@@ -562,6 +559,8 @@
 
   // ---------- catálogo (produtos.json) ----------
   const prod = (id) => catalogo.produtos.find((p) => p.id === id);
+  // na tela só aparecem os produtos à venda; os totais seguem somando o catálogo inteiro
+  const aVendaLista = () => catalogo.produtos.filter((p) => p.status === "à venda");
   const nomeDe = (id) => prod(id)?.nome || id;
   const corDe = (id) => prod(id)?.cor || "#8b9087";
   const impostoDe = (id) => Number(prod(id)?.imposto_pct ?? catalogo.imposto_pct ?? 0) / 100;
@@ -572,7 +571,7 @@
     const r = await fetch("produtos.json", { cache: "no-store" });
     if (!r.ok) throw new Error("rede");
     catalogo = await r.json();
-    if (produto && !prod(produto)) produto = "";
+    if (produto && prod(produto)?.status !== "à venda") produto = "";
     desenharSeletor();
   }
 
@@ -622,8 +621,8 @@
 
   function desenharSeletor() {
     const botoes = [`<button class="pilula" data-produto="" aria-pressed="${!produto}">Todos</button>`].concat(
-      catalogo.produtos.map((p) => `<button class="pilula ${p.status === "à venda" ? "" : "fora"}" data-produto="${esc(p.id)}" aria-pressed="${produto === p.id}">` +
-        `<i class="ponto" style="--cor:${esc(p.cor)}"></i>${esc(p.nome)}${p.status === "à venda" ? "" : ` <small>${esc(p.status)}</small>`}</button>`));
+      aVendaLista().map((p) => `<button class="pilula" data-produto="${esc(p.id)}" aria-pressed="${produto === p.id}">` +
+        `<i class="ponto" style="--cor:${esc(p.cor)}"></i>${esc(p.nome)}</button>`));
     $("produtos").innerHTML = botoes.join("");
     $("nome-filtro").textContent = produto ? nomeDe(produto) : "FlowGeeks · todos os produtos";
     $("cartao-produtos").hidden = !!produto;
@@ -726,12 +725,12 @@
   }
 
   function tabelaProdutos(d) {
-    const linhas = catalogo.produtos.map((p) => ({ p, k: somar(d.kpis, [p.id]) }))
+    const linhas = aVendaLista().map((p) => ({ p, k: somar(d.kpis, [p.id]) }))
       .sort((x, y) => y.k.lucro - x.k.lucro || y.k.receita_liquida - x.k.receita_liquida);
     const t = somar(d.kpis, null);
     const celula = (v) => `<td class="n num ${v < 0 ? "negativo" : ""}">${brl(v)}</td>`;
     $("tabela-produtos").innerHTML = `<table class="tabela-produtos"><thead><tr><th>Produto</th><th class="n">Pedidos</th><th class="n">Líquido</th><th class="n">Anúncios</th><th class="n">Lucro</th><th class="n">Conv.</th></tr></thead><tbody>${
-      linhas.map(({ p, k }) => `<tr data-produto="${esc(p.id)}" tabindex="0"><td><i class="ponto" style="--cor:${esc(p.cor)}"></i>${esc(p.nome)}${p.status === "à venda" ? "" : ` <span class="estado-produto">${esc(p.status)}</span>`}</td>` +
+      linhas.map(({ p, k }) => `<tr data-produto="${esc(p.id)}" tabindex="0"><td><i class="ponto" style="--cor:${esc(p.cor)}"></i>${esc(p.nome)}</td>` +
         `<td class="n num">${int(k.pedidos)}</td><td class="n num">${brl(k.receita_liquida)}</td><td class="n num">${brl(k.gasto)}</td>${celula(k.lucro)}<td class="n num">${pct(k.pedidos, k.visitantes)}</td></tr>`).join("")
     }</tbody><tfoot><tr><td>Total</td><td class="n num">${int(t.pedidos)}</td><td class="n num">${brl(t.receita_liquida)}</td><td class="n num">${brl(t.gasto)}</td>${celula(t.lucro)}<td class="n num">${pct(t.pedidos, t.visitantes)}</td></tr></tfoot></table>`;
     $("tabela-produtos").querySelectorAll("[data-produto]").forEach((tr) => {
@@ -775,8 +774,7 @@
       `</tbody></table></div></div>`;
   }
   function diaADia(d) {
-    const comNumero = (id) => prod(id)?.status === "à venda" || d.diario.some((x) => x.produto === id) || (d.mes.kpis || []).some((k) => k.id === id && (k.receita || k.gasto));
-    const comNum = catalogo.produtos.filter((p) => comNumero(p.id));
+    const comNum = aVendaLista();
     const quadros = produto
       ? [quadroDiaADia(d, nomeDe(produto), [produto], corDe(produto))]
       : [quadroDiaADia(d, "Geral (todos os produtos)", escolhidos(), null)]
