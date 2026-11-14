@@ -23,8 +23,8 @@
     color-scheme: dark;
     --fundo: #08090a;
     --cartao: rgba(255, 255, 255, .035);
-    --cartao-forte: rgba(255, 255, 255, .07);
-    --borda: rgba(255, 255, 255, .08);
+    --cartao-forte: rgba(255, 255, 255, .08);
+    --borda: rgba(255, 255, 255, .1);
     --tinta: #f2f3ef;
     --suave: #b9bdb4;
     --apagado: #8b9087;
@@ -35,14 +35,25 @@
     --atencao: #fab219;
     --serio: #ec835a;
     --critico: #e66767;
-    --raio: 20px;
+    --raio: 24px;
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; background: var(--fundo); }
   body { margin: 0; min-height: 100dvh; color: var(--tinta); font-family: "Archivo", system-ui, sans-serif;
-         font-size: 14.5px; line-height: 1.45; -webkit-font-smoothing: antialiased;
-         background: radial-gradient(900px 480px at 0% -10%, rgba(184, 242, 58, .07), transparent 60%), var(--fundo);
-         background-attachment: fixed; }
+         font-size: 14.5px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  /* vidro: brilhos de limão, oliva e madeira atrás (derivando devagar) e um granulado fino por cima;
+     os cartões desfocam o que passa por baixo */
+  body::before { content: ""; position: fixed; inset: -15%; z-index: -2; pointer-events: none;
+                 background: radial-gradient(30% 34% at 22% 14%, rgba(184, 242, 58, .34), transparent 70%),
+                             radial-gradient(34% 40% at 84% 18%, rgba(118, 150, 34, .42), transparent 70%),
+                             radial-gradient(32% 36% at 74% 66%, rgba(201, 164, 58, .3), transparent 70%),
+                             radial-gradient(28% 30% at 14% 76%, rgba(236, 131, 90, .16), transparent 70%),
+                             radial-gradient(40% 40% at 48% 48%, rgba(184, 242, 58, .08), transparent 70%),
+                             linear-gradient(180deg, #0c0f0a, #08090a);
+                 animation: deriva 40s ease-in-out infinite alternate; }
+  body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); }
+  @keyframes deriva { 50% { transform: translate(3%, -2%) scale(1.04); } 100% { transform: translate(-3%, 2%) scale(1.02); } }
   button, select { font: inherit; color: inherit; }
   .num { font-variant-numeric: tabular-nums; }
   [hidden] { display: none !important; }
@@ -54,8 +65,8 @@
   /* ---------- cabeçalho ---------- */
   .cabeca { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
   .titulo { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .selo { width: 42px; height: 42px; border-radius: 13px; flex: none; border: 1px solid rgba(184, 242, 58, .35); }
-  .titulo h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+  .selo { width: 44px; height: 44px; border-radius: 14px; flex: none; border: 1px solid rgba(184, 242, 58, .4); box-shadow: 0 0 28px -6px rgba(184, 242, 58, .55); }
+  .titulo h1 { margin: 0; font-size: 23px; font-weight: 800; letter-spacing: -.02em; }
   .titulo p { margin: 1px 0 0; font-size: 12.5px; color: var(--apagado); font-weight: 600; }
   .titulo p .vivo { color: var(--limao); }
   .titulo p .vivo::before { content: "●"; margin-right: 4px; animation: piscar 2s infinite; }
@@ -64,7 +75,10 @@
   @keyframes piscar { 50% { opacity: .35; } }
 
   .pilula { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-radius: 999px; flex: none;
-            background: var(--cartao-forte); border: 1px solid var(--borda); font-weight: 700; font-size: 13px; white-space: nowrap; }
+            background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .11); font-weight: 700; font-size: 13px; white-space: nowrap;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
+            transition: background .2s, border-color .2s, box-shadow .2s; }
+  @media (hover: hover) { button.pilula:hover { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .18); } }
   .pilula svg { width: 15px; height: 15px; flex: none; }
   .pilula select { appearance: none; -webkit-appearance: none; background: none; border: 0; font-weight: 700; font-size: 13px;
                    padding-right: 14px; cursor: pointer;
@@ -76,7 +90,7 @@
   .produtos { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 16px; padding: 2px 16px; }
   .produtos::-webkit-scrollbar { display: none; }
   .produtos button { cursor: pointer; }
-  .produtos button[aria-pressed="true"] { background: var(--limao); border-color: var(--limao); color: #08090a; }
+  .produtos button[aria-pressed="true"] { background: var(--limao); border-color: var(--limao); color: #08090a; box-shadow: 0 6px 22px -6px rgba(184, 242, 58, .7); }
   .produtos button.fora { color: var(--apagado); }
   .produtos button[aria-pressed="true"].fora { color: #08090a; }
   .ponto { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--cor); }
@@ -84,7 +98,38 @@
   .produtos small { font-size: 11px; font-weight: 700; opacity: .75; }
 
   /* ---------- cartões ---------- */
-  .cartao { background: var(--cartao); border: 1px solid var(--borda); border-radius: var(--raio); padding: 16px; min-width: 0; }
+  .cartao { position: relative; min-width: 0; padding: 18px; border-radius: var(--raio);
+            background: linear-gradient(155deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .035) 45%, rgba(255, 255, 255, .02));
+            border: 1px solid rgba(255, 255, 255, .06);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 24px 48px -24px rgba(0, 0, 0, .75);
+            backdrop-filter: blur(28px) saturate(170%); -webkit-backdrop-filter: blur(28px) saturate(170%);
+            transition: transform .3s ease, box-shadow .3s ease; }
+  /* borda de vidro: acende no canto de cima e some na diagonal */
+  .cartao::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+                    background: linear-gradient(140deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, .06) 30%, transparent 55%, rgba(184, 242, 58, .18));
+                    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+                    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+  /* 3D: o cartão de número inclina seguindo o mouse (--rx/--ry vêm do script) e um reflexo acompanha o ponteiro */
+  .kpi { animation: surgir .6s cubic-bezier(.2, .8, .2, 1) both;
+         transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0px)); }
+  .cartao::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
+                   background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, .1), transparent 45%); }
+  @media (hover: hover) {
+    .cartao:hover::after { opacity: 1; }
+    .kpi:hover { --ty: -4px; transition: transform .12s ease-out, box-shadow .3s ease;
+                 box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 34px 60px -24px rgba(0, 0, 0, .85); }
+  }
+  /* camadas: os quadros de baixo entram deitados e se levantam ao subir na tela; o fundo anda mais devagar que a página */
+  @supports (animation-timeline: view()) {
+    .cartao:not(.kpi) { animation: levantar linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+    body::before { animation: deriva 40s ease-in-out infinite alternate, paralaxe linear both; animation-timeline: auto, scroll(); }
+  }
+  @keyframes levantar { from { opacity: .2; transform: perspective(1100px) rotateX(16deg) translateY(40px) scale(.96); } }
+  @keyframes paralaxe { to { translate: 0 -10vh; } }
+  @keyframes surgir { from { opacity: 0; transform: translateY(10px) scale(.985); } }
+  .kpis .cartao:nth-child(2) { animation-delay: .05s; } .kpis .cartao:nth-child(3) { animation-delay: .1s; }
+  .kpis .cartao:nth-child(4) { animation-delay: .15s; } .kpis .cartao:nth-child(5) { animation-delay: .2s; } .kpis .cartao:nth-child(6) { animation-delay: .25s; }
+  body.pronto .kpi { animation: none; }   /* entra uma vez só; quando chegam números novos não pisca */
   .cartao h2 { margin: 0; font-size: 14.5px; font-weight: 800; }
   .cabeca-cartao { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 12px; }
   .cabeca-cartao small { color: var(--apagado); font-weight: 700; font-size: 12px; white-space: nowrap; }
@@ -96,19 +141,33 @@
   .kpi strong { display: block; font-size: 26px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; margin: 6px 0 8px; }
   .kpi strong small { font-size: .55em; color: var(--suave); font-weight: 700; margin-right: 3px; letter-spacing: 0; }
   .kpi strong.negativo { color: var(--critico); }
+  .linha-kpi { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+  .faisca { flex: 0 1 96px; min-width: 0; height: 30px; margin-bottom: 10px; color: var(--limao); overflow: visible; }
+  .faisca polyline { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; opacity: .9; }
+  .faisca circle { fill: currentColor; }
+  @media (max-width: 560px) { .kpi:not(.lucro) .faisca { display: none; } }   /* cartão de meia largura no celular: o número precisa do espaço */
   .etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
-  .etq { font-size: 11.5px; font-weight: 800; padding: 3px 8px; border-radius: 7px; background: var(--cartao-forte); color: var(--suave); white-space: nowrap; }
+  .etq { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--cartao-forte); color: var(--suave); white-space: nowrap; }
   .etq.sobe { background: rgba(74, 222, 128, .12); color: #86efac; }
   .etq.desce { background: rgba(230, 103, 103, .14); color: #fca5a5; }
   .etq.estimativa { background: rgba(201, 164, 58, .16); color: #e6cd84; }
 
-  .lucro { grid-column: 1 / -1; border-color: rgba(184, 242, 58, .3); background: linear-gradient(135deg, rgba(184, 242, 58, .1), rgba(255, 255, 255, .03) 70%); }
+  /* o destaque da tela: vidro limão sólido, texto escuro (nunca branco no limão) */
+  .lucro { grid-column: 1 / -1; color: #08090a; border-color: transparent;
+           background: radial-gradient(120% 100% at 0% 0%, rgba(255, 255, 255, .42), transparent 55%),
+                       linear-gradient(135deg, rgba(200, 246, 96, .96), rgba(166, 220, 44, .92) 50%, rgba(122, 168, 26, .9));
+           box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 26px 60px -22px rgba(184, 242, 58, .6); }
+  .lucro::before { background: linear-gradient(140deg, rgba(255, 255, 255, .8), transparent 40%); }
+  .lucro.kpi span, .lucro.kpi strong small { color: rgba(8, 9, 10, .66); }
+  .lucro.kpi strong.negativo { color: #7a1414; }
+  .lucro .etq, .lucro .etq.sobe, .lucro .etq.desce, .lucro .etq.estimativa { background: rgba(8, 9, 10, .13); color: #08090a; }
+  .lucro .faisca { color: #08090a; }
   .lucro strong { font-size: 34px; }
   .meta { grid-column: 1 / -1; position: relative; overflow: hidden; }
   .meta strong { font-size: 30px; }
   .meta strong em { font-style: normal; font-size: 13px; font-weight: 800; color: var(--limao); margin-left: 6px; letter-spacing: 0; }
-  .barra-meta { position: relative; height: 12px; border-radius: 6px; background: rgba(255, 255, 255, .08); overflow: hidden; margin: 4px 0 8px; }
-  .barra-meta .feito { position: absolute; inset: 0 auto 0 0; border-radius: 6px; background: var(--limao); }
+  .barra-meta { position: relative; height: 12px; border-radius: 6px; background: rgba(0, 0, 0, .3); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .4), 0 1px 0 rgba(255, 255, 255, .06); overflow: hidden; margin: 4px 0 8px; }
+  .barra-meta .feito { position: absolute; inset: 0 auto 0 0; border-radius: 6px; background: linear-gradient(90deg, #8fc21f, var(--limao)); box-shadow: 0 0 14px rgba(184, 242, 58, .7); }
   .barra-meta .proj { position: absolute; top: 0; bottom: 0; border-radius: 0 6px 6px 0;
                       background: repeating-linear-gradient(135deg, rgba(184, 242, 58, .7) 0 4px, rgba(184, 242, 58, .12) 4px 8px); }
   .barra-meta .alvo { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--tinta); border-radius: 1px; }
@@ -159,10 +218,11 @@
   .atencao h2 svg { width: 16px; height: 16px; flex: none; }
   .atencao h2 small { margin-left: auto; color: var(--apagado); }
   .alertas { display: grid; gap: 8px; margin-top: 12px; }
-  .alerta { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 13px; background: var(--cartao-forte);
+  .alerta { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 14px; background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .07); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
             font-size: 13px; font-weight: 700; }
   .alerta[role="button"] { cursor: pointer; }
-  .alerta::before { content: ""; width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--cor); }
+  .alerta::before { content: ""; width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--cor); box-shadow: 0 0 10px var(--cor); }
   .alerta span { flex: 1; min-width: 0; }
   .alerta .tag { flex: none; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 7px;
                  background: color-mix(in srgb, var(--cor) 18%, transparent); color: color-mix(in srgb, var(--cor) 70%, white); }
@@ -198,13 +258,14 @@
 
   /* abas embaixo */
   .abas { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); transform: translateX(-50%); z-index: 10;
-          display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(18, 20, 22, .86); border: 1px solid var(--borda);
-          backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+          display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(22, 26, 20, .55); border: 1px solid rgba(255, 255, 255, .13);
+          backdrop-filter: blur(26px) saturate(180%); -webkit-backdrop-filter: blur(26px) saturate(180%);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 18px 40px -10px rgba(0, 0, 0, .7);
           max-width: calc(100% - 24px); }
   .abas button { display: flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--suave); font-weight: 800; font-size: 13px;
-                 padding: 10px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; min-height: 44px; }
+                 padding: 10px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; min-height: 44px; transition: background .25s, color .25s, box-shadow .25s; }
   .abas button svg { width: 17px; height: 17px; flex: none; }
-  .abas button[aria-selected="true"] { color: #08090a; background: var(--limao); }
+  .abas button[aria-selected="true"] { color: #08090a; background: var(--limao); box-shadow: 0 6px 22px -4px rgba(184, 242, 58, .75), inset 0 1px 0 rgba(255, 255, 255, .5); }
   @media (max-width: 420px) { .abas button { padding: 10px 12px; } .abas button:not([aria-selected="true"]) span { display: none; } }
 
   .dica { position: fixed; z-index: 20; pointer-events: none; background: #f2f3ef; color: #08090a; font-size: 12.5px; font-weight: 700;
@@ -233,7 +294,8 @@
   .sub-abas button { cursor: pointer; }
   .sub-abas button[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: #08090a; }
   .faixa-partida { padding: 11px 14px; border-radius: 13px; font-size: 13px; font-weight: 700; background: rgba(201, 164, 58, .14); color: #e6cd84; }
-  .placar-sim { display: grid; gap: 16px; border-color: rgba(184, 242, 58, .3); background: linear-gradient(135deg, rgba(184, 242, 58, .1), rgba(255, 255, 255, .03) 70%); }
+  .placar-sim { display: grid; gap: 16px; border-color: rgba(184, 242, 58, .3); background: linear-gradient(135deg, rgba(184, 242, 58, .26), rgba(184, 242, 58, .06) 55%, rgba(255, 255, 255, .03));
+          box-shadow: inset 0 1px 0 rgba(184, 242, 58, .25), 0 0 40px -12px rgba(184, 242, 58, .35); }
   .placar-sim .grande { font-size: 44px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
   .placar-sim .grande small { font-size: 18px; color: var(--suave); font-weight: 700; letter-spacing: 0; }
   .placar-sim .selo-portao { display: inline-block; margin-top: 8px; }
@@ -321,7 +383,7 @@
     .linha-principal { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
     .duas { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
   }
-  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
@@ -613,13 +675,22 @@
     return { meta, feitoValor: feito, feito: meta ? Math.max(0, feito / meta) : 0, proj, projPct: meta ? Math.max(0, proj / meta) : 0 };
   }
 
+  // Mini linha do período dentro do cartão de número; some quando o período não tem número nenhum.
+  function faisca(dias, valor) {
+    const v = dias.map((x) => valor(x) || 0);
+    if (v.length < 2 || !v.some(Boolean)) return "";
+    const min = Math.min(...v), max = Math.max(...v), W = 96, H = 30;
+    const pts = v.map((n, i) => [(2 + i / (v.length - 1) * (W - 4)).toFixed(1), (max === min ? H / 2 : H - 3 - (n - min) / (max - min) * (H - 6)).toFixed(1)]);
+    const [x, y] = pts.at(-1);
+    return `<svg class="faisca" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.join(" ")}"/><circle cx="${x}" cy="${y}" r="2.6"/></svg>`;
+  }
   function kpis(d) {
     const ids = escolhidos(), k = somar(d.kpis, ids), a = d.anterior ? somar(d.anterior, ids) : null;
     const pctImp = produto ? `${(impostoDe(produto) * 100).toLocaleString("pt-BR")}%` : "o % de cada produto";
     const conv = k.visitantes ? k.pedidos / k.visitantes : 0, convA = a?.visitantes ? a.pedidos / a.visitantes : null;
     const ticket = k.pedidos ? k.receita / k.pedidos : 0, ticketA = a?.pedidos ? a.receita / a.pedidos : null;
     const roas = k.gasto ? k.receita_liquida / k.gasto : null;
-    const r = ritmoMes(d);
+    const r = ritmoMes(d), dias = serieDiaria(d.diario);
     const explica = esc(`Faturamento líquido ${brl(k.receita_liquida)}<br>− anúncios ${brl(k.gasto)}<br>− imposto sobre a mídia ${brl(k.imposto_midia)}<br>− imposto estimado ${brl(k.imposto)} (${pctImp} do bruto)`);
     let meta;
     if (r.meta) {
@@ -641,15 +712,15 @@
         <div class="etiquetas"><span class="etq">no ritmo: ${brl(r.proj)}</span>${casa ? `<span class="etq">${pct(Math.max(0, r.proj), casa)} da meta da casa</span>` : ""}</div></div>`;
     }
     $("kpis").innerHTML = `
-      <div class="cartao kpi lucro" data-dica="${explica}"><span>Lucro limpo</span><strong class="num ${k.lucro < 0 ? "negativo" : ""}"><small>R$</small>${reais(k.lucro)}</strong>
+      <div class="cartao kpi lucro" data-dica="${explica}"><span>Lucro limpo</span><div class="linha-kpi"><strong class="num ${k.lucro < 0 ? "negativo" : ""}"><small>R$</small>${reais(k.lucro)}</strong>${faisca(dias, (x) => x.lucro)}</div>
         <div class="etiquetas">${variacao(k.lucro, a?.lucro)}<span class="etq estimativa">estimativa</span></div></div>
-      <div class="cartao kpi"><span>Faturamento líquido</span><strong class="num"><small>R$</small>${reais(k.receita_liquida)}</strong>
+      <div class="cartao kpi"><span>Faturamento líquido</span><div class="linha-kpi"><strong class="num"><small>R$</small>${reais(k.receita_liquida)}</strong>${faisca(dias, (x) => x.receita_liquida)}</div>
         <div class="etiquetas">${variacao(k.receita_liquida, a?.receita_liquida)}<span class="etq">${int(k.pedidos)} pedidos${k.bumps ? ` · ${int(k.bumps)} bumps` : ""}</span></div></div>
-      <div class="cartao kpi"><span>Gasto em anúncios</span><strong class="num"><small>R$</small>${reais(k.gasto)}</strong>
+      <div class="cartao kpi"><span>Gasto em anúncios</span><div class="linha-kpi"><strong class="num"><small>R$</small>${reais(k.gasto)}</strong>${faisca(dias, (x) => x.gasto)}</div>
         <div class="etiquetas"><span class="etq">${roas == null ? "sem gasto" : `retorno ${roas.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}×`}</span>${k.gasto && k.pedidos ? `<span class="etq">CPA ${brl(k.gasto / k.pedidos)}</span>` : ""}</div></div>
-      <div class="cartao kpi"><span>Conversão da página</span><strong class="num">${pct(k.pedidos, k.visitantes)}</strong>
+      <div class="cartao kpi"><span>Conversão da página</span><div class="linha-kpi"><strong class="num">${pct(k.pedidos, k.visitantes)}</strong>${faisca(dias, (x) => x.visitantes && x.pedidos / x.visitantes)}</div>
         <div class="etiquetas">${variacao(conv, convA)}<span class="etq">${int(k.visitantes)} visitantes</span></div></div>
-      <div class="cartao kpi" data-dica="Quanto cada pedido deixa, em média, contando os bumps (valor pago pelo cliente)"><span>Ticket por pedido</span><strong class="num"><small>R$</small>${k.pedidos ? reais(ticket) : "—"}</strong>
+      <div class="cartao kpi" data-dica="Quanto cada pedido deixa, em média, contando os bumps (valor pago pelo cliente)"><span>Ticket por pedido</span><div class="linha-kpi"><strong class="num"><small>R$</small>${k.pedidos ? reais(ticket) : "—"}</strong>${faisca(dias, (x) => x.pedidos && x.receita / x.pedidos)}</div>
         <div class="etiquetas">${variacao(ticket, ticketA)}<span class="etq">com os bumps</span></div></div>
       ${meta}`;
   }
@@ -1626,6 +1697,7 @@
   let timer = null;
   async function iniciar() {
     $("tela-login").hidden = true; $("app").hidden = false;
+    setTimeout(() => document.body.classList.add("pronto"), 1500);
     try { await carregarCatalogo(); } catch (e) { relogio(false); return; }
     irPara(aba); pedidosAntes = null; carregar();
     clearInterval(timer); timer = setInterval(verificar, INTERVALO);
@@ -1633,6 +1705,19 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden && senha) { carregarCatalogo().catch(() => {}); verificar(); } });
   let redim = null;
   addEventListener("resize", () => { clearTimeout(redim); redim = setTimeout(() => dados && desenhar(dados), 150); });
+
+  // 3D com mouse: o cartão sob o ponteiro inclina um pouco e o reflexo segue o ponteiro (no celular fica o 3D da rolagem)
+  if (matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)").matches) {
+    let sob = null;
+    addEventListener("pointermove", (e) => {
+      const c = e.target.closest?.(".cartao");
+      if (sob && sob !== c) { sob.style.removeProperty("--rx"); sob.style.removeProperty("--ry"); }
+      sob = c; if (!c) return;
+      const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      c.style.setProperty("--mx", `${x * 100}%`); c.style.setProperty("--my", `${y * 100}%`);
+      if (c.classList.contains("kpi")) { c.style.setProperty("--rx", `${(.5 - y) * 10}deg`); c.style.setProperty("--ry", `${(x - .5) * 12}deg`); }
+    }, { passive: true });
+  }
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
