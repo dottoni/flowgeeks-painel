@@ -96,6 +96,15 @@
       "projeto": "plataforma-esteticistas",
       "paginas": [],
       "hotmart": {}
+    },
+    {
+      "id": "devocional",
+      "nome": "Devocional para mulheres (nome provisório)",
+      "cor": "#7a9e4f",
+      "status": "em preparação",
+      "projeto": "devocional",
+      "paginas": [],
+      "hotmart": {}
     }
   ],
   "mudancas": [
