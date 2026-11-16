@@ -107,6 +107,15 @@
       "projeto": "devocional",
       "paginas": [],
       "hotmart": {}
+    },
+    {
+      "id": "geladinho",
+      "nome": "A conta pronta do geladinho (nome provisório)",
+      "cor": "#3987e5",
+      "status": "em preparação",
+      "projeto": "geladinho",
+      "paginas": [],
+      "hotmart": {}
     }
   ],
   "mudancas": [
