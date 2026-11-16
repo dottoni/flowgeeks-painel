@@ -1,0 +1,1804 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel FlowGeeks</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone-192.png?v=2">
+<link rel="apple-touch-icon" href="icone-180.png?v=2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FlowGeeks">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#08090a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Escuro de propósito (um só tema): grafite com o verde-limão da casa.
+     A cor de cada produto vem do produtos.json e é a mesma em todo o painel. */
+  :root {
+    color-scheme: dark;
+    --fundo: #08090a;
+    --cartao: rgba(255, 255, 255, .035);
+    --cartao-forte: rgba(255, 255, 255, .08);
+    --borda: rgba(255, 255, 255, .1);
+    --tinta: #f2f3ef;
+    --suave: #b9bdb4;
+    --apagado: #8b9087;
+    --grade: rgba(255, 255, 255, .06);
+    --limao: #b8f23a;
+    --madeira: #c9a43a;
+    --bom: #4ade80;
+    --atencao: #fab219;
+    --serio: #ec835a;
+    --critico: #e66767;
+    --raio: 24px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; background: var(--fundo); }
+  body { margin: 0; min-height: 100dvh; color: var(--tinta); font-family: "Archivo", system-ui, sans-serif;
+         font-size: 14.5px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  /* vidro: brilhos de limão, oliva e madeira atrás (derivando devagar) e um granulado fino por cima;
+     os cartões desfocam o que passa por baixo */
+  body::before { content: ""; position: fixed; inset: -15%; z-index: -2; pointer-events: none;
+                 background: radial-gradient(30% 34% at 22% 14%, rgba(184, 242, 58, .34), transparent 70%),
+                             radial-gradient(34% 40% at 84% 18%, rgba(118, 150, 34, .42), transparent 70%),
+                             radial-gradient(32% 36% at 74% 66%, rgba(201, 164, 58, .3), transparent 70%),
+                             radial-gradient(28% 30% at 14% 76%, rgba(236, 131, 90, .16), transparent 70%),
+                             radial-gradient(40% 40% at 48% 48%, rgba(184, 242, 58, .08), transparent 70%),
+                             linear-gradient(180deg, #0c0f0a, #08090a);
+                 animation: deriva 40s ease-in-out infinite alternate; }
+  body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); }
+  @keyframes deriva { 50% { transform: translate(3%, -2%) scale(1.04); } 100% { transform: translate(-3%, 2%) scale(1.02); } }
+  button, select { font: inherit; color: inherit; }
+  .num { font-variant-numeric: tabular-nums; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--limao); outline-offset: 2px; }
+
+  .moldura { max-width: 1180px; margin: 0 auto;
+             padding: calc(env(safe-area-inset-top, 0px) + 16px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 104px) max(16px, env(safe-area-inset-left, 0px)); }
+
+  /* ---------- cabeçalho ---------- */
+  .cabeca { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+  .titulo { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .selo { width: 44px; height: 44px; border-radius: 14px; flex: none; border: 1px solid rgba(184, 242, 58, .4); box-shadow: 0 0 28px -6px rgba(184, 242, 58, .55); }
+  .titulo h1 { margin: 0; font-size: 23px; font-weight: 800; letter-spacing: -.02em; }
+  .titulo p { margin: 1px 0 0; font-size: 12.5px; color: var(--apagado); font-weight: 600; }
+  .titulo p .vivo { color: var(--limao); }
+  .titulo p .vivo::before { content: "●"; margin-right: 4px; animation: piscar 2s infinite; }
+  .titulo p .vivo.parado { color: var(--apagado); }
+  .titulo p .vivo.parado::before { animation: none; }
+  @keyframes piscar { 50% { opacity: .35; } }
+
+  .pilula { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-radius: 999px; flex: none;
+            background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .11); font-weight: 700; font-size: 13px; white-space: nowrap;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
+            transition: background .2s, border-color .2s, box-shadow .2s; }
+  @media (hover: hover) { button.pilula:hover { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .18); } }
+  .pilula svg { width: 15px; height: 15px; flex: none; }
+  .pilula select { appearance: none; -webkit-appearance: none; background: none; border: 0; font-weight: 700; font-size: 13px;
+                   padding-right: 14px; cursor: pointer;
+                   background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+                   background-position: right 4px center, right 0 center; background-size: 4px 4px; background-repeat: no-repeat; }
+  .pilula select option { background: #16181a; color: var(--tinta); }
+
+  /* seletor de produto */
+  .produtos { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 16px; padding: 2px 16px; }
+  .produtos::-webkit-scrollbar { display: none; }
+  .produtos button { cursor: pointer; }
+  .produtos button[aria-pressed="true"] { background: var(--limao); border-color: var(--limao); color: #08090a; box-shadow: 0 6px 22px -6px rgba(184, 242, 58, .7); }
+  .ponto { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--cor); }
+  .produtos button[aria-pressed="true"] .ponto { box-shadow: 0 0 0 2px #08090a; }
+  .produtos small { font-size: 11px; font-weight: 700; opacity: .75; }
+
+  /* ---------- cartões ---------- */
+  .cartao { position: relative; min-width: 0; padding: 18px; border-radius: var(--raio);
+            background: linear-gradient(155deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .035) 45%, rgba(255, 255, 255, .02));
+            border: 1px solid rgba(255, 255, 255, .06);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 24px 48px -24px rgba(0, 0, 0, .75);
+            backdrop-filter: blur(28px) saturate(170%); -webkit-backdrop-filter: blur(28px) saturate(170%);
+            transition: transform .3s ease, box-shadow .3s ease; }
+  /* borda de vidro: acende no canto de cima e some na diagonal */
+  .cartao::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+                    background: linear-gradient(140deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, .06) 30%, transparent 55%, rgba(184, 242, 58, .18));
+                    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+                    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+  /* 3D: o cartão de número inclina seguindo o mouse (--rx/--ry vêm do script) e um reflexo acompanha o ponteiro */
+  .kpi { animation: surgir .6s cubic-bezier(.2, .8, .2, 1) both;
+         transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0px)); }
+  .cartao::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
+                   background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, .1), transparent 45%); }
+  @media (hover: hover) {
+    .cartao:hover::after { opacity: 1; }
+    .kpi:hover { --ty: -4px; transition: transform .12s ease-out, box-shadow .3s ease;
+                 box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 34px 60px -24px rgba(0, 0, 0, .85); }
+  }
+  /* camadas: os quadros de baixo entram deitados e se levantam ao subir na tela; o fundo anda mais devagar que a página */
+  @supports (animation-timeline: view()) {
+    .cartao:not(.kpi) { animation: levantar linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+    body::before { animation: deriva 40s ease-in-out infinite alternate, paralaxe linear both; animation-timeline: auto, scroll(); }
+  }
+  @keyframes levantar { from { opacity: .2; transform: perspective(1100px) rotateX(16deg) translateY(40px) scale(.96); } }
+  @keyframes paralaxe { to { translate: 0 -10vh; } }
+  @keyframes surgir { from { opacity: 0; transform: translateY(10px) scale(.985); } }
+  .kpis .cartao:nth-child(2) { animation-delay: .05s; } .kpis .cartao:nth-child(3) { animation-delay: .1s; }
+  .kpis .cartao:nth-child(4) { animation-delay: .15s; } .kpis .cartao:nth-child(5) { animation-delay: .2s; } .kpis .cartao:nth-child(6) { animation-delay: .25s; }
+  body.pronto .kpi { animation: none; }   /* entra uma vez só; quando chegam números novos não pisca */
+  .cartao h2 { margin: 0; font-size: 14.5px; font-weight: 800; }
+  .cabeca-cartao { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .cabeca-cartao small { color: var(--apagado); font-weight: 700; font-size: 12px; white-space: nowrap; }
+  .vazio { color: var(--apagado); font-weight: 700; font-size: 13.5px; padding: 16px 0; text-align: center; }
+
+  .grade { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .kpi span { display: block; font-size: 12.5px; color: var(--suave); font-weight: 700; }
+  .kpi strong { display: block; font-size: 26px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; margin: 6px 0 8px; }
+  .kpi strong small { font-size: .55em; color: var(--suave); font-weight: 700; margin-right: 3px; letter-spacing: 0; }
+  .kpi strong.negativo { color: var(--critico); }
+  .linha-kpi { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+  .faisca { flex: 0 1 96px; min-width: 0; height: 30px; margin-bottom: 10px; color: var(--limao); overflow: visible; }
+  .faisca polyline { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; opacity: .9; }
+  .faisca circle { fill: currentColor; }
+  @media (max-width: 560px) { .kpi:not(.lucro) .faisca { display: none; } }   /* cartão de meia largura no celular: o número precisa do espaço */
+  .etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .etq { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--cartao-forte); color: var(--suave); white-space: nowrap; }
+  .etq.sobe { background: rgba(74, 222, 128, .12); color: #86efac; }
+  .etq.desce { background: rgba(230, 103, 103, .14); color: #fca5a5; }
+  .etq.estimativa { background: rgba(201, 164, 58, .16); color: #e6cd84; }
+  .resumo { margin: 0 0 6px; font-size: 15px; font-weight: 700; line-height: 1.4; }
+  .grupo-sub { align-self: center; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--suave); white-space: nowrap; padding-left: 6px; }
+  .etq.lim-bom { background: rgba(74, 222, 128, .12); color: #86efac; }
+  .etq.lim-atencao { background: rgba(250, 178, 25, .14); color: #fcd27b; }
+  .etq.lim-critico { background: rgba(230, 103, 103, .14); color: #fca5a5; }
+  details#cartao-produtos > summary { cursor: pointer; list-style: none; }
+  details#cartao-produtos > summary::-webkit-details-marker { display: none; }
+  details#cartao-produtos > summary h2::after { content: " ▾"; color: var(--suave); }
+  details#cartao-produtos[open] > summary h2::after { content: " ▴"; }
+  .ver-colunas { display: none; margin-top: 10px; }
+  @media (max-width: 560px) {
+    table.enxuto:not(.tudo) th:nth-child(n+5), table.enxuto:not(.tudo) td:nth-child(n+5) { display: none; }
+    .ver-colunas { display: inline-flex; }
+  }
+
+  /* o destaque da tela: vidro limão sólido, texto escuro (nunca branco no limão) */
+  .lucro { grid-column: 1 / -1; color: #08090a; border-color: transparent;
+           background: radial-gradient(120% 100% at 0% 0%, rgba(255, 255, 255, .42), transparent 55%),
+                       linear-gradient(135deg, rgba(200, 246, 96, .96), rgba(166, 220, 44, .92) 50%, rgba(122, 168, 26, .9));
+           box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 26px 60px -22px rgba(184, 242, 58, .6); }
+  .lucro::before { background: linear-gradient(140deg, rgba(255, 255, 255, .8), transparent 40%); }
+  .lucro.kpi span, .lucro.kpi strong small { color: rgba(8, 9, 10, .66); }
+  .lucro.kpi strong.negativo { color: #7a1414; }
+  .lucro .etq, .lucro .etq.sobe, .lucro .etq.desce, .lucro .etq.estimativa { background: rgba(8, 9, 10, .13); color: #08090a; }
+  .lucro .faisca { color: #08090a; }
+  .lucro strong { font-size: 34px; }
+  .meta { grid-column: 1 / -1; position: relative; overflow: hidden; }
+  .meta strong { font-size: 30px; }
+  .meta strong em { font-style: normal; font-size: 13px; font-weight: 800; color: var(--limao); margin-left: 6px; letter-spacing: 0; }
+  .barra-meta { position: relative; height: 12px; border-radius: 6px; background: rgba(0, 0, 0, .3); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .4), 0 1px 0 rgba(255, 255, 255, .06); overflow: hidden; margin: 4px 0 8px; }
+  .barra-meta .feito { position: absolute; inset: 0 auto 0 0; border-radius: 6px; background: linear-gradient(90deg, #8fc21f, var(--limao)); box-shadow: 0 0 14px rgba(184, 242, 58, .7); }
+  .barra-meta .proj { position: absolute; top: 0; bottom: 0; border-radius: 0 6px 6px 0;
+                      background: repeating-linear-gradient(135deg, rgba(184, 242, 58, .7) 0 4px, rgba(184, 242, 58, .12) 4px 8px); }
+  .barra-meta .alvo { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--tinta); border-radius: 1px; }
+  .rodape-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--suave); font-weight: 700; }
+
+  /* gráficos */
+  .grafico svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .grafico text { font-family: inherit; font-weight: 700; }
+  .eixo { fill: var(--apagado); font-size: 11px; }
+  .linha-grade { stroke: var(--grade); }
+  .legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; font-weight: 700; color: var(--suave); margin: -4px 0 10px; }
+  .legenda b { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  /* barras horizontais */
+  .barras { display: grid; gap: 11px; }
+  .bl { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 9fr) auto; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; }
+  .bl > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--suave); }
+  .bl .trilho { height: 9px; border-radius: 5px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+  .bl .trilho i { display: block; height: 100%; border-radius: 5px; min-width: 3px; background: var(--limao); transition: width .5s ease; }
+  .bl .valor { min-width: 54px; text-align: right; }
+  .bl .valor.bom { color: var(--bom); } .bl .valor.ruim { color: var(--critico); }
+  .barras.empilhadas .bl { grid-template-columns: minmax(0, 1fr) auto; }
+  .barras.empilhadas .trilho { grid-column: 1 / -1; order: 3; }
+
+  /* por produto */
+  .tabela-produtos tbody tr[data-produto] { cursor: pointer; }
+  .tabela-produtos tbody tr[data-produto]:hover td { background: rgba(255, 255, 255, .03); }
+  .tabela-produtos td:first-child { display: flex; align-items: center; gap: 8px; }
+  .tabela-produtos tfoot td { border-bottom: 0; border-top: 1px solid var(--borda); font-weight: 800; }
+  td.negativo { color: var(--critico); }
+
+  /* dia a dia: um quadro para o geral e um por produto */
+  .dia-a-dia h2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dia-a-dia h2 .etq { font-size: 12px; }
+  .dia-a-dia td, .dia-a-dia th { padding: 7px 6px; font-size: 12.5px; }
+  .dia-a-dia td.roas { padding: 7px 8px; }
+  @media (max-width: 560px) { .dia-a-dia td, .dia-a-dia th { padding: 7px 4px; font-size: 12px; } .dia-a-dia th { letter-spacing: 0; } }
+  .dia-a-dia tr.soma td { font-weight: 800; border-top: 1px solid var(--borda); }
+  .dia-a-dia tr.projecao td { color: var(--limao); }
+  td.roas { text-align: right; border-radius: 6px; }
+  td.roas.bom { background: rgba(74, 222, 128, .14); color: #86efac; }
+  td.roas.atencao { background: rgba(250, 178, 25, .15); color: #fcd34d; }
+  td.roas.ruim { background: rgba(230, 103, 103, .16); color: #fca5a5; }
+
+  /* atenção */
+  .atencao h2 { display: flex; align-items: center; gap: 8px; }
+  .atencao h2 svg { width: 16px; height: 16px; flex: none; }
+  .atencao h2 small { margin-left: auto; color: var(--apagado); }
+  .alertas { display: grid; gap: 8px; margin-top: 12px; }
+  .alerta { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 14px; background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .07); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
+            font-size: 13px; font-weight: 700; }
+  .alerta[role="button"] { cursor: pointer; }
+  .alerta::before { content: ""; width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--cor); box-shadow: 0 0 10px var(--cor); }
+  .alerta span { flex: 1; min-width: 0; }
+  .alerta .tag { flex: none; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 7px;
+                 background: color-mix(in srgb, var(--cor) 18%, transparent); color: color-mix(in srgb, var(--cor) 70%, white); }
+
+  /* mapa dia x hora */
+  .mapa { display: grid; grid-template-columns: 28px repeat(24, minmax(0, 1fr)); gap: 2px; font-size: 10px; font-weight: 700; color: var(--apagado); }
+  .mapa .c { aspect-ratio: 1; border-radius: 3px; background: rgba(255, 255, 255, .05); }
+  .mapa .h { text-align: center; }
+  .escala { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11.5px; font-weight: 700; color: var(--apagado); }
+  .escala i { width: 16px; height: 10px; border-radius: 2px; }
+
+  /* listas e tabela */
+  .lista { display: grid; }
+  .item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 11px 0; border-bottom: 1px solid var(--grade); }
+  .item:last-child { border-bottom: 0; }
+  .item b { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item .dir { text-align: right; font-weight: 800; }
+  .item small { color: var(--apagado); font-weight: 600; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tag-produto { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px;
+                 margin-left: 6px; vertical-align: 1px; background: var(--cartao-forte); color: var(--suave); }
+  .tag-produto .ponto { width: 7px; height: 7px; }
+  .st-ok { color: var(--bom) !important; } .st-esp { color: var(--atencao) !important; } .st-ruim { color: var(--critico) !important; }
+  .zap { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 800; color: #08090a; background: var(--bom);
+         padding: 5px 10px; border-radius: 999px; text-decoration: none; }
+  .rolar { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { text-align: left; font-size: 11px; letter-spacing: .04em; color: var(--apagado); font-weight: 800; padding: 6px 8px; border-bottom: 1px solid var(--borda); white-space: nowrap; }
+  td { padding: 10px 8px; border-bottom: 1px solid var(--grade); white-space: nowrap; font-weight: 700; }
+  td.n, th.n { text-align: right; }
+  td:first-child, th:first-child { padding-left: 0; } td:last-child, th:last-child { padding-right: 0; }
+  details.numeros { margin-top: 10px; font-size: 12.5px; }
+  details.numeros summary { cursor: pointer; color: var(--limao); font-weight: 800; }
+
+  /* abas embaixo */
+  .abas { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); transform: translateX(-50%); z-index: 10;
+          display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(22, 26, 20, .55); border: 1px solid rgba(255, 255, 255, .13);
+          backdrop-filter: blur(26px) saturate(180%); -webkit-backdrop-filter: blur(26px) saturate(180%);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 18px 40px -10px rgba(0, 0, 0, .7);
+          max-width: calc(100% - 24px); }
+  .abas button { display: flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--suave); font-weight: 800; font-size: 13px;
+                 padding: 10px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; min-height: 44px; transition: background .25s, color .25s, box-shadow .25s; }
+  .abas button svg { width: 17px; height: 17px; flex: none; }
+  .abas button[aria-selected="true"] { color: #08090a; background: var(--limao); box-shadow: 0 6px 22px -4px rgba(184, 242, 58, .75), inset 0 1px 0 rgba(255, 255, 255, .5); }
+  @media (max-width: 420px) { .abas button { padding: 10px 12px; } .abas button:not([aria-selected="true"]) span { display: none; } }
+
+  .dica { position: fixed; z-index: 20; pointer-events: none; background: #f2f3ef; color: #08090a; font-size: 12.5px; font-weight: 700;
+          padding: 7px 10px; border-radius: 9px; line-height: 1.35; max-width: 240px; opacity: 0; transition: opacity .12s; }
+  .dica.on { opacity: 1; }
+  .dica .ponto { display: inline-block; width: 8px; height: 8px; margin-right: 5px; }
+  .aviso { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translate(-50%, -160%); z-index: 30;
+           background: var(--limao); color: #08090a; font-weight: 800; padding: 12px 18px; border-radius: 14px;
+           box-shadow: 0 10px 30px rgba(0, 0, 0, .5); transition: transform .35s cubic-bezier(.2, .8, .2, 1); max-width: calc(100% - 32px); }
+  .aviso.on { transform: translate(-50%, 0); }
+  .rodape { text-align: center; color: var(--apagado); font-size: 12px; font-weight: 700; margin-top: 16px; }
+  .rodape button { border: 0; background: none; color: var(--limao); font-weight: 800; cursor: pointer; padding: 6px; }
+
+  /* login */
+  .login { min-height: 100dvh; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-left, 0px)); }
+  .login form { width: 100%; max-width: 340px; display: grid; gap: 12px; }
+  .login h1 { margin: 6px 0 0; font-size: 22px; font-weight: 800; }
+  .login p { margin: 0; color: var(--suave); font-size: 14px; }
+  .login input { font: inherit; font-size: 16px; padding: 13px 14px; border-radius: 13px; border: 1px solid var(--borda); background: var(--cartao-forte); color: var(--tinta); }
+  .login button { border: 0; background: var(--limao); color: #08090a; font-weight: 800; padding: 14px; border-radius: 13px; font-size: 16px; cursor: pointer; }
+  .login .erro { color: var(--critico); font-weight: 800; font-size: 13.5px; }
+
+  /* ---------- análise ---------- */
+  .sub-abas { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 4px; padding: 2px 16px; }
+  .sub-abas::-webkit-scrollbar { display: none; }
+  .sub-abas button { cursor: pointer; }
+  .sub-abas button[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: #08090a; }
+  .faixa-partida { padding: 11px 14px; border-radius: 13px; font-size: 13px; font-weight: 700; background: rgba(201, 164, 58, .14); color: #e6cd84; }
+  .placar-sim { display: grid; gap: 16px; border-color: rgba(184, 242, 58, .3); background: linear-gradient(135deg, rgba(184, 242, 58, .26), rgba(184, 242, 58, .06) 55%, rgba(255, 255, 255, .03));
+          box-shadow: inset 0 1px 0 rgba(184, 242, 58, .25), 0 0 40px -12px rgba(184, 242, 58, .35); }
+  .placar-sim .grande { font-size: 44px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  .placar-sim .grande small { font-size: 18px; color: var(--suave); font-weight: 700; letter-spacing: 0; }
+  .placar-sim .selo-portao { display: inline-block; margin-top: 8px; }
+  .placar-sim p { margin: 8px 0 0; color: var(--suave); font-weight: 600; font-size: 13.5px; max-width: 56ch; }
+  .placar-sim .op { font-size: 16px; font-weight: 800; color: var(--tinta); margin: 2px 0 0; }
+  .placar-sim .rot { font-size: 12px; font-weight: 800; color: var(--limao); }
+  .numeros-sim { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .numeros-sim span { display: block; font-size: 12px; font-weight: 700; color: var(--suave); }
+  .numeros-sim b { display: block; font-size: 21px; font-weight: 800; letter-spacing: -.02em; }
+  .numeros-sim small { font-size: 11.5px; font-weight: 700; color: var(--apagado); }
+  .acoes-sim { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .acoes-sim button { cursor: pointer; }
+  .acoes-sim label { gap: 8px; }
+  .acoes-sim input { width: 58px; background: none; border: 0; font: inherit; font-weight: 800; text-align: right; }
+  .esteira { display: flex; align-items: stretch; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .esteira .et { flex: 1 0 86px; min-width: 0; padding: 10px; border-radius: 12px; background: var(--cartao-forte); font-weight: 800; }
+  .esteira .et span { display: block; font-size: 11.5px; color: var(--suave); }
+  .esteira .et b { font-size: 18px; letter-spacing: -.02em; }
+  .esteira .et small { display: block; font-size: 11.5px; color: var(--apagado); font-weight: 700; }
+  .esteira .et.gargalo { background: rgba(230, 103, 103, .14); box-shadow: inset 0 0 0 1px rgba(230, 103, 103, .5); }
+  .esteira .et.gargalo small { color: #fca5a5; }
+  .alavancas { display: grid; gap: 12px; }
+  .grupo-alav h3 { margin: 0 0 2px; font-size: 14.5px; font-weight: 800; }
+  .grupo-alav > small { display: block; color: var(--apagado); font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+  .alav + .alav { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--grade); }
+  .alav-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .alav-top label { font-weight: 800; font-size: 13.5px; min-width: 0; }
+  .alav-top label small { display: block; font-weight: 600; font-size: 11.5px; color: var(--apagado); }
+  .campo-alav { display: flex; align-items: center; gap: 4px; flex: none; padding: 4px 8px; border-radius: 9px; background: var(--cartao-forte); font-weight: 800; font-size: 13px; color: var(--suave); }
+  .campo-alav input { width: 72px; background: none; border: 0; color: var(--tinta); font: inherit; font-size: 15px; text-align: right; -moz-appearance: textfield; }
+  .campo-alav input::-webkit-outer-spin-button, .campo-alav input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .trilho-alav { position: relative; margin: 10px 0 6px; }
+  .trilho-alav input[type=range] { width: 100%; margin: 0; display: block; accent-color: var(--limao); height: 24px; background: transparent; }
+  .pino { position: absolute; top: -2px; width: 2px; height: 28px; border-radius: 1px; pointer-events: none; transform: translateX(-1px); }
+  .pino.real { background: var(--tinta); opacity: .75; }
+  .pino.limite { background: #ef6fa6; }
+  .rodape-alav { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; font-weight: 700; color: var(--apagado); }
+  .rodape-alav .lim { color: #f19bc1; }
+  .delta-sobe { color: var(--bom) !important; } .delta-desce { color: var(--critico) !important; }
+  .fonte { font-size: 12px; font-weight: 600; color: var(--apagado); margin: 8px 0 0; }
+  tr.destaque td { background: rgba(184, 242, 58, .1); }
+  tr.destaque td:first-child { box-shadow: inset 2px 0 0 var(--limao); padding-left: 8px; }
+  .periodos { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .periodos fieldset { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; padding: 8px 10px; border: 1px solid var(--borda); border-radius: 13px; min-width: 0; }
+  .periodos legend { padding: 0 4px; font-size: 11.5px; font-weight: 800; }
+  .periodos input { font: inherit; font-size: 13px; font-weight: 700; background: none; border: 0; color: var(--tinta); color-scheme: dark; max-width: 128px; }
+  .botoes-trecho { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .botoes-trecho button { cursor: pointer; display: block; flex: 1 1 100%; min-width: 0; max-width: 100%; height: auto; min-height: 38px; padding: 8px 14px; border-radius: 14px; white-space: normal; text-align: left; }
+  .campo-linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .campo-linha input, .campo-linha select { font: inherit; font-size: 13.5px; font-weight: 700; color: var(--tinta); color-scheme: dark; padding: 9px 12px; border-radius: 11px; border: 1px solid var(--borda); background: var(--cartao-forte); min-width: 0; }
+  .campo-linha input.cresce { flex: 1 1 220px; }
+  .campo-linha button, .botao { cursor: pointer; border: 0; background: var(--limao); color: #08090a; font: inherit; font-weight: 800; font-size: 13.5px; padding: 10px 16px; border-radius: 11px; }
+  .campo-linha button:disabled, .botao:disabled { opacity: .45; cursor: default; }
+  .apagar { cursor: pointer; border: 0; background: none; color: var(--apagado); font: inherit; font-weight: 800; padding: 0 4px; }
+  .abre { cursor: pointer; border: 0; background: none; color: var(--suave); font: inherit; font-weight: 800; padding: 0 6px 0 0; }
+  tr.filho td:first-child { padding-left: 22px; color: var(--suave); font-weight: 600; }
+  th[data-ordem] { cursor: pointer; }
+  .fichas { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .fichas button { cursor: pointer; border: 1px solid var(--borda); background: none; color: var(--suave); font: inherit; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
+  .fichas button[aria-pressed="true"] { background: var(--tinta); color: #08090a; border-color: var(--tinta); }
+  .leitura { display: inline-block; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 6px; margin-right: 3px; background: var(--cartao-forte); color: var(--suave); }
+  .leitura.Novo { background: rgba(57, 135, 229, .18); color: #9cc5f5; }
+  .leitura.Parou { background: rgba(230, 103, 103, .16); color: #fca5a5; }
+  .leitura.Piorou { background: rgba(250, 178, 25, .15); color: #fcd34d; }
+  .leitura.Melhorou { background: rgba(74, 222, 128, .14); color: #86efac; }
+  .leitura.Menos { background: rgba(236, 131, 90, .16); color: #f3b193; }
+  .ajustes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .ajustes span { display: block; font-size: 12px; font-weight: 700; color: var(--suave); }
+  .ajustes b { font-size: 19px; font-weight: 800; }
+  .mudanca { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--grade); font-size: 13px; font-weight: 600; color: var(--suave); }
+  .mudanca:last-child { border-bottom: 0; }
+  .mudanca b { color: var(--tinta); font-weight: 800; }
+
+  @media (min-width: 900px) {
+    .sub-abas { flex-wrap: wrap; overflow: visible; }
+    .placar-sim { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; }
+    .numeros-sim { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .alavancas { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+    .alavancas .larga { grid-column: 1 / -1; }
+    .alavancas .larga .lista-alav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+    .alavancas .larga .alav:nth-child(2) { margin-top: 0; padding-top: 0; border-top: 0; }
+    .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .lucro, .meta { grid-column: auto; }
+    .lucro strong { font-size: 30px; }
+    .linha-principal { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
+    .duas { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+  <symbol id="i-casa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-vendas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+  <symbol id="i-anuncio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4h4l6 5V5L7 10z"/><path d="M17 8a5 5 0 0 1 0 8"/></symbol>
+  <symbol id="i-pessoas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></symbol>
+  <symbol id="i-analise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h8M16 18h4"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="14" cy="18" r="2"/></symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></symbol>
+</svg>
+
+<section class="login" id="tela-login" hidden>
+  <form id="form-login">
+    <img class="selo" src="icone-192.png?v=2" alt="">
+    <h1>Painel FlowGeeks</h1>
+    <p>Digite a senha do painel. Ela fica salva neste aparelho.</p>
+    <!-- usuário fixo e invisível: sem ele o Chaveiro do iPhone não oferece salvar a senha nem preencher com Face ID -->
+    <input name="usuario" autocomplete="username" value="Painel FlowGeeks" readonly tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+    <input id="senha" name="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
+    <div class="erro" id="erro-login" hidden>Senha incorreta.</div>
+    <button type="submit">Entrar</button>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <div class="moldura">
+    <header class="cabeca">
+      <div class="titulo">
+        <img class="selo" src="icone-192.png?v=2" alt="">
+        <div>
+          <h1 id="pergunta">Como foi a semana?</h1>
+          <p><span id="nome-filtro">FlowGeeks</span> · <span class="vivo" id="vivo">ao vivo</span> · <span id="atualizado">—</span></p>
+        </div>
+      </div>
+      <label class="pilula"><svg><use href="#i-cal"/></svg>
+        <select id="periodo" aria-label="Período">
+          <option value="hoje">Hoje</option>
+          <option value="7d">Últimos 7 dias</option>
+          <option value="30d">Últimos 30 dias</option>
+          <option value="tudo">Desde o início</option>
+        </select>
+      </label>
+    </header>
+    <nav class="produtos" id="produtos" aria-label="Produto"></nav>
+
+    <!-- ===== INÍCIO ===== -->
+    <section class="grade" data-aba="inicio">
+      <div class="cartao atencao" id="cartao-atencao">
+        <p class="resumo" id="resumo"></p>
+        <h2><svg><use href="#i-alerta"/></svg>Precisa de atenção hoje <small id="qtd-alertas" class="num"></small></h2>
+        <div class="alertas" id="alertas"></div>
+      </div>
+      <div class="kpis" id="kpis"></div>
+      <div class="grade duas" id="dia-a-dia"></div>
+      <details class="cartao" id="cartao-produtos">
+        <summary class="cabeca-cartao"><h2>Comparar produtos</h2><small>toque num produto para ver só ele</small></summary>
+        <div class="rolar" id="tabela-produtos"></div>
+      </details>
+      <div class="grade linha-principal">
+        <div class="cartao grafico">
+          <div class="cabeca-cartao"><h2>Faturamento líquido por dia</h2><small>R$, após a Hotmart</small></div>
+          <div class="legenda" id="leg-fat"></div>
+          <div id="graf-fat"></div>
+          <details class="numeros"><summary>Ver em tabela</summary><div class="rolar" id="tab-fat"></div></details>
+        </div>
+        <div class="grade">
+          <div class="cartao">
+            <div class="cabeca-cartao"><h2>Receita por anúncio</h2><small>maior → menor</small></div>
+            <div class="barras" id="rank-anuncios"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VENDAS ===== -->
+    <section class="grade" data-aba="vendas" hidden>
+      <div class="cartao grafico">
+        <div class="cabeca-cartao"><h2>Pedidos por dia</h2><small>toque nas barras</small></div>
+        <div class="legenda" id="leg-pedidos"></div>
+        <div id="graf-pedidos"></div>
+      </div>
+      <div class="grade duas">
+        <div class="cartao"><div class="cabeca-cartao"><h2>Últimas vendas</h2><small>inclui boletos e bumps</small></div><div class="lista" id="ultimas"></div></div>
+        <div class="grade">
+          <div class="cartao"><div class="cabeca-cartao"><h2>Order bumps</h2><small>% dos pedidos que levaram</small></div><div class="barras" id="bumps"></div></div>
+          <div class="cartao"><div class="cabeca-cartao"><h2>Quando compram</h2><small>dia × hora</small></div><div id="mapa"></div></div>
+          <div class="cartao"><div class="cabeca-cartao"><h2>Forma de pagamento</h2></div><div class="barras" id="pagamentos"></div></div>
+          <div class="cartao"><div class="cabeca-cartao"><h2>Estados</h2><small>top 10</small></div><div class="barras" id="estados"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ANÚNCIOS ===== -->
+    <section class="grade" data-aba="anuncios" hidden>
+      <div class="cartao">
+        <div class="cabeca-cartao"><h2>Resultado por anúncio</h2><small>pela primeira visita</small></div>
+        <div class="rolar" id="tabela-anuncios"></div>
+      </div>
+      <div class="grade duas">
+        <div class="cartao"><div class="cabeca-cartao"><h2>Funil da página</h2><small>pessoas</small></div><div class="barras empilhadas" id="funil"></div></div>
+        <div class="grade">
+          <div class="cartao"><div class="cabeca-cartao"><h2>Aparelho dos visitantes</h2></div><div class="barras" id="dispositivos"></div></div>
+          <div class="cartao"><div class="cabeca-cartao"><h2>Dúvidas mais abertas</h2><small>FAQ</small></div><div class="barras" id="faq"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ANÁLISE ===== -->
+    <section class="grade" data-aba="analise" hidden>
+      <nav class="sub-abas" id="sub-abas" aria-label="Tipo de análise">
+        <span class="grupo-sub">Vale escalar?</span>
+        <button class="pilula" data-sub="simulador" aria-pressed="true">Simulador de funil</button>
+        <button class="pilula" data-sub="escala" aria-pressed="false">Nível de escala</button>
+        <button class="pilula" data-sub="hora" aria-pressed="false">ROAS por hora</button>
+        <span class="grupo-sub">O que mudou?</span>
+        <button class="pilula" data-sub="comparar" aria-pressed="false">Comparar períodos</button>
+        <button class="pilula" data-sub="mensal" aria-pressed="false">Mês a mês</button>
+        <button class="pilula" data-sub="diario" aria-pressed="false">Métricas do dia</button>
+        <span class="grupo-sub">De onde vem a venda?</span>
+        <button class="pilula" data-sub="anuncios" aria-pressed="false">Anúncios</button>
+        <button class="pilula" data-sub="origem" aria-pressed="false">Origem de vendas</button>
+        <button class="pilula" data-sub="pais" aria-pressed="false">Por país</button>
+        <span class="grupo-sub">Ajustes</span>
+        <button class="pilula" data-sub="config" aria-pressed="false">Importar e ajustes</button>
+      </nav>
+      <div class="grade" id="analise"></div>
+    </section>
+
+    <!-- ===== CLIENTES ===== -->
+    <section class="grade" data-aba="clientes" hidden>
+      <div class="cartao"><div class="cabeca-cartao"><h2>Carrinhos abandonados</h2><small>chame no WhatsApp</small></div><div class="lista" id="abandonos"></div></div>
+    </section>
+
+    <p class="rodape"><span id="rodape-info">Atualiza sozinho a cada 10 s · lucro é estimativa</span><br><button id="avisos" hidden>Ativar avisos de venda</button><br><button id="sair">Sair deste aparelho</button></p>
+  </div>
+
+  <nav class="abas" role="tablist" aria-label="Seções">
+    <button role="tab" data-ir="inicio" aria-selected="true"><svg><use href="#i-casa"/></svg><span>Início</span></button>
+    <button role="tab" data-ir="vendas" aria-selected="false"><svg><use href="#i-vendas"/></svg><span>Vendas</span></button>
+    <button role="tab" data-ir="anuncios" aria-selected="false"><svg><use href="#i-anuncio"/></svg><span>Anúncios</span></button>
+    <button role="tab" data-ir="analise" aria-selected="false"><svg><use href="#i-analise"/></svg><span>Análise</span></button>
+    <button role="tab" data-ir="clientes" aria-selected="false"><svg><use href="#i-pessoas"/></svg><span>Clientes</span></button>
+  </nav>
+</div>
+
+<div class="dica" id="dica" role="status"></div>
+<div class="aviso" id="aviso" role="alert"></div>
+
+<script>
+  const API = "https://zqolcoakhxabqviquybe.supabase.co/functions/v1/painel-flowgeeks";
+  const INTERVALO = 10000;
+
+  const $ = (id) => document.getElementById(id);
+  const ler = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const gravar = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} };
+
+  let senha = ler("fg_painel_senha");
+  let periodo = ler("fg_painel_periodo") || "7d";
+  let produto = ler("fg_painel_produto") || "";   // "" = todos
+  let aba = ler("fg_painel_aba") || "inicio";
+  let catalogo = null, versao = null, dados = null, pedidosAntes = null, ultimaAtualizacao = null;
+
+  const brl = (v) => (Number(v) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const reais = (v) => (Number(v) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const brlCurto = (v) => { v = Number(v) || 0; const s = v < 0 ? "-" : ""; v = Math.abs(v); return s + (v >= 1000 ? (v / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + " mil" : v.toLocaleString("pt-BR", { maximumFractionDigits: 0 })); };
+  const int = (v) => (Number(v) || 0).toLocaleString("pt-BR");
+  const pct = (a, b) => (b ? (100 * a / b).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%" : "—");
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const NOMES_PAG = { CREDIT_CARD: "Cartão", PIX: "Pix", BILLET: "Boleto", PAYPAL: "PayPal", HOTMART_BALANCE: "Saldo Hotmart",
+                      GOOGLE_PAY: "Google Pay", APPLE_PAY: "Apple Pay", DIRECT_DEBIT: "Débito" };
+  const STATUS = { APPROVED: ["Aprovada", "ok"], COMPLETE: ["Aprovada", "ok"], BILLET_PRINTED: ["Boleto gerado", "esp"],
+                   WAITING_PAYMENT: ["Aguardando", "esp"], DELAYED: ["Atrasada", "esp"], REFUNDED: ["Reembolsada", "ruim"],
+                   CHARGEBACK: ["Chargeback", "ruim"], CANCELED: ["Cancelada", "ruim"], CANCELLED: ["Cancelada", "ruim"],
+                   EXPIRED: ["Expirada", "ruim"], PROTESTED: ["Contestada", "ruim"] };
+  const DIAS = ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"];
+  const NOME_ANTERIOR = { hoje: "ontem", "7d": "7 dias antes", "30d": "30 dias antes" };
+  const hojeSP = () => new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+
+  // ---------- catálogo (produtos.json) ----------
+  const prod = (id) => catalogo.produtos.find((p) => p.id === id);
+  // na tela só aparecem os produtos à venda; os totais seguem somando o catálogo inteiro
+  const aVendaLista = () => catalogo.produtos.filter((p) => p.status === "à venda");
+  const nomeDe = (id) => prod(id)?.nome || id;
+  const corDe = (id) => prod(id)?.cor || "#8b9087";
+  const impostoDe = (id) => Number(prod(id)?.imposto_pct ?? catalogo.imposto_pct ?? 0) / 100;
+  const midiaDe = () => Number(catalogo?.imposto_midia_pct ?? 0) / 100;   // imposto cobrado em cima do gasto em anúncios
+  const tagProduto = (id) => produto ? "" : `<span class="tag-produto"><i class="ponto" style="--cor:${corDe(id)}"></i>${esc(nomeDe(id))}</span>`;
+
+  async function carregarCatalogo() {
+    const r = await fetch("produtos.json", { cache: "no-store" });
+    if (!r.ok) throw new Error("rede");
+    catalogo = await r.json();
+    if (produto && prod(produto)?.status !== "à venda") produto = "";
+    desenharSeletor();
+  }
+
+  // Soma os números dos produtos escolhidos e calcula o lucro limpo (estimativa).
+  function somar(lista, ids) {
+    const t = { visitantes: 0, clicaram_comprar: 0, pedidos: 0, bumps: 0, receita: 0, receita_liquida: 0, gasto: 0,
+                reembolsos: 0, reembolsos_valor: 0, aguardando: 0, abandonos: 0, imposto: 0 };
+    for (const k of lista || []) {
+      if (ids && !ids.includes(k.id)) continue;
+      for (const c of Object.keys(t)) if (c !== "imposto") t[c] += Number(k[c]) || 0;
+      t.imposto += (Number(k.receita) || 0) * impostoDe(k.id);
+    }
+    t.imposto_midia = t.gasto * midiaDe();
+    t.lucro = t.receita_liquida - t.gasto - t.imposto_midia - t.imposto;
+    return t;
+  }
+  const escolhidos = () => produto ? [produto] : catalogo.produtos.map((p) => p.id);
+
+  async function chamar(params, corpo) {
+    const r = await fetch(API + "?" + new URLSearchParams(params), {
+      method: corpo ? "POST" : "GET", cache: "no-store",
+      headers: { "x-painel-senha": senha || "", ...(corpo ? { "content-type": "application/json" } : {}) },
+      body: corpo ? JSON.stringify(corpo) : undefined,
+    });
+    if (r.status === 401) throw new Error("senha");
+    if (!r.ok) throw new Error("rede");
+    return r.json();
+  }
+
+  // ---------- login ----------
+  function mostrarLogin(erro) {
+    $("app").hidden = true; $("tela-login").hidden = false; $("erro-login").hidden = !erro;
+    setTimeout(() => $("senha").focus(), 50);
+  }
+  $("form-login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    senha = $("senha").value.trim();
+    $("erro-login").textContent = "Senha incorreta.";
+    try { await chamar({ versao: 1 }); gravar("fg_painel_senha", senha); iniciar(); }
+    catch (err) { mostrarLogin(true); if (err.message !== "senha") $("erro-login").textContent = "Sem conexão. Tente de novo."; }
+  });
+  $("sair").addEventListener("click", () => { gravar("fg_painel_senha", null); senha = null; mostrarLogin(false); });
+
+  // ---------- filtros e abas ----------
+  $("periodo").value = periodo;
+  $("periodo").addEventListener("change", () => { periodo = $("periodo").value; gravar("fg_painel_periodo", periodo); pedidosAntes = null; carregar(); });
+
+  function desenharSeletor() {
+    const botoes = [`<button class="pilula" data-produto="" aria-pressed="${!produto}">Todos</button>`].concat(
+      aVendaLista().map((p) => `<button class="pilula" data-produto="${esc(p.id)}" aria-pressed="${produto === p.id}">` +
+        `<i class="ponto" style="--cor:${esc(p.cor)}"></i>${esc(p.nome)}</button>`));
+    $("produtos").innerHTML = botoes.join("");
+    $("nome-filtro").textContent = produto ? nomeDe(produto) : "FlowGeeks · todos os produtos";
+    $("cartao-produtos").hidden = !!produto;
+  }
+  function escolherProduto(id) {
+    produto = id; gravar("fg_painel_produto", id || null);
+    desenharSeletor(); scrollTo({ top: 0 });
+    if (dados) desenhar(dados);   // os números do topo já estão aqui; os detalhes chegam em seguida
+    carregar();
+  }
+  $("produtos").addEventListener("click", (e) => { const b = e.target.closest("[data-produto]"); if (b) escolherProduto(b.dataset.produto); });
+
+  function irPara(nome) {
+    aba = nome; gravar("fg_painel_aba", nome);
+    document.querySelectorAll("[data-aba]").forEach((s) => (s.hidden = s.dataset.aba !== nome));
+    document.querySelectorAll(".abas button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.ir === nome)));
+    scrollTo({ top: 0 });
+    if (dados) desenhar(dados);
+  }
+  document.querySelectorAll(".abas button").forEach((b) => b.addEventListener("click", () => irPara(b.dataset.ir)));
+
+  // ---------- dica ----------
+  const dica = $("dica");
+  document.addEventListener("pointerover", (e) => {
+    const a = e.target.closest("[data-dica]"); if (!a) return;
+    const r = a.getBoundingClientRect(); dica.innerHTML = a.dataset.dica; dica.classList.add("on");
+    const w = dica.offsetWidth, h = dica.offsetHeight;
+    dica.style.left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8) + "px";
+    dica.style.top = Math.max(8, r.top - h - 10) + "px";
+  });
+  document.addEventListener("pointerout", (e) => { if (e.target.closest("[data-dica]")) dica.classList.remove("on"); });
+  addEventListener("scroll", () => dica.classList.remove("on"), { passive: true });
+
+  // ---------- números do topo ----------
+  function variacao(atual, antes) {
+    if (antes == null || dados?.periodo === "tudo") return "";
+    if (!antes) return atual > 0 ? `<span class="etq sobe">▲ novo</span>` : "";
+    const p = (atual - antes) / Math.abs(antes) * 100;
+    if (Math.abs(p) < 0.5) return `<span class="etq">= ${NOME_ANTERIOR[dados.periodo]}</span>`;
+    return `<span class="etq ${p > 0 ? "sobe" : "desce"}">${p > 0 ? "▲" : "▼"} ${Math.abs(p).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}% vs ${NOME_ANTERIOR[dados.periodo]}</span>`;
+  }
+
+  // Meta de lucro: a do produto (se tiver) ou a da casa, quando a visão é de todos.
+  function ritmoMes(d) {
+    const m = d.mes, feito = somar(m.kpis, escolhidos()).lucro;
+    const meta = produto ? Number(prod(produto)?.meta_lucro_mensal) || 0 : Number(catalogo.meta_lucro_mensal) || 0;
+    const decorrido = (m.dia - 1) + Math.min(1, (m.horas_hoje || 0) / 24);
+    const proj = decorrido > 0.25 ? feito / decorrido * m.dias_mes : feito;
+    return { meta, feitoValor: feito, feito: meta ? Math.max(0, feito / meta) : 0, proj, projPct: meta ? Math.max(0, proj / meta) : 0 };
+  }
+
+  // Mini linha do período dentro do cartão de número; some quando o período não tem número nenhum.
+  function faisca(dias, valor) {
+    const v = dias.map((x) => valor(x) || 0);
+    if (v.length < 2 || !v.some(Boolean)) return "";
+    const min = Math.min(...v), max = Math.max(...v), W = 96, H = 30;
+    const pts = v.map((n, i) => [(2 + i / (v.length - 1) * (W - 4)).toFixed(1), (max === min ? H / 2 : H - 3 - (n - min) / (max - min) * (H - 6)).toFixed(1)]);
+    const [x, y] = pts.at(-1);
+    return `<svg class="faisca" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.join(" ")}"/><circle cx="${x}" cy="${y}" r="2.6"/></svg>`;
+  }
+  // CPA real x CPA máximo: só ganha cor quando o produto tem cpa_max no produtos.json e há pedidos suficientes.
+  function cpaEtq(k, poucos) {
+    if (!k.gasto || !k.pedidos) return "";
+    const cpa = k.gasto / k.pedidos, max = produto ? Number(prod(produto)?.cpa_max) || 0 : 0;
+    if (!max) return `<span class="etq" data-dica="Sem CPA máximo no produtos.json${produto ? "" : " (escolha um produto)"}: sem cor">CPA ${brl(cpa)}</span>`;
+    const cls = poucos ? "" : cpa <= max ? "lim-bom" : cpa <= max * 1.2 ? "lim-atencao" : "lim-critico";
+    const palavra = poucos ? "poucos dados" : cpa <= max ? "dentro" : cpa <= max * 1.2 ? "perto do limite" : "acima do limite";
+    return `<span class="etq ${cls}" data-dica="CPA real ÷ CPA máximo de ${brl(max)}">CPA ${brl(cpa)} · máx ${brl(max)} · ${palavra}</span>`;
+  }
+
+  function kpis(d) {
+    const ids = escolhidos(), k = somar(d.kpis, ids), a = d.anterior ? somar(d.anterior, ids) : null;
+    const pctImp = produto ? `${(impostoDe(produto) * 100).toLocaleString("pt-BR")}%` : "o % de cada produto";
+    const conv = k.visitantes ? k.pedidos / k.visitantes : 0, convA = a?.visitantes ? a.pedidos / a.visitantes : null;
+    const ticket = k.pedidos ? k.receita / k.pedidos : 0, ticketA = a?.pedidos ? a.receita / a.pedidos : null;
+    const roas = k.gasto ? k.receita_liquida / k.gasto : null;
+    const r = ritmoMes(d), dias = serieDiaria(d.diario);
+    const poucos = k.pedidos < 5 || k.visitantes < 30, POUCOS = `<span class="etq estimativa" data-dica="Menos de 5 pedidos ou 30 visitantes: ainda é cedo para concluir">poucos dados</span>`;
+    const explica = esc(`Faturamento líquido ${brl(k.receita_liquida)}<br>− anúncios ${brl(k.gasto)}<br>− imposto sobre a mídia ${brl(k.imposto_midia)}<br>− imposto estimado ${brl(k.imposto)} (${pctImp} do bruto)`);
+    let meta;
+    if (r.meta) {
+      // escala da barra: a meta fica em 100% ou, se a projeção passar dela, a marca recua
+      const escala = Math.max(1, r.projPct);
+      const feitoW = Math.min(100, r.feito / escala * 100), projW = Math.min(100, r.projPct / escala * 100), alvoW = 100 / escala;
+      meta = `<div class="cartao kpi meta"><span>Meta de lucro do mês · dia ${d.mes.dia} de ${d.mes.dias_mes}</span>
+        <strong class="num">${Math.round(r.projPct * 100)}%<em>projeção</em></strong>
+        <div class="barra-meta" data-dica="${esc(`Lucro do mês: ${brl(r.feitoValor)} de ${brl(r.meta)}<br>No ritmo atual: ${brl(r.proj)}`)}">
+          <span class="proj" style="left:${feitoW}%;width:${Math.max(0, projW - feitoW)}%"></span>
+          <span class="feito" style="width:${feitoW}%"></span>
+          <span class="alvo" style="left:calc(${alvoW}% - 2px)"></span>
+        </div>
+        <div class="rodape-meta"><span class="num">${Math.round(r.feito * 100)}% feito · ${brl(r.feitoValor)}</span><span class="num">meta ${brlCurto(r.meta)}</span></div></div>`;
+    } else {
+      const casa = Number(catalogo.meta_lucro_mensal) || 0;
+      meta = `<div class="cartao kpi meta"><span>Lucro do mês · dia ${d.mes.dia} de ${d.mes.dias_mes}</span>
+        <strong class="num ${r.feitoValor < 0 ? "negativo" : ""}"><small>R$</small>${reais(r.feitoValor)}</strong>
+        <div class="etiquetas"><span class="etq">no ritmo: ${brl(r.proj)}</span>${casa ? `<span class="etq">${pct(Math.max(0, r.proj), casa)} da meta da casa</span>` : ""}</div></div>`;
+    }
+    $("kpis").innerHTML = `
+      <div class="cartao kpi lucro" data-dica="${explica}"><span>Lucro limpo</span><div class="linha-kpi"><strong class="num ${k.lucro < 0 ? "negativo" : ""}"><small>R$</small>${reais(k.lucro)}</strong>${faisca(dias, (x) => x.lucro)}</div>
+        <div class="etiquetas">${variacao(k.lucro, a?.lucro)}<span class="etq estimativa">estimativa</span></div></div>
+      ${meta}
+      <div class="cartao kpi"><span>Faturamento líquido</span><div class="linha-kpi"><strong class="num"><small>R$</small>${reais(k.receita_liquida)}</strong>${faisca(dias, (x) => x.receita_liquida)}</div>
+        <div class="etiquetas">${variacao(k.receita_liquida, a?.receita_liquida)}<span class="etq">${int(k.pedidos)} pedidos${k.bumps ? ` · ${int(k.bumps)} bumps` : ""}</span></div></div>
+      <div class="cartao kpi"><span>Gasto em anúncios</span><div class="linha-kpi"><strong class="num"><small>R$</small>${reais(k.gasto)}</strong>${faisca(dias, (x) => x.gasto)}</div>
+        <div class="etiquetas"><span class="etq">${roas == null ? "sem gasto" : `retorno ${roas.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}×`}</span>${cpaEtq(k, poucos)}</div></div>
+      <div class="cartao kpi"><span>Conversão da página</span><div class="linha-kpi"><strong class="num">${pct(k.pedidos, k.visitantes)}</strong>${faisca(dias, (x) => x.visitantes && x.pedidos / x.visitantes)}</div>
+        <div class="etiquetas">${poucos ? POUCOS : variacao(conv, convA)}<span class="etq">${int(k.visitantes)} visitantes</span></div></div>
+      <div class="cartao kpi" data-dica="Quanto cada pedido deixa, em média, contando os bumps (valor pago pelo cliente)"><span>Ticket por pedido</span><div class="linha-kpi"><strong class="num"><small>R$</small>${k.pedidos ? reais(ticket) : "—"}</strong>${faisca(dias, (x) => x.pedidos && x.receita / x.pedidos)}</div>
+        <div class="etiquetas">${poucos ? POUCOS : variacao(ticket, ticketA)}<span class="etq">com os bumps</span></div></div>`;
+  }
+
+  function tabelaProdutos(d) {
+    const linhas = aVendaLista().map((p) => ({ p, k: somar(d.kpis, [p.id]) }))
+      .sort((x, y) => y.k.lucro - x.k.lucro || y.k.receita_liquida - x.k.receita_liquida);
+    const t = somar(d.kpis, null);
+    const celula = (v) => `<td class="n num ${v < 0 ? "negativo" : ""}">${brl(v)}</td>`;
+    $("tabela-produtos").innerHTML = `<table class="tabela-produtos"><thead><tr><th>Produto</th><th class="n">Pedidos</th><th class="n">Líquido</th><th class="n">Anúncios</th><th class="n">Lucro</th><th class="n">Conv.</th></tr></thead><tbody>${
+      linhas.map(({ p, k }) => `<tr data-produto="${esc(p.id)}" tabindex="0"><td><i class="ponto" style="--cor:${esc(p.cor)}"></i>${esc(p.nome)}</td>` +
+        `<td class="n num">${int(k.pedidos)}</td><td class="n num">${brl(k.receita_liquida)}</td><td class="n num">${brl(k.gasto)}</td>${celula(k.lucro)}<td class="n num">${pct(k.pedidos, k.visitantes)}</td></tr>`).join("")
+    }</tbody><tfoot><tr><td>Total</td><td class="n num">${int(t.pedidos)}</td><td class="n num">${brl(t.receita_liquida)}</td><td class="n num">${brl(t.gasto)}</td>${celula(t.lucro)}<td class="n num">${pct(t.pedidos, t.visitantes)}</td></tr></tfoot></table>`;
+    $("tabela-produtos").querySelectorAll("[data-produto]").forEach((tr) => {
+      tr.addEventListener("click", () => escolherProduto(tr.dataset.produto));
+      tr.addEventListener("keydown", (e) => { if (e.key === "Enter") escolherProduto(tr.dataset.produto); });
+    });
+  }
+
+  // ---------- dia a dia ----------
+  // Os últimos 8 dias, a soma deles, o mês até agora e a projeção do mês, para o geral e para cada produto.
+  // ROAS = receita (sem os reembolsos) ÷ investimento; a cor segue os limites do produtos.json.
+  function faixaRoas(roas, id) {
+    const bom = Number(prod(id)?.roas_bom ?? catalogo.roas_bom ?? 2), atencao = Number(prod(id)?.roas_atencao ?? catalogo.roas_atencao ?? 1.45);
+    return roas == null ? "" : roas >= bom ? "bom" : roas >= atencao ? "atencao" : "ruim";
+  }
+  function quadroDiaADia(d, titulo, ids, cor) {
+    const porDia = {};
+    for (const x of d.diario) if (ids.includes(x.produto)) (porDia[x.dia] ||= []).push({ id: x.produto, ...x });
+    const fim = new Date(Date.now() - 3 * 3600e3), dias = [];
+    for (let i = 0; i < 8; i++) { const dia = new Date(fim - i * 864e5).toISOString().slice(0, 10); dias.push({ dia, ...somar(porDia[dia], null) }); }
+    const oito = somar(dias.map((x) => ({ ...x, id: null })), null);
+    oito.imposto = dias.reduce((s, x) => s + x.imposto, 0); oito.lucro = dias.reduce((s, x) => s + x.lucro, 0);
+    const mes = somar(d.mes.kpis, ids), m = d.mes;
+    const fator = m.dias_mes / Math.max(0.25, (m.dia - 1) + Math.min(1, (m.horas_hoje || 0) / 24));
+    const proj = Object.fromEntries(Object.entries(mes).map(([k, v]) => [k, v * fator]));
+    const idRoas = ids.length === 1 ? ids[0] : null;
+    // no celular, sem centavos, para a tabela inteira caber na tela
+    const v = matchMedia("(max-width: 560px)").matches ? (n) => (Number(n) || 0).toLocaleString("pt-BR", { maximumFractionDigits: 0 }) : reais;
+    const linha = (rot, x, cls = "") => {
+      const roas = x.gasto ? x.receita / x.gasto : null;
+      return `<tr class="${cls}"><td>${rot}</td><td class="n num">${v(x.gasto)}</td><td class="n num">${v(x.receita + x.reembolsos_valor)}</td>` +
+        `<td class="n num">${v(x.reembolsos_valor)}</td><td class="n num ${x.lucro < 0 ? "negativo" : ""}">${v(x.lucro)}</td>` +
+        `<td class="num roas ${faixaRoas(roas, idRoas)}">${roas == null ? "—" : roas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td></tr>`;
+    };
+    const hoje = dias[0];
+    return `<div class="cartao dia-a-dia"><div class="cabeca-cartao"><h2>${cor ? `<i class="ponto" style="--cor:${esc(cor)}"></i>` : ""}${esc(titulo)}` +
+      `<span class="etq" data-dica="Receita de hoje, sem reembolsos">hoje ${brl(hoje.receita)}</span><span class="etq ${hoje.lucro >= 0 ? "sobe" : "desce"}" data-dica="Lucro de hoje, depois de anúncios e imposto (estimativa)">lucro ${brl(hoje.lucro)}</span></h2><small>R$</small></div>` +
+      `<div class="rolar"><table><thead><tr><th>Data</th><th class="n">Invest.</th><th class="n">Receita</th><th class="n">Reemb.</th><th class="n" data-dica="Faturamento líquido − anúncios − imposto sobre a mídia − imposto estimado">Lucro</th><th class="n">ROAS</th></tr></thead><tbody>` +
+      dias.map((x, i) => linha(i ? rotuloDia(x.dia) : "Hoje", x)).join("") +
+      linha("8 dias", oito, "soma") + linha("Mês (acum.)", mes, "soma") + linha("Projeção mês", proj, "soma projecao") +
+      `</tbody></table></div></div>`;
+  }
+  function diaADia(d) {
+    const comNum = aVendaLista();
+    const quadros = produto
+      ? [quadroDiaADia(d, nomeDe(produto), [produto], corDe(produto))]
+      : [quadroDiaADia(d, "Geral (todos os produtos)", escolhidos(), null)]
+          .concat(comNum.length > 1 ? comNum.map((p) => quadroDiaADia(d, p.nome, [p.id], p.cor)) : []);   // um só produto: o geral já é ele
+    $("dia-a-dia").innerHTML = quadros.join("");
+  }
+
+  // ---------- gráficos ----------
+  // Uma linha por dia, com os números de cada produto escolhido em "por".
+  function serieDiaria(lista) {
+    const ids = escolhidos(), porDia = {};
+    for (const x of lista) {
+      if (!ids.includes(x.produto)) continue;
+      (porDia[x.dia] ||= {})[x.produto] = x;
+    }
+    const fim = new Date(Date.now() - 3 * 3600e3);
+    let qtd = { hoje: 7, "7d": 7, "30d": 30 }[dados.periodo];
+    if (!qtd) { const p = Object.keys(porDia).sort()[0]; qtd = p ? Math.min(90, Math.max(7, Math.round((fim - new Date(p + "T00:00:00Z")) / 864e5) + 1)) : 7; }
+    const saida = [];
+    for (let i = qtd - 1; i >= 0; i--) {
+      const dia = new Date(fim - i * 864e5).toISOString().slice(0, 10), por = porDia[dia] || {};
+      const lista = Object.entries(por).map(([id, x]) => ({ id, ...x }));
+      saida.push({ dia, por, ...somar(lista, null) });
+    }
+    return saida;
+  }
+  const rotuloDia = (iso) => iso.slice(8, 10) + "/" + iso.slice(5, 7);
+
+  // Produtos que aparecem no gráfico: os que têm número no período, na ordem do catálogo (a cor segue o produto).
+  function seriesDe(dias, campo) {
+    return escolhidos().filter((id) => dias.some((x) => Number(x.por[id]?.[campo]) > 0));
+  }
+  function legenda(el, ids) {
+    $(el).innerHTML = ids.length > 1 ? ids.map((id) => `<span><b style="background:${corDe(id)}"></b>${esc(nomeDe(id))}</span>`).join("") : "";
+  }
+
+  // Barras empilhadas por produto, com 2px de respiro entre as partes e só o topo arredondado.
+  function grafEmpilhado(elId, dias, campo, { formato, eixo, H = 230, info }) {
+    const ids = seriesDe(dias, campo);
+    const el = $(elId), W = Math.max(300, Math.round(el.clientWidth || 640)), mE = 40, mB = 26, mT = 10;
+    const totalDe = (x) => ids.reduce((s, id) => s + (Number(x.por[id]?.[campo]) || 0), 0);
+    let max = Math.max(...dias.map(totalDe), campo === "pedidos" ? 2 : 10);
+    if (campo === "pedidos") max = Math.ceil(max / 2) * 2;
+    else { const p = 10 ** Math.floor(Math.log10(max)); max = Math.ceil(max / p * 2) / 2 * p; }   // topo redondo: 465 → 500
+    const y = (v) => H - mB - (v / max) * (H - mB - mT);
+    const larg = (W - mE) / dias.length, bw = Math.max(4, Math.min(30, larg * 0.6)), r = Math.min(4, bw / 2);
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(el.closest(".cartao").querySelector("h2").textContent)}">`;
+    for (const t of [0, max / 2, max]) s += `<line class="linha-grade" x1="${mE}" x2="${W}" y1="${y(t)}" y2="${y(t)}"/><text class="eixo num" x="${mE - 6}" y="${y(t) + 4}" text-anchor="end">${eixo(t)}</text>`;
+    const passo = Math.ceil(dias.length / 8), hoje = hojeSP(), ultimo = dias.length - 1;
+    // rótulo a cada "passo" dias, sem encostar no do último dia
+    const comRotulo = (i) => i === ultimo || (i % passo === 0 && ultimo - i >= Math.ceil(passo * 0.7));
+    dias.forEach((x, i) => {
+      const cx = mE + larg * i + larg / 2, bx = cx - bw / 2;
+      const partes = ids.map((id) => [id, Number(x.por[id]?.[campo]) || 0]).filter(([, v]) => v > 0);
+      let base = 0;
+      partes.forEach(([id, v], j) => {
+        const topo = j === partes.length - 1;
+        const y0 = y(base) - (j ? 2 : 0), y1 = y(base + v), alto = Math.max(1, y0 - y1);
+        // retângulo com só os cantos de cima arredondados no último pedaço
+        s += topo && alto > r
+          ? `<path d="M${bx},${y0} V${y1 + r} Q${bx},${y1} ${bx + r},${y1} H${bx + bw - r} Q${bx + bw},${y1} ${bx + bw},${y1 + r} V${y0} Z" fill="${corDe(id)}"/>`
+          : `<rect x="${bx}" y="${y1}" width="${bw}" height="${alto}" fill="${corDe(id)}"/>`;
+        base += v;
+      });
+      if (!partes.length) s += `<rect x="${bx}" y="${y(0) - 2}" width="${bw}" height="2" rx="1" fill="rgba(255,255,255,.14)"/>`;
+      s += `<rect x="${mE + larg * i}" y="${mT}" width="${larg}" height="${H - mT - mB}" fill="transparent" data-dica="${esc(info(x, ids))}"/>`;
+      if (comRotulo(i)) s += `<text class="eixo num" x="${cx}" y="${H - 7}" text-anchor="middle" ${x.dia === hoje ? 'fill="#f2f3ef"' : ""}>${x.dia === hoje ? "Hoje" : rotuloDia(x.dia)}</text>`;
+    });
+    el.innerHTML = s + "</svg>";
+    return ids;
+  }
+
+  function grafFaturamento(d) {
+    const dias = serieDiaria(d.diario);
+    const ids = grafEmpilhado("graf-fat", dias, "receita_liquida", {
+      eixo: brlCurto,
+      info: (x, ids) => `<b>${x.dia === hojeSP() ? "Hoje" : rotuloDia(x.dia)}</b>` +
+        (ids.length > 1 ? ids.map((id) => `<br><i class="ponto" style="--cor:${corDe(id)}"></i>${esc(nomeDe(id))}: ${brl(x.por[id]?.receita_liquida)}`).join("") : "") +
+        `<br>Líquido ${brl(x.receita_liquida)} · anúncios ${brl(x.gasto)}<br>Lucro estimado ${brl(x.lucro)} · ${int(x.pedidos)} pedidos`,
+    });
+    legenda("leg-fat", ids);
+    $("tab-fat").innerHTML = `<table><thead><tr><th>Dia</th><th class="n">Visitantes</th><th class="n">Pedidos</th><th class="n">Líquido</th><th class="n">Anúncios</th><th class="n">Lucro est.</th></tr></thead><tbody>${
+      dias.slice().reverse().map((x) => `<tr><td>${rotuloDia(x.dia)}</td><td class="n num">${int(x.visitantes)}</td><td class="n num">${int(x.pedidos)}</td><td class="n num">${brl(x.receita_liquida)}</td><td class="n num">${brl(x.gasto)}</td><td class="n num ${x.lucro < 0 ? "negativo" : ""}">${brl(x.lucro)}</td></tr>`).join("")}</tbody></table>`;
+  }
+
+  function grafPedidos(d) {
+    const dias = serieDiaria(d.diario);
+    const ids = grafEmpilhado("graf-pedidos", dias, "pedidos", {
+      H: 210, eixo: (t) => int(t),
+      info: (x, ids) => `<b>${rotuloDia(x.dia)}</b>` + (ids.length > 1
+        ? ids.map((id) => `<br><i class="ponto" style="--cor:${corDe(id)}"></i>${esc(nomeDe(id))}: ${int(x.por[id]?.pedidos)}`).join("")
+        : `<br>${int(x.pedidos)} pedido${x.pedidos === 1 ? "" : "s"}`),
+    });
+    legenda("leg-pedidos", ids);
+  }
+
+  function barras(id, itens, { valor = (i) => int(i.n), vazio = "Sem dados no período." } = {}) {
+    if (!itens.length) { $(id).innerHTML = `<div class="vazio">${vazio}</div>`; return; }
+    const max = Math.max(1, ...itens.map((i) => i.n));
+    $(id).innerHTML = itens.map((i) => `<div class="bl"><span title="${esc(i.nome)}">${esc(i.nome)}</span><div class="trilho"><i style="width:${(100 * i.n / max).toFixed(1)}%;background:${i.cor || "var(--limao)"}"></i></div><span class="valor num ${i.classe || ""}">${valor(i)}</span></div>`).join("");
+  }
+
+  function rankAnuncios(d) {
+    const lista = d.anuncios.filter((a) => a.anuncio !== "(sem anúncio)" || a.pedidos);
+    if (!lista.length) { $("rank-anuncios").innerHTML = `<div class="vazio">Aparece quando os anúncios começarem.</div>`; return; }
+    const ord = lista.slice().sort((a, b) => b.receita_liquida - a.receita_liquida || b.visitantes - a.visitantes).slice(0, 6);
+    barras("rank-anuncios", ord.map((a, i) => {
+      const semVenda = a.gasto > 0 && !a.pedidos, melhor = i === 0 && a.pedidos > 0;
+      return { nome: produto ? a.anuncio : `${a.anuncio} · ${nomeDe(a.produto)}`,
+               n: Math.max(Number(a.receita_liquida) || 0, semVenda ? Number(a.gasto) : 0),
+               cor: semVenda ? "var(--critico)" : corDe(a.produto),
+               classe: semVenda ? "ruim" : melhor ? "bom" : "", rotulo: semVenda ? "sem venda" : "R$ " + brlCurto(a.receita_liquida) };
+    }), { valor: (i) => i.rotulo });
+  }
+
+  // Frase do topo: a conclusão do período em uma linha (lucro, comparação, meta e quantos pontos pedem atenção).
+  function resumo(k, a, r, n) {
+    const per = { hoje: "Hoje", "7d": "Nos últimos 7 dias", "30d": "Nos últimos 30 dias", tudo: "Até aqui" }[dados?.periodo] || "No período";
+    let txt = `${per}, lucro de ${brl(k.lucro)} (estimativa)`;
+    if (a && dados?.periodo !== "tudo" && a.lucro) { const v = (k.lucro - a.lucro) / Math.abs(a.lucro) * 100; if (Math.abs(v) >= 0.5) txt += `, ${v > 0 ? "▲" : "▼"} ${Math.abs(v).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}% vs ${NOME_ANTERIOR[dados.periodo]}`; }
+    if (r.meta) txt += `; a meta do mês está em ${Math.round(r.projPct * 100)}% no ritmo atual`;
+    txt += n ? `. ${n} ponto${n > 1 ? "s pedem" : " pede"} atenção.` : ". Nada pede atenção agora.";
+    $("resumo").textContent = txt;
+  }
+
+  function alertas(d) {
+    const ids = escolhidos(), k = somar(d.kpis, ids), a = d.anterior ? somar(d.anterior, ids) : null, lista = [];
+    const cor = { cliente: "#e87ba4", pagamento: "#fab219", reembolso: "#e66767", "anúncio": "#ec835a", meta: "#b8f23a", "tráfego": "#ec835a", lucro: "#e66767", ok: "#4ade80" };
+    if (k.abandonos) lista.push(["cliente", `${k.abandonos} carrinho${k.abandonos > 1 ? "s" : ""} abandonado${k.abandonos > 1 ? "s" : ""} para chamar no WhatsApp`, "clientes"]);
+    if (k.aguardando) lista.push(["pagamento", `${k.aguardando} boleto${k.aguardando > 1 ? "s" : ""}/Pix aguardando pagamento`, "vendas"]);
+    if (k.reembolsos) { const tx = k.reembolsos / Math.max(1, k.pedidos + k.reembolsos); lista.push(["reembolso", `${k.reembolsos} reembolso${k.reembolsos > 1 ? "s" : ""} no período (${pct(k.reembolsos, k.pedidos + k.reembolsos)} dos pedidos)${k.pedidos + k.reembolsos >= 20 && tx > 0.1 ? " · acima de 10%: rever a promessa da página" : ""}`, "vendas"]); }
+    if (k.gasto > 0 && k.lucro < 0) lista.push(["lucro", `Gastando mais do que volta: lucro de ${brl(k.lucro)} no período`, "anuncios"]);
+    for (const an of d.anuncios) if (an.gasto > 0 && !an.pedidos) lista.push(["anúncio", `${an.anuncio}${produto ? "" : ` (${nomeDe(an.produto)})`} gastou ${brl(an.gasto)} sem vender`, "anuncios"]);
+    if (a && a.visitantes >= 30 && k.visitantes >= 30) {
+      const c = k.pedidos / k.visitantes, ca = a.pedidos / a.visitantes;
+      if (ca > 0 && c < ca * 0.75) lista.push(["anúncio", `Conversão caiu de ${pct(a.pedidos, a.visitantes)} para ${pct(k.pedidos, k.visitantes)}`, "anuncios"]);
+    }
+    const r = ritmoMes(d);
+    if (r.meta && d.mes.dia >= 3 && r.projPct < 0.9) lista.push(["meta", `No ritmo atual o lucro do mês fecha em ${brl(r.proj)} (${Math.round(r.projPct * 100)}% da meta)`, ""]);
+    const aVenda = ids.filter((id) => prod(id)?.status === "à venda" && prod(id)?.paginas?.length);
+    const visHoje = d.diario.filter((x) => x.dia === hojeSP() && aVenda.includes(x.produto)).reduce((s, x) => s + x.visitantes, 0);
+    if (aVenda.length && !visHoje && (d.mes.horas_hoje || 0) >= 10) lista.push(["tráfego", "Nenhuma visita hoje até agora", "anuncios"]);
+    const GRAV = { lucro: 0, "anúncio": 1, reembolso: 2, "tráfego": 3, meta: 4, pagamento: 5, cliente: 6 };
+    lista.sort((x, y) => (GRAV[x[0]] ?? 9) - (GRAV[y[0]] ?? 9));
+    resumo(k, a, r, lista.length);
+    if (!lista.length) lista.push(["ok", "Tudo certo por aqui", ""]);
+    $("qtd-alertas").textContent = lista[0][0] === "ok" ? "" : lista.length;
+    $("alertas").innerHTML = lista.slice(0, 6).map(([t, txt, ir]) =>
+      `<div class="alerta" style="--cor:${cor[t]}" ${ir ? `role="button" tabindex="0" data-ir-aba="${ir}"` : ""}><span>${esc(txt)}</span><span class="tag">${t}</span></div>`).join("");
+    $("alertas").querySelectorAll("[data-ir-aba]").forEach((el) => {
+      el.addEventListener("click", () => irPara(el.dataset.irAba));
+      el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); irPara(el.dataset.irAba); } });
+    });
+  }
+
+  // Order bumps: quantos pedidos de cada produto levaram cada bump.
+  function bumps(d) {
+    const pedidos = {};
+    for (const i of d.itens) if (!i.bump) pedidos[i.produto] = (pedidos[i.produto] || 0) + i.n;
+    const lista = d.itens.filter((i) => i.bump).map((i) => ({
+      nome: produto ? i.nome : `${i.nome} · ${nomeDe(i.produto)}`, n: i.n, cor: corDe(i.produto),
+      rotulo: `${int(i.n)} · ${pct(i.n, pedidos[i.produto] || 0)}`,
+    }));
+    barras("bumps", lista, { valor: (i) => i.rotulo, vazio: "Aparece quando alguém levar um bump." });
+  }
+
+  function mapa(celulas) {
+    if (!celulas.length) { $("mapa").innerHTML = `<div class="vazio">Aparece quando houver vendas.</div>`; return; }
+    const g = {}; let max = 0;
+    for (const c of celulas) { g[c.dia + "-" + c.hora] = c.vendas; max = Math.max(max, c.vendas); }
+    const tons = ["#2c3a12", "#4a6419", "#6d9222", "#93c42c", "#b8f23a"];
+    const cor = (v) => !v ? "" : `background:${tons[Math.min(4, Math.floor((v / max) * 4.999))]}`;
+    let h = `<div class="mapa"><span></span>`;
+    for (let hr = 0; hr < 24; hr++) h += `<span class="h">${hr % 6 === 0 ? hr + "h" : ""}</span>`;
+    for (let d = 1; d <= 7; d++) {
+      h += `<span>${DIAS[d - 1]}</span>`;
+      for (let hr = 0; hr < 24; hr++) { const v = g[d + "-" + hr] || 0; h += `<span class="c" style="${cor(v)}" data-dica="${DIAS[d - 1]} ${hr}h: ${v} pedido${v === 1 ? "" : "s"}"></span>`; }
+    }
+    $("mapa").innerHTML = h + `</div><div class="escala"><span>menos</span><i style="background:rgba(255,255,255,.05)"></i><i style="background:${tons[0]}"></i><i style="background:${tons[2]}"></i><i style="background:${tons[4]}"></i><span>mais pedidos</span></div>`;
+  }
+
+  function quando(iso) {
+    if (!iso) return "";
+    const d = new Date(iso), seg = (Date.now() - d) / 1000;
+    if (seg < 60) return "agora";
+    if (seg < 3600) return `há ${Math.floor(seg / 60)} min`;
+    if (seg < 86400) return `há ${Math.floor(seg / 3600)} h`;
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) + " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function ultimas(lista) {
+    $("ultimas").innerHTML = lista.length ? lista.map((v) => {
+      const [txt, cls] = STATUS[v.status] || [v.status || "—", "esp"];
+      return `<div class="item"><b>${esc(v.nome || "Comprador")}${tagProduto(v.produto)}</b><span class="dir num">${brl(v.valor)}</span>
+        <small>${quando(v.data_pedido)} · ${esc(NOMES_PAG[v.forma_pagamento] || v.forma_pagamento || "")}${v.parcelas > 1 ? " " + v.parcelas + "x" : ""}${v.estado ? " · " + esc(v.estado) : ""}</small>
+        <small class="dir st-${cls}">${txt}</small><small style="grid-column:1/-1">${v.bump ? `bump: ${esc(v.item)} · ` : ""}origem: ${esc(v.anuncio)}</small></div>`;
+    }).join("") : `<div class="vazio">Nenhuma venda no período.</div>`;
+  }
+
+  function abandonos(lista) {
+    $("abandonos").innerHTML = lista.length ? lista.map((a) => {
+      const fone = String(a.telefone || "").replace(/\D/g, "");
+      const zap = fone ? `<a class="zap" href="https://wa.me/${fone.length <= 11 ? "55" + fone : fone}" target="_blank" rel="noopener">WhatsApp</a>` : "";
+      return `<div class="item"><b>${esc(a.nome || "Sem nome")}${tagProduto(a.produto)}</b><span class="dir">${a.comprou_depois ? '<small class="st-ok">comprou depois</small>' : zap}</span>
+        <small>${quando(a.criado_em)}${a.item ? " · " + esc(a.item) : ""}</small><small class="dir">${esc(a.email || "")}</small></div>`;
+    }).join("") : `<div class="vazio">Nenhum carrinho abandonado no período.</div>`;
+  }
+
+  function tabelaAnuncios(lista) {
+    if (!lista.length) { $("tabela-anuncios").innerHTML = `<div class="vazio">Sem visitas no período.</div>`; return; }
+    const colProduto = !produto;
+    $("tabela-anuncios").innerHTML = `<table><thead><tr><th>Anúncio</th>${colProduto ? "<th>Produto</th>" : ""}<th class="n">Visit.</th><th class="n">Cliques</th><th class="n">Pedidos</th><th class="n">Conv.</th><th class="n">Líquido</th><th class="n">Gasto</th><th class="n">CPA</th><th class="n">Retorno</th></tr></thead><tbody>${
+      lista.map((a) => `<tr><td title="${esc(a.campanha || "")}">${esc(a.anuncio)}</td>${colProduto ? `<td>${esc(nomeDe(a.produto))}</td>` : ""}<td class="n num">${int(a.visitantes)}</td><td class="n num">${int(a.cliques)}</td><td class="n num">${int(a.pedidos)}</td><td class="n num">${pct(a.pedidos, a.visitantes)}</td><td class="n num">${brl(a.receita_liquida)}</td><td class="n num">${a.gasto ? brl(a.gasto) : "—"}</td><td class="n num">${a.gasto && a.pedidos ? brl(a.gasto / a.pedidos) : "—"}</td><td class="n num">${a.gasto ? (a.receita_liquida / a.gasto).toLocaleString("pt-BR", { maximumFractionDigits: 2 }) + "×" : "—"}</td></tr>`).join("")}</tbody></table>`;
+  }
+
+  function desenhar(d) {
+    $("pergunta").textContent = { hoje: "Como está o dia?", "7d": "Como foi a semana?", "30d": "Como foi o mês?", tudo: "Como estamos até aqui?" }[d.periodo] || "Como está o mês?";
+    // os detalhes vêm filtrados pelo servidor: enquanto chegam os do produto novo, só o topo é redesenhado
+    const detalhesOk = (d.produto || "") === produto;
+    if (aba === "inicio") { kpis(d); if (!produto) tabelaProdutos(d); diaADia(d); grafFaturamento(d); if (detalhesOk) { rankAnuncios(d); alertas(d); } }
+    if (!detalhesOk) return;
+    if (aba === "vendas") {
+      grafPedidos(d); ultimas(d.ultimas_vendas); bumps(d); mapa(d.dia_hora);
+      barras("pagamentos", d.pagamentos.map((p) => ({ ...p, nome: NOMES_PAG[p.nome] || p.nome })), { vazio: "Aparece quando houver vendas." });
+      barras("estados", d.estados, { vazio: "Aparece quando houver vendas." });
+    }
+    if (aba === "anuncios") {
+      tabelaAnuncios(d.anuncios);
+      const total = d.funil[0]?.pessoas || 0;
+      const tons = ["#e3f9b5", "#cff57f", "#b8f23a", "#93c42c", "#6d9222"];
+      barras("funil", total ? d.funil.map((e, i) => ({ nome: e.etapa, n: e.pessoas, cor: tons[i] })) : [], { valor: (i) => `${int(i.n)} · ${pct(i.n, total)}`, vazio: "Ainda sem visitas no período." });
+      barras("dispositivos", d.dispositivos);
+      barras("faq", d.faq, { vazio: "Ninguém abriu o FAQ ainda." });
+    }
+    if (aba === "clientes") abandonos(d.abandonos_lista);
+    if (aba === "analise") desenharAnalise(d);
+  }
+
+  // ---------- análise ----------
+  // Tudo aqui sai do que o painel já recebe: os números do período (kpis) e o histórico diário.
+  let sub = ler("fg_painel_sub") || "simulador", historico = null, versaoHistorico = null;
+  let extras = null, chaveExtras = null, janela = "30";
+  const num = (v, c = 2) => (Number(v) || 0).toLocaleString("pt-BR", { minimumFractionDigits: c, maximumFractionDigits: c });
+  const pc = (v, c = 1) => num(v * 100, c) + "%";
+  const isoDe = (ms) => new Date(ms).toISOString().slice(0, 10);
+  const hojeMs = () => new Date(hojeSP() + "T00:00:00Z").getTime();
+  const diasEntre = (a, b) => Math.round((new Date(b + "T00:00:00Z") - new Date(a + "T00:00:00Z")) / 864e5) + 1;
+
+  async function garantirHistorico(d) {
+    if (historico && versaoHistorico === d.versao) return;
+    const h = await chamar({ periodo: "tudo" }, { catalogo: catalogo.produtos });
+    historico = h.diario || []; versaoHistorico = d.versao;
+  }
+  // Um dia com a soma dos produtos escolhidos.
+  function serieHistorica() {
+    const ids = escolhidos(), por = {};
+    for (const x of historico || []) if (ids.includes(x.produto)) (por[x.dia] ||= []).push({ id: x.produto, ...x });
+    const dias = Object.keys(por).sort();
+    if (!dias.length) return [];
+    const saida = [], fim = hojeMs();
+    for (let t = new Date(dias[0] + "T00:00:00Z").getTime(); t <= fim; t += 864e5) {
+      const dia = isoDe(t);
+      saida.push({ dia, ...somar(por[dia] || [], null) });
+    }
+    return saida;
+  }
+  function somaTrecho(serie, de, ate) {
+    const t = { visitantes: 0, pedidos: 0, receita: 0, receita_liquida: 0, reembolsos_valor: 0, gasto: 0, lucro: 0, dias: 0 };
+    for (const x of serie) if (x.dia >= de && x.dia <= ate) { for (const c of Object.keys(t)) if (c !== "dias") t[c] += x[c]; }
+    t.dias = Math.max(1, diasEntre(de, ate));
+    return t;
+  }
+  const roasDe = (x) => x.gasto ? x.receita / x.gasto : null;
+  const mudancas = () => [...(catalogo.mudancas || []), ...(extras?.mudancas || [])].filter((m) => !produto || !m.produto || m.produto === produto).sort((a, b) => b.dia.localeCompare(a.dia));
+
+  // ----- conta do simulador: cada etapa multiplica a anterior -----
+  function simular(p) {
+    if (p.cpm != null) p = { ...p, cpv: (p.ctr > 0 && p.con > 0) ? (p.cpm / 1000) / (p.ctr / 100) / (p.con / 100) : 0 };
+    const visitas = p.cpv > 0 ? p.inv / p.cpv : 0, cliques = visitas * p.tCli / 100, pedidos = cliques * p.tConv / 100;
+    const ticket = p.base + p.tBump / 100 * p.pBump, bruto = pedidos * ticket, reembolsos = bruto * p.r / 100, receita = bruto - reembolsos;
+    const liquido = receita * (1 - p.taxa / 100), impostoMidia = p.inv * p.midia / 100, imposto = receita * p.imp / 100;
+    const lucro = liquido - p.inv - impostoMidia - imposto;
+    return { visitas, cliques, pedidos, ticket, bruto, reembolsos, receita, liquido, imposto, impostoMidia, lucro, roas: p.inv ? receita / p.inv : 0, cpa: pedidos ? p.inv / pedidos : 0 };
+  }
+  // Valor de cada alavanca que faz o ROAS bater no portão, com as outras paradas.
+  function limites(p, portao) {
+    const r0 = simular(p).roas;
+    if (!r0 || !portao) return {};
+    const f = portao / r0, tAlvo = (p.base + p.tBump / 100 * p.pBump) * f;
+    return { cpm: p.cpm / f, ctr: p.ctr * f, con: p.con * f, cpv: p.cpv / f, tCli: p.tCli * f, tConv: p.tConv * f, base: tAlvo - p.tBump / 100 * p.pBump,
+             tBump: p.pBump ? (tAlvo - p.base) / p.pBump * 100 : null, r: 100 - (100 - p.r) * f };
+  }
+  const ALAVANCAS = [
+    { grupo: "Tráfego", dica: "O quanto custa trazer uma pessoa para a página", itens: [
+      { id: "inv", nome: "Investimento", sub: "gasto no período", pre: "R$", max: (v) => Math.max(500, v * 3), passo: 10, livre: true, esforco: "" },
+      { id: "cpv", nome: "Custo por visita", sub: "gasto ÷ visitantes", pre: "R$", max: (v) => Math.max(5, v * 2.5), passo: .01, menor: true, sem: true, esforco: "médio · criativos e público" },
+      { id: "cpm", nome: "CPM", sub: "R$ por mil impressões", pre: "R$", max: (v) => Math.max(100, v * 2.5), passo: .01, menor: true, meta: true, esforco: "difícil · conta, público e leilão" },
+      { id: "ctr", nome: "CTR de link", sub: "cliques no link ÷ impressões", pos: "%", max: (v) => Math.min(100, Math.max(5, v * 2.5)), passo: .01, meta: true, esforco: "médio · criativos e ganchos" },
+      { id: "con", nome: "Taxa de conexão", sub: "visitantes ÷ cliques no link", pos: "%", max: (v) => Math.min(100, Math.max(100, v * 1.2)), passo: .1, meta: true, esforco: "fácil · velocidade da página" } ] },
+    { grupo: "Página e checkout", dica: "Quem chega clica em comprar, e quem clica paga", itens: [
+      { id: "tCli", nome: "Clique em comprar", sub: "clicaram ÷ visitantes", pos: "%", max: (v) => Math.min(100, Math.max(30, v * 2.5)), passo: .1, esforco: "médio · página de vendas" },
+      { id: "tConv", nome: "Conversão do checkout", sub: "pedidos ÷ clicaram", pos: "%", max: (v) => Math.min(100, Math.max(80, v * 2)), passo: .1, esforco: "médio · checkout e recuperação" } ] },
+    { grupo: "Oferta e pós-venda", dica: "Quanto cada pedido deixa, sem custar mais tráfego", itens: [
+      { id: "base", nome: "Preço do produto", sub: "por pedido, sem os bumps", pre: "R$", max: (v) => Math.max(150, v * 2.5), passo: 1, esforco: "fácil · preço, testar com cuidado" },
+      { id: "tBump", nome: "Pedidos com bump", sub: "bumps ÷ pedidos", pos: "%", max: (v) => Math.min(100, Math.max(50, v * 2.5)), passo: .1, esforco: "fácil · oferta, não custa tráfego" },
+      { id: "pBump", nome: "Preço médio do bump", sub: "por bump vendido", pre: "R$", max: (v) => Math.max(100, v * 2.5), passo: 1, livre: true, esforco: "" },
+      { id: "r", nome: "Reembolso", sub: "reembolsos ÷ vendas", pos: "%", max: (v) => Math.max(20, v * 3), passo: .1, menor: true, esforco: "médio · produto e expectativa" } ] },
+  ];
+  const alavancas = (comMeta) => ALAVANCAS.map((g) => ({ ...g, itens: g.itens.filter((a) => comMeta ? !a.sem : !a.meta) }));
+  const fmtAlav = (a, v) => (a.pre ? "R$ " : "") + num(v, a.passo >= 1 && a.pre ? 0 : a.pos ? 1 : 2) + (a.pos || "");
+
+  // Lê o funil real do período. Sem vendas ainda, entram números de partida, só para testar.
+  function funilReal(d) {
+    const k = somar(d.kpis, escolhidos());
+    const itensB = (d.itens || []).filter((i) => i.bump), liqB = itensB.reduce((s, i) => s + Number(i.receita_liquida || 0), 0), nB = itensB.reduce((s, i) => s + Number(i.n || 0), 0);
+    const imp = k.receita ? k.imposto / k.receita * 100 : impostoDe(produto || catalogo.produtos[0]?.id) * 100;
+    const midia = midiaDe() * 100;
+    const temDados = k.pedidos > 0 && k.gasto > 0 && k.visitantes > 0 && k.clicaram_comprar > 0;
+    const ids = escolhidos(), hoje = hojeSP(), nDias = { hoje: 1, "7d": 7, "30d": 30 }[d.periodo];
+    const inicioP = nDias ? isoDe(hojeMs() - (nDias - 1) * 864e5) : "2000-01-01";
+    const tm = { impressoes: 0, cliques_link: 0 };
+    for (const m of extras?.metricas || []) if (ids.includes(m.produto) && m.dia >= inicioP && m.dia <= hoje) { tm.impressoes += m.impressoes || 0; tm.cliques_link += m.cliques_link || 0; }
+    const meta = temDados && tm.impressoes > 0 && tm.cliques_link > 0
+      ? { cpm: k.gasto / tm.impressoes * 1000, ctr: tm.cliques_link / tm.impressoes * 100, con: k.visitantes / tm.cliques_link * 100 } : {};
+    if (!temDados) return { temDados, k, p: { inv: k.gasto || 3000, cpv: 2, tCli: 10, tConv: 35, base: 67, tBump: 15, pBump: 32, r: 5, taxa: 10, imp, midia } };
+    const taxa = k.receita ? (1 - k.receita_liquida / k.receita) * 100 : 10;
+    const pBump = nB ? liqB / nB / (1 - taxa / 100) : 32;
+    const ticket = k.receita / k.pedidos * (1 + k.reembolsos_valor / Math.max(1, k.receita));
+    const tBump = k.bumps / k.pedidos * 100;
+    return { temDados, k, p: { ...meta, inv: k.gasto, cpv: k.gasto / k.visitantes, tCli: k.clicaram_comprar / k.visitantes * 100, tConv: k.pedidos / k.clicaram_comprar * 100,
+      base: Math.max(0, ticket - tBump / 100 * pBump), tBump, pBump, r: k.reembolsos_valor / Math.max(1, k.receita + k.reembolsos_valor) * 100, taxa, imp, midia } };
+  }
+  // Melhor semana corrida do histórico em cada parte do funil: a maior distância é a maior oportunidade.
+  function oportunidade(serie, p) {
+    if (serie.length < 14) return null;
+    let cpv = Infinity, conv = 0, ticket = 0;
+    for (let i = 6; i < serie.length; i++) {
+      const s = somaTrecho(serie, serie[i - 6].dia, serie[i].dia);
+      if (s.visitantes >= 30 && s.gasto > 0) cpv = Math.min(cpv, s.gasto / s.visitantes);
+      if (s.visitantes >= 30) conv = Math.max(conv, s.pedidos / s.visitantes * 100);
+      if (s.pedidos >= 5) ticket = Math.max(ticket, s.receita / s.pedidos);
+    }
+    const hoje = { cpv: p.cpv, conv: p.tCli * p.tConv / 100, ticket: p.base + p.tBump / 100 * p.pBump };
+    const lista = [];
+    if (isFinite(cpv) && cpv > 0) lista.push({ onde: "Tráfego", txt: "Cada visita já custou menos", agora: "R$ " + num(hoje.cpv), melhor: "R$ " + num(cpv), dist: hoje.cpv / cpv - 1, como: "criativos e público" });
+    if (conv) lista.push({ onde: "Página e checkout", txt: "Mais visitas já viraram pedido", agora: num(hoje.conv) + "%", melhor: num(conv) + "%", dist: conv / hoje.conv - 1, como: "página, checkout e recuperação" });
+    if (ticket) lista.push({ onde: "Oferta", txt: "Cada pedido já deixou mais", agora: "R$ " + num(hoje.ticket), melhor: "R$ " + num(ticket), dist: ticket / hoje.ticket - 1, como: "bumps e preço" });
+    return lista.filter((x) => x.dist > .02).sort((a, b) => b.dist - a.dist)[0] || null;
+  }
+
+  let sim = null;   // { chave, real, p, base, portao, temDados }
+  function montarSimulador(d) {
+    const chave = `${produto}|${d.periodo}`, roasCasa = Number(prod(produto)?.roas_bom ?? catalogo.roas_bom ?? 2);
+    if (!sim || sim.chave !== chave) {
+      const f = funilReal(d);
+      sim = { chave, real: { ...f.p }, p: { ...f.p }, base: null, portao: sim?.portao ?? roasCasa, temDados: f.temDados };
+    }
+    const faixa = sim.temDados ? "" : `<div class="faixa-partida">Ainda não há venda e gasto no período, então estes são números de partida para você testar, não resultados. Mude os valores à vontade.</div>`;
+    const comMeta = sim.real.cpm != null;
+    const grupos = alavancas(comMeta).map((g) => `<div class="cartao grupo-alav ${g.itens.length > 2 ? "larga" : ""}"><h3>${g.grupo}</h3><small>${g.dica}</small><div class="lista-alav">${g.itens.map((a) => `
+      <div class="alav" data-alav="${a.id}">
+        <div class="alav-top"><label for="al-${a.id}">${a.nome}<small>${a.sub}</small></label>
+          <span class="campo-alav">${a.pre || ""}<input id="al-${a.id}" type="number" inputmode="decimal" step="${a.passo}" min="0">${a.pos || ""}</span></div>
+        <div class="trilho-alav"><input type="range" aria-label="${a.nome}" step="${a.passo}" min="0"><i class="pino real" data-dica="${sim.temDados ? "Real do período" : "Número de partida"}"></i><i class="pino limite" hidden></i></div>
+        <div class="rodape-alav"><span class="r-real num"></span><span class="lim num"></span></div>
+      </div>`).join("")}</div></div>`).join("");
+    $("analise").innerHTML = `${faixa}
+      <div class="cartao placar-sim" id="placar-sim"></div>
+      <div class="acoes-sim">
+        <label class="pilula">Portão de ROAS<input id="portao" class="num" type="number" step=".05" min="0" inputmode="decimal" aria-label="Portão de ROAS"></label>
+        <button class="pilula" id="fixar-base" type="button">Fixar como base</button>
+        <button class="pilula" id="voltar-real" type="button">${sim.temDados ? "Voltar ao real" : "Voltar ao início"}</button>
+      </div>
+      <div class="cartao"><div class="esteira" id="esteira"></div></div>
+      <div class="alavancas">${grupos}</div>
+      <div class="cartao"><div class="cabeca-cartao"><h2 id="tit-folga">Folga até o portão</h2><small>uma alavanca por vez</small></div>
+        <div class="rolar" id="folga"></div>
+        <p class="fonte">Mexer em uma etapa recalcula tudo o que vem depois. O simulador não prevê queda de ROAS ao aumentar a verba: para isso, veja Nível de escala.</p></div>
+      <p class="fonte">Lucro = faturamento líquido − anúncios − imposto sobre a mídia (${num(sim.p.midia, 1)}%) − imposto da venda (${num(sim.p.imp, 2)}%). Taxa da plataforma usada: ${num(sim.p.taxa, 1)}%. Período: o escolhido no alto.</p>`;
+    for (const g of alavancas(comMeta)) for (const a of g.itens) {
+      const el = document.querySelector(`[data-alav="${a.id}"]`), n = el.querySelector("input[type=number]"), r = el.querySelector("input[type=range]");
+      r.max = a.max(sim.real[a.id]);
+      const mudar = (v) => { sim.p[a.id] = Math.max(0, Number(v) || 0); atualizarSim(a.id); };
+      r.addEventListener("input", () => mudar(r.value));
+      n.addEventListener("input", () => { if (n.value !== "") mudar(n.value); });
+    }
+    $("portao").value = sim.portao;
+    $("portao").addEventListener("input", () => { sim.portao = Number($("portao").value) || 0; atualizarSim(); });
+    $("fixar-base").addEventListener("click", () => { sim.base = { ...sim.p }; atualizarSim(); });
+    $("voltar-real").addEventListener("click", () => { sim.p = { ...sim.real }; sim.base = null; atualizarSim(); });
+    atualizarSim();
+  }
+  function atualizarSim(mexido) {
+    if (sim.p.cpm != null) sim.p.cpv = (sim.p.ctr > 0 && sim.p.con > 0) ? (sim.p.cpm / 1000) / (sim.p.ctr / 100) / (sim.p.con / 100) : 0;
+    const p = sim.p, c = simular(p), base = simular(sim.base || sim.real), lim = limites(p, sim.portao);
+    const abaixo = c.roas < sim.portao, folgaPct = sim.portao ? (c.roas / sim.portao - 1) * 100 : 0;
+    const op = oportunidade(serieHistorica(), p);
+    const delta = (a, b, fmt) => Math.abs(a - b) < .005 ? "" : `<small class="${a > b ? "delta-sobe" : "delta-desce"}">${a > b ? "+" : "−"}${fmt(Math.abs(a - b))}</small>`;
+    $("placar-sim").innerHTML = `<div><span class="rot" style="display:block;color:var(--suave);margin-bottom:6px">ROAS ${sim.temDados ? "do período" : "de partida"} / portão</span><div class="grande num">${num(c.roas)} <small>/ ${num(sim.portao)}</small></div>
+        <span class="etq selo-portao ${abaixo ? "desce" : "sobe"}">${abaixo ? "Abaixo" : "Acima"} do portão · ${abaixo ? "falta" : "folga de"} ${num(Math.abs(folgaPct), 1)}%</span>
+        ${op ? `<p class="rot">Maior oportunidade · ${op.onde}</p><p class="op">${op.txt}</p><p>Hoje ${op.agora}; a melhor semana do histórico chegou a ${op.melhor}. Mexer em ${op.como}.</p>` :
+               `<p>Com pelo menos 2 semanas de histórico, aparece aqui a parte do funil mais longe da sua melhor semana.</p>`}</div>
+      <div class="numeros-sim">
+        <div><span>Pedidos</span><b class="num">${num(c.pedidos, 0)}</b>${delta(c.pedidos, base.pedidos, (v) => num(v, 0))}</div>
+        <div><span>CPA</span><b class="num">R$ ${num(c.cpa)}</b>${delta(base.cpa, c.cpa, (v) => "R$ " + num(v))}</div>
+        <div><span>Ticket</span><b class="num">R$ ${num(c.ticket)}</b>${delta(c.ticket, base.ticket, (v) => "R$ " + num(v))}</div>
+        <div><span>Lucro após impostos</span><b class="num ${c.lucro < 0 ? "delta-desce" : "delta-sobe"}">R$ ${num(c.lucro, 0)}</b>${delta(c.lucro, base.lucro, (v) => "R$ " + num(v, 0))}</div>
+      </div>`;
+    const ets = [...(p.cpm != null ? [["Impressões", num(p.inv / p.cpm * 1000, 0), `CPM R$ ${num(p.cpm)}`, "cpv"], ["Cliques no link", num(p.inv / p.cpm * 1000 * p.ctr / 100, 0), `CTR ${num(p.ctr)}%`, "cpv"]] : []), ["Visitas", num(c.visitas, 0), `R$ ${num(p.cpv)} cada`, "cpv"], ["Clicaram comprar", num(c.cliques, 0), `${num(p.tCli)}% das visitas`, "pag"],
+                 ["Pedidos", num(c.pedidos, 0), `${num(p.tConv)}% dos cliques`, "pag"], ["Bumps", num(c.pedidos * p.tBump / 100, 0), `${num(p.tBump)}% dos pedidos`, "of"], ["Ticket", "R$ " + num(c.ticket), `reembolso ${num(p.r)}%`, "of"]];
+    const gargalo = op ? { "Tráfego": "cpv", "Página e checkout": "pag", "Oferta": "of" }[op.onde] : null;
+    $("esteira").innerHTML = ets.map(([t, v, s, g]) => `<div class="et ${g === gargalo ? "gargalo" : ""}"><span>${t}</span><b class="num">${v}</b><small>${s}</small></div>`).join("");
+    const linhas = [];
+    for (const g of alavancas(p.cpm != null)) for (const a of g.itens) {
+      const el = document.querySelector(`[data-alav="${a.id}"]`); if (!el) continue;
+      const n = el.querySelector("input[type=number]"), r = el.querySelector("input[type=range]"), v = p[a.id];
+      if (mexido !== a.id || document.activeElement !== n) n.value = a.id === "inv" ? Math.round(v) : Math.round(v * 100) / 100;
+      if (Number(r.max) < v) r.max = v * 1.5;
+      r.value = v;
+      const em = (x) => Math.min(100, Math.max(0, x / Number(r.max) * 100));
+      el.querySelector(".pino.real").style.left = `calc(${em(sim.real[a.id])}% )`;
+      const pl = el.querySelector(".pino.limite"), l = lim[a.id], temLim = !a.livre && l != null && isFinite(l) && l >= 0 && (a.id !== "r" || l <= 100) && (!a.pos || l <= 100);
+      pl.hidden = !temLim; if (temLim) pl.style.left = em(l) + "%";
+      el.querySelector(".r-real").textContent = `${sim.temDados ? "real" : "partida"} ${fmtAlav(a, sim.real[a.id])}`;
+      el.querySelector(".lim").textContent = temLim ? `${abaixo ? "precisa de" : "pode ir até"} ${fmtAlav(a, l)}` : "";
+      if (!a.livre) {
+        const impossivel = l == null || !isFinite(l) || l < 0 || (a.pos && l > 100);
+                linhas.push(`<tr><td>${a.nome}<br><small style="color:var(--apagado)">${g.grupo}</small></td><td class="n num">${fmtAlav(a, v)}</td><td class="n num"><b>${impossivel ? (abaixo ? "não alcança sozinha" : "qualquer valor") : fmtAlav(a, l)}</b></td>` +
+          `<td class="n num">${impossivel ? "—" : (a.pre ? (l - v >= 0 ? "+" : "−") + "R$ " + num(Math.abs(l - v)) : (l - v >= 0 ? "+" : "−") + num(Math.abs(l - v)) + " pontos")}</td><td style="color:var(--suave)">${a.esforco}</td></tr>`);
+      }
+    }
+    $("tit-folga").textContent = abaixo ? "Quanto falta para o portão" : "Folga até o portão";
+    $("folga").innerHTML = `<table><thead><tr><th>Alavanca</th><th class="n">Hoje</th><th class="n">${abaixo ? "Precisa de" : "Pode ir até"}</th><th class="n">Diferença</th><th>Esforço</th></tr></thead><tbody>${linhas.join("")}</tbody></table>`;
+  }
+
+  // ----- comparar períodos -----
+  let cmp = null;
+  function presetCmp(nome) {
+    const h = hojeMs(), r = (a, b) => [isoDe(h - a * 864e5), isoDe(h - b * 864e5)];
+    if (nome === "mes") {
+      const agora = new Date(h), ini = Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth(), 1), iniA = Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth() - 1, 1);
+      return { a: [isoDe(iniA), isoDe(ini - 864e5)], b: [isoDe(ini), isoDe(h)], nome };
+    }
+    const n = Number(nome);
+    return { a: r(2 * n, n + 1), b: r(n, 1), nome };
+  }
+  function desenharComparar() {
+    cmp ||= presetCmp("7");
+    const serie = serieHistorica();
+    const janela = serie.slice(-Math.max(60, Math.min(120, diasEntre(cmp.a[0], hojeSP()))));
+    if (!janela.some((x) => x.gasto || x.receita)) {
+      $("analise").innerHTML = `<div class="cartao"><div class="vazio">Aparece quando houver vendas ou gasto. Aqui você vai ver dois períodos lado a lado, o que mudou entre eles e o lucro por dia.</div></div>`; return;
+    }
+    const A = somaTrecho(serie, ...cmp.a), B = somaTrecho(serie, ...cmp.b);
+    const linha = (rot, fa, fb, fmt, bomSubir = true) => {
+      const a = fa(A), b = fb(B), dif = (a == null || b == null) ? null : b - a;
+      const cl = dif == null || Math.abs(dif) < 1e-6 ? "" : ((dif > 0) === bomSubir ? "delta-sobe" : "delta-desce");
+      return `<tr><td>${rot}</td><td class="n num">${a == null ? "—" : fmt(a)}</td><td class="n num">${b == null ? "—" : fmt(b)}</td><td class="n num ${cl}">${dif == null ? "—" : (dif > 0 ? "+" : dif < 0 ? "−" : "") + fmt(Math.abs(dif))}</td></tr>`;
+    };
+    const dia = (c) => (x) => x[c] / x.dias, conv = (x) => x.visitantes ? x.pedidos / x.visitantes * 100 : null;
+    const cpa = (x) => x.pedidos && x.gasto ? x.gasto / x.pedidos : null, tk = (x) => x.pedidos ? x.receita / x.pedidos : null;
+    const mud = mudancas().filter((m) => m.dia >= cmp.a[0] && m.dia <= cmp.b[1]);
+    // melhor e pior semana corrida
+    let melhor = null, pior = null;
+    for (let i = 6; i < serie.length; i++) {
+      const s = somaTrecho(serie, serie[i - 6].dia, serie[i].dia); if (!s.gasto && !s.receita) continue;
+      const m = { de: serie[i - 6].dia, ate: serie[i].dia, lucro: s.lucro / 7 };
+      if (!melhor || m.lucro > melhor.lucro) melhor = m; if (!pior || m.lucro < pior.lucro) pior = m;
+    }
+    $("analise").innerHTML = `
+      <div class="cartao grafico"><div class="cabeca-cartao"><h2>Lucro após impostos por dia</h2><small>A e B sombreados</small></div>
+        <div class="legenda"><span><b style="background:#9085e9"></b>Período A</span><span><b style="background:#e8934a"></b>Período B</span><span><b style="background:#f2f3ef;height:2px;vertical-align:3px"></b>média de 7 dias</span>${mud.length ? `<span><b style="background:#ef6fa6;width:2px"></b>mudança registrada</span>` : ""}</div>
+        <div id="graf-cmp"></div>
+        ${melhor && pior && melhor.de !== pior.de ? `<div class="botoes-trecho"><button class="pilula" type="button" id="btn-trechos">Comparar a pior semana (${rotuloDia(pior.de)} a ${rotuloDia(pior.ate)}) com a melhor (${rotuloDia(melhor.de)} a ${rotuloDia(melhor.ate)})</button></div>` : ""}
+      </div>
+      <div class="cartao"><div class="periodos">
+        <label class="pilula"><select id="preset-cmp" aria-label="Atalho de período">
+          <option value="7">7 dias × 7 anteriores</option><option value="14">14 dias × 14 anteriores</option><option value="30">30 dias × 30 anteriores</option><option value="mes">Este mês × mês passado</option><option value="livre">Escolher as datas</option></select></label>
+        <fieldset><legend style="color:#b5adf2">Período A (antes)</legend><input type="date" id="a-de" aria-label="A: início" value="${cmp.a[0]}"><input type="date" id="a-ate" aria-label="A: fim" value="${cmp.a[1]}"></fieldset>
+        <fieldset><legend style="color:#f0b27f">Período B (depois)</legend><input type="date" id="b-de" aria-label="B: início" value="${cmp.b[0]}"><input type="date" id="b-ate" aria-label="B: fim" value="${cmp.b[1]}"></fieldset>
+      </div></div>
+      <div class="grade duas">
+        <div class="cartao"><div class="cabeca-cartao"><h2>Resultado</h2><small>médias por dia</small></div><div class="rolar"><table><thead><tr><th></th><th class="n">A</th><th class="n">B</th><th class="n">Diferença</th></tr></thead><tbody>
+          ${linha("Investimento/dia", dia("gasto"), dia("gasto"), (v) => brl(v), false)}
+          ${linha("Faturamento/dia", dia("receita"), dia("receita"), (v) => brl(v))}
+          ${linha("Lucro/dia", dia("lucro"), dia("lucro"), (v) => brl(v))}
+          ${linha("ROAS", roasDe, roasDe, (v) => num(v))}
+          ${linha("Pedidos/dia", dia("pedidos"), dia("pedidos"), (v) => num(v, 1))}
+          ${linha("Visitas/dia", dia("visitantes"), dia("visitantes"), (v) => num(v, 0))}
+          ${linha("Visita → pedido", conv, conv, (v) => num(v) + "%")}
+          ${linha("CPA", cpa, cpa, (v) => brl(v), false)}
+          ${linha("Ticket", tk, tk, (v) => brl(v))}
+          ${linha("Reembolso/dia", dia("reembolsos_valor"), dia("reembolsos_valor"), (v) => brl(v), false)}
+        </tbody></table></div></div>
+        <div class="cartao"><div class="cabeca-cartao"><h2>Mudanças fora dos anúncios</h2><small>nesses dias</small></div>
+          <p class="fonte" style="margin:0 0 6px">Mudança de página, preço ou checkout tem efeito no mesmo dia. Se a virada coincidir com uma data daqui, confira isso antes de culpar um anúncio.</p>
+          ${mud.length ? mud.map((m) => `<div class="mudanca"><b class="num">${rotuloDia(m.dia)}</b><span>${esc(m.texto)}${!produto && m.produto ? ` <span class="tag-produto">${esc(nomeDe(m.produto))}</span>` : ""}</span></div>`).join("") : `<div class="vazio">Nenhuma mudança registrada nesses dias.</div>`}
+        </div>
+      </div>
+      <div class="cartao" id="anuncios-ab"></div>`;
+    grafComparar(janela, mud);
+    desenharAnunciosAB();
+    $("preset-cmp").value = cmp.nome;
+    $("preset-cmp").addEventListener("change", (e) => { if (e.target.value !== "livre") { cmp = presetCmp(e.target.value); desenharComparar(); } });
+    for (const [id, g, i] of [["a-de", "a", 0], ["a-ate", "a", 1], ["b-de", "b", 0], ["b-ate", "b", 1]])
+      $(id).addEventListener("change", (e) => { if (e.target.value) { cmp[g][i] = e.target.value; cmp.nome = "livre"; desenharComparar(); } });
+    $("btn-trechos")?.addEventListener("click", () => { cmp = { a: [pior.de, pior.ate], b: [melhor.de, melhor.ate], nome: "livre" }; desenharComparar(); });
+  }
+  function grafComparar(serie, mud) {
+    const el = $("graf-cmp"), W = Math.max(300, Math.round(el.clientWidth || 640)), H = 240, mE = 44, mB = 24, mT = 8;
+    const v = serie.map((x) => x.lucro);
+    let max = Math.max(10, ...v), min = Math.min(0, ...v); const amp = (max - min) * .08; max += amp; if (min < 0) min -= amp;
+    const y = (t) => mT + (max - t) / (max - min) * (H - mT - mB), larg = (W - mE) / serie.length, bw = Math.max(2, Math.min(20, larg * .68));
+    const faixa = (de, ate, cor) => { const i = serie.findIndex((x) => x.dia >= de); let j = -1; serie.forEach((x, k) => { if (x.dia <= ate) j = k; }); return i < 0 || j < i ? "" : `<rect x="${mE + i * larg}" y="${mT}" width="${(j - i + 1) * larg}" height="${H - mT - mB}" fill="${cor}"/>`; };
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lucro após impostos por dia">` + faixa(...cmp.a, "rgba(144,133,233,.16)") + faixa(...cmp.b, "rgba(232,147,74,.16)");
+    for (const t of [max, (max + min) / 2, min]) s += `<text class="eixo num" x="${mE - 6}" y="${y(t) + 4}" text-anchor="end">${brlCurto(t)}</text>`;
+    s += `<line class="linha-grade" x1="${mE}" x2="${W}" y1="${y(0)}" y2="${y(0)}" style="stroke:rgba(255,255,255,.22)"/>`;
+    serie.forEach((x, i) => {
+      const cx = mE + larg * i + larg / 2, y0 = y(0), y1 = y(x.lucro);
+      s += `<rect x="${cx - bw / 2}" y="${Math.min(y0, y1)}" width="${bw}" height="${Math.max(1, Math.abs(y1 - y0))}" rx="2" fill="${x.lucro < 0 ? "#e66767" : "#7fa24a"}"/>`;
+      s += `<rect x="${mE + larg * i}" y="${mT}" width="${larg}" height="${H - mT - mB}" fill="transparent" data-dica="${esc(`<b>${rotuloDia(x.dia)}</b><br>Lucro ${brl(x.lucro)}<br>Anúncios ${brl(x.gasto)} · ${int(x.pedidos)} pedidos`)}"/>`;
+      if (i % Math.ceil(serie.length / 7) === 0) s += `<text class="eixo num" x="${cx}" y="${H - 6}" text-anchor="middle">${rotuloDia(x.dia)}</text>`;
+    });
+    const med = serie.map((_, i) => { const t = serie.slice(Math.max(0, i - 6), i + 1); return t.reduce((a, b) => a + b.lucro, 0) / t.length; });
+    s += `<polyline fill="none" stroke="#f2f3ef" stroke-width="2" stroke-linejoin="round" points="${med.map((m, i) => `${mE + larg * i + larg / 2},${y(m)}`).join(" ")}"/>`;
+    for (const m of mud) { const i = serie.findIndex((x) => x.dia === m.dia); if (i >= 0) s += `<line x1="${mE + larg * i + larg / 2}" x2="${mE + larg * i + larg / 2}" y1="${mT}" y2="${H - mB}" stroke="#ef6fa6" stroke-dasharray="3 3"><title>${esc(m.texto)}</title></line>`; }
+    el.innerHTML = s + "</svg>";
+  }
+
+  // ----- nível de escala: em que faixa de gasto por dia o lucro é melhor -----
+  let escalaCfg = { dias: "90", amostra: 4 };
+  function desenharEscala() {
+    let serie = serieHistorica().filter((x) => x.gasto > 0);
+    if (escalaCfg.dias !== "tudo") { const de = isoDe(hojeMs() - (Number(escalaCfg.dias) - 1) * 864e5); serie = serie.filter((x) => x.dia >= de); }
+    const controles = `<div class="acoes-sim"><label class="pilula"><select id="esc-dias" aria-label="Período"><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="tudo">Desde o início</option></select></label>
+      <label class="pilula">Mínimo de dias<input id="esc-amostra" class="num" type="number" min="1" step="1" inputmode="numeric" aria-label="Mínimo de dias para destacar"></label></div>`;
+    if (!serie.length) {
+      $("analise").innerHTML = controles + `<div class="cartao"><div class="vazio">Aparece quando os anúncios rodarem. Mostra em que faixa de gasto por dia o lucro é melhor, para saber até onde escalar.</div></div>`;
+    } else {
+      const maior = Math.max(...serie.map((x) => x.gasto)), passo = maior < 300 ? 25 : maior < 1000 ? 50 : 100, faixas = {};
+      for (const x of serie) { const f = Math.floor(x.gasto / passo) * passo; const t = (faixas[f] ||= { f, dias: 0, gasto: 0, receita: 0, lucro: 0, pedidos: 0 }); t.dias++; t.gasto += x.gasto; t.receita += x.receita; t.lucro += x.lucro; t.pedidos += x.pedidos; }
+      const lista = Object.values(faixas).sort((a, b) => b.f - a.f);
+      const validas = lista.filter((t) => t.dias >= escalaCfg.amostra), topo = validas.length ? Math.max(...validas.map((t) => t.lucro / t.dias)) : null;
+      $("analise").innerHTML = controles + `
+        <div class="cartao"><div class="cabeca-cartao"><h2>Lucro por faixa de gasto</h2><small>${serie.length} dias com anúncio</small></div>
+          <div class="rolar"><table><thead><tr><th>Gasto por dia</th><th class="n">Dias</th><th class="n">Faturamento médio</th><th class="n">Lucro médio</th><th class="n">ROAS</th><th class="n">CPA</th></tr></thead><tbody>${
+            lista.map((t) => `<tr class="${topo != null && t.dias >= escalaCfg.amostra && t.lucro / t.dias === topo ? "destaque" : ""}"><td class="num">${int(t.f)} a ${int(t.f + passo - 1)}</td><td class="n num">${t.dias}</td><td class="n num">${brl(t.receita / t.dias)}</td><td class="n num ${t.lucro < 0 ? "negativo" : ""}">${brl(t.lucro / t.dias)}</td>` +
+              `<td class="num roas ${faixaRoas(t.receita / t.gasto, produto || null)}">${num(t.receita / t.gasto)}</td><td class="n num">${t.pedidos ? brl(t.gasto / t.pedidos) : "—"}</td></tr>`).join("")}</tbody></table></div>
+          <p class="fonte">O destaque é a faixa com maior lucro médio entre as que têm pelo menos ${escalaCfg.amostra} dias. Com poucos dias, pode ser sorte.</p></div>
+        <div class="cartao grafico"><div class="cabeca-cartao"><h2>Lucro × investimento</h2><small>R$ por dia, média de 7 dias</small></div><div id="graf-disp"></div>
+          <p class="fonte">Cada ponto é uma semana corrida. A linha verde liga o melhor lucro já visto em cada nível de gasto: abaixo dela, dá para fazer melhor com a mesma verba.</p></div>`;
+      grafDispersao(serieHistorica());
+    }
+    $("esc-dias").value = escalaCfg.dias; $("esc-amostra").value = escalaCfg.amostra;
+    $("esc-dias").addEventListener("change", (e) => { escalaCfg.dias = e.target.value; desenharEscala(); });
+    $("esc-amostra").addEventListener("change", (e) => { escalaCfg.amostra = Math.max(1, Number(e.target.value) || 1); desenharEscala(); });
+  }
+  function grafDispersao(serie) {
+    const pts = [];
+    for (let i = 6; i < serie.length; i++) { const s = somaTrecho(serie, serie[i - 6].dia, serie[i].dia); if (s.gasto > 0) pts.push({ x: s.gasto / 7, y: s.lucro / 7, dia: serie[i].dia }); }
+    const el = $("graf-disp"); if (!pts.length) { el.innerHTML = `<div class="vazio">Aparece depois de 7 dias com anúncio.</div>`; return; }
+    const W = Math.max(300, Math.round(el.clientWidth || 640)), H = 240, mE = 44, mB = 30, mT = 8;
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y), x0 = Math.min(...xs) * .95, x1 = Math.max(...xs) * 1.05 || 1, y0 = Math.min(0, ...ys), y1 = Math.max(10, ...ys) * 1.08;
+    const X = (v) => mE + (v - x0) / (x1 - x0 || 1) * (W - mE - 8), Y = (v) => mT + (y1 - v) / (y1 - y0 || 1) * (H - mT - mB);
+    const ord = pts.slice().sort((a, b) => b.x - a.x), fr = []; let topo = -Infinity;
+    for (const p of ord) if (p.y > topo) { fr.unshift(p); topo = p.y; }
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lucro por dia contra investimento por dia">`;
+    for (const t of [y1, (y1 + y0) / 2, y0]) s += `<line class="linha-grade" x1="${mE}" x2="${W}" y1="${Y(t)}" y2="${Y(t)}"/><text class="eixo num" x="${mE - 6}" y="${Y(t) + 4}" text-anchor="end">${brlCurto(t)}</text>`;
+    for (const t of [x0, (x0 + x1) / 2, x1]) s += `<text class="eixo num" x="${Math.min(W - 24, Math.max(mE, X(t)))}" y="${H - 12}" text-anchor="middle">${brlCurto(t)}</text>`;
+    s += `<polyline fill="none" stroke="#4ade80" stroke-width="2" stroke-dasharray="4 4" points="${fr.map((p) => `${X(p.x)},${Y(p.y)}`).join(" ")}"/>`;
+    for (const p of pts) s += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="${fr.includes(p) ? 5 : 4}" fill="${fr.includes(p) ? "#4ade80" : "rgba(255,255,255,.3)"}" data-dica="${esc(`Semana até ${rotuloDia(p.dia)}<br>Gasto ${brl(p.x)}/dia<br>Lucro ${brl(p.y)}/dia`)}"/>`;
+    el.innerHTML = s + `<text></text></svg>`;
+  }
+
+  // ----- mês a mês -----
+  function desenharMensal() {
+    const meses = {};
+    for (const x of serieHistorica()) { const m = x.dia.slice(0, 7), t = (meses[m] ||= { m, gasto: 0, receita: 0, receita_liquida: 0, reembolsos_valor: 0, lucro: 0, pedidos: 0, visitantes: 0 }); for (const c of Object.keys(t)) if (c !== "m") t[c] += x[c]; }
+    const lista = Object.values(meses).filter((t) => t.gasto || t.receita || t.visitantes).sort((a, b) => b.m.localeCompare(a.m));
+    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Mês a mês</h2><small>desde o início</small></div>${lista.length ? `<div class="rolar"><table class="enxuto"><thead><tr><th>Mês</th><th class="n">Investimento</th><th class="n">Faturamento</th><th class="n">Reembolsos</th><th class="n">Líquido</th><th class="n">Lucro após impostos</th><th class="n">ROAS</th><th class="n">Pedidos</th><th class="n">CPA</th></tr></thead><tbody>${
+      lista.map((t) => `<tr><td class="num">${t.m.slice(5)}/${t.m.slice(0, 4)}</td><td class="n num">${brl(t.gasto)}</td><td class="n num">${brl(t.receita + t.reembolsos_valor)}</td><td class="n num">${brl(t.reembolsos_valor)}</td><td class="n num">${brl(t.receita_liquida)}</td><td class="n num ${t.lucro < 0 ? "negativo" : ""}">${brl(t.lucro)}</td><td class="num roas ${faixaRoas(roasDe(t), produto || null)}">${roasDe(t) == null ? "—" : num(roasDe(t))}</td><td class="n num">${int(t.pedidos)}</td><td class="n num">${t.pedidos && t.gasto ? brl(t.gasto / t.pedidos) : "—"}</td></tr>`).join("")}</tbody></table></div><button class="pilula ver-colunas" type="button">ver todas as colunas</button><p class="fonte">O mês atual está em andamento.</p>` : `<div class="vazio">Aparece quando houver vendas ou gasto.</div>`}</div>`;
+  }
+
+  // ----- métricas do dia: o funil inteiro, da impressão à venda -----
+  function serieMetricas() {
+    const ids = escolhidos(), por = {};
+    for (const m of extras?.metricas || []) if (ids.includes(m.produto)) {
+      const t = (por[m.dia] ||= { impressoes: 0, cliques_link: 0, visualizacoes_pagina: 0, video_3s: 0, video_thruplay: 0, checkouts_fb: 0, compras_fb: 0, receita_fb: 0, clicaram: 0, bumps: 0 });
+      for (const c of Object.keys(t)) t[c] += Number(m[c]) || 0;
+    }
+    return por;
+  }
+  const div = (a, b) => b ? a / b : null;
+  const fPct = (v) => v == null ? "—" : num(v * 100) + "%", fBrl = (v) => v == null ? "—" : brl(v), fInt = (v) => v ? int(v) : "—";
+  async function postar(params, corpo) { const r = await chamar(params, corpo); if (!r.ok) throw new Error("servidor"); return r; }
+  function desenharDiario() {
+    const serie = serieHistorica().slice(-45).reverse(), mud = mudancas(), met = serieMetricas();
+    const tem = serie.some((x) => x.gasto || x.receita || x.visitantes);
+    const form = `<div class="cartao"><div class="cabeca-cartao"><h2>Registrar mudança</h2><small>página, preço ou checkout</small></div>
+      <form class="campo-linha" id="form-mudanca">
+        <input type="date" id="mud-dia" value="${hojeSP()}" aria-label="Dia da mudança" required>
+        <select id="mud-prod" aria-label="Produto">${catalogo.produtos.map((p) => `<option value="${esc(p.id)}" ${p.id === produto ? "selected" : ""}>${esc(p.nome)}</option>`).join("")}</select>
+        <input class="cresce" id="mud-texto" maxlength="300" placeholder="O que mudou?" aria-label="O que mudou" required>
+        <button type="submit">Registrar</button>
+      </form></div>`;
+    const cols = ["Dia", "Mudanças", "Invest.", "Fatur.", "Reemb.", "Lucro", "ROAS", "CPM", "Impressões", "Gancho", "Retenção", "CTR", "CPC", "Custo checkout", "Cliques link", "Visualiz. página", "Conexão", "Clicaram comprar", "Clique/visita", "Conv. checkout", "Conv. venda", "Vendas", "CPA", "Bumps", "% bump", "% vendas Meta", "% fatur. Meta"];
+    $("analise").innerHTML = form + `<div class="cartao"><div class="cabeca-cartao"><h2>Métricas do dia</h2><small>até 45 dias · role para o lado</small></div>${tem ? `<div class="rolar"><table><thead><tr>${cols.map((c, i) => `<th class="${i > 1 ? "n" : ""}">${c}</th>`).join("")}</tr></thead><tbody>${
+      serie.map((x) => {
+        const r = roasDe(x), mx = mud.filter((m) => m.dia === x.dia), m = met[x.dia] || {}, imp = m.impressoes || 0, lk = m.cliques_link || 0, cl = m.clicaram || 0;
+        return `<tr><td class="num">${rotuloDia(x.dia)}</td><td style="white-space:normal;min-width:150px;color:var(--suave);font-size:12px">${mx.map((q) => esc(q.texto) + (q.id ? ` <button class="apagar" data-apagar="${q.id}" aria-label="Apagar mudança">×</button>` : "")).join("<br>")}</td>` +
+          `<td class="n num">${brl(x.gasto)}</td><td class="n num">${brl(x.receita + x.reembolsos_valor)}</td><td class="n num">${brl(x.reembolsos_valor)}</td><td class="n num ${x.lucro < 0 ? "negativo" : ""}">${brl(x.lucro)}</td><td class="num roas ${faixaRoas(r, produto || null)}">${r == null ? "—" : num(r)}</td>` +
+          `<td class="n num">${fBrl(imp ? x.gasto / imp * 1000 : null)}</td><td class="n num">${fInt(imp)}</td><td class="n num">${fPct(div(m.video_3s, imp))}</td><td class="n num">${fPct(div(m.video_thruplay, m.video_3s))}</td><td class="n num">${fPct(div(lk, imp))}</td><td class="n num">${fBrl(div(x.gasto, lk))}</td>` +
+          `<td class="n num">${fBrl(div(x.gasto, cl))}</td><td class="n num">${fInt(lk)}</td><td class="n num">${fInt(m.visualizacoes_pagina)}</td><td class="n num">${fPct(div(x.visitantes, lk))}</td><td class="n num">${fInt(cl)}</td><td class="n num">${fPct(div(cl, x.visitantes))}</td><td class="n num">${fPct(div(x.pedidos, cl))}</td><td class="n num">${fPct(div(x.pedidos, x.visitantes))}</td>` +
+          `<td class="n num">${int(x.pedidos)}</td><td class="n num">${x.gasto && x.pedidos ? brl(x.gasto / x.pedidos) : "—"}</td><td class="n num">${fInt(m.bumps)}</td><td class="n num">${fPct(div(m.bumps, x.pedidos))}</td><td class="n num">${fPct(div(m.compras_fb, x.pedidos))}</td><td class="n num">${fPct(div(m.receita_fb, x.receita))}</td></tr>`;
+      }).join("")}</tbody></table></div><p class="fonte">Impressão, gancho, CTR e cliques vêm do relatório do Gerenciador de Anúncios (em Importar e ajustes). Vendas e faturamento vêm da Hotmart.</p>` : `<div class="vazio">Aparece quando houver visitas, vendas ou gasto.</div>`}</div>`;
+    $("form-mudanca").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try { await postar({ mudanca: 1 }, { dia: $("mud-dia").value, produto: $("mud-prod").value, texto: $("mud-texto").value }); chaveExtras = null; await garantirExtras(); desenharDiario(); avisar("Mudança registrada"); }
+      catch (err) { avisar("Não deu para registrar. Tente de novo."); }
+    });
+    $("analise").querySelectorAll("[data-apagar]").forEach((b) => b.addEventListener("click", async () => {
+      try { await postar({ mudanca_apagar: 1 }, { id: Number(b.dataset.apagar) }); chaveExtras = null; await garantirExtras(); desenharDiario(); } catch (err) { avisar("Não deu para apagar."); }
+    }));
+  }
+
+  // ----- anúncios por variação -----
+  // "AD82V3H398" e "AD82V3H417" são o mesmo corpo; no nosso padrão, é o nome sem o último [colchete].
+  const corpoDe = (nome) => {
+    const n = String(nome || "");
+    const h = n.match(/^(.*?V\d+)H\d.*$/i); if (h) return h[1];
+    const c = n.match(/^(.*)\[[^\]]*\]\s*$/); if (c && c[1].trim()) return c[1].trim();
+    return n;
+  };
+  const somaAd = (lista) => { const t = { gasto: 0, impressoes: 0, cliques_link: 0, visualizacoes_pagina: 0, video_3s: 0, video_thruplay: 0, checkouts_fb: 0, compras: 0, bumps: 0, receita: 0, receita_liquida: 0, compras_fb: 0, receita_fb: 0 };
+    for (const a of lista) for (const c of Object.keys(t)) t[c] += Number(a[c]) || 0; return t; };
+  let adsCfg = { busca: "", roas: "", gasto: "", ordem: "gasto", abertos: {} };
+  const seletorJanela = () => `<label class="pilula"><select id="janela" aria-label="Período"><option value="7">Últimos 7 dias</option><option value="14">Últimos 14 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="tudo">Desde o início</option></select></label>`;
+  function ligarJanela() {
+    $("janela").value = janela;
+    $("janela").addEventListener("change", async (e) => { janela = e.target.value; await garantirExtras(); ({ anuncios: desenharAnuncios, hora: desenharHora, pais: desenharPais })[sub](); });
+  }
+  function desenharAnuncios() {
+    const lista = (extras?.anuncios || []).filter((a) => !produto || a.produto === produto);
+    const grupos = {};
+    for (const a of lista) (grupos[corpoDe(a.nome)] ||= []).push(a);
+    let linhas = Object.entries(grupos).map(([corpo, itens]) => ({ corpo, itens, ...somaAd(itens), primeiro: itens.map((i) => i.primeiro_dia).filter(Boolean).sort()[0], status: itens.some((i) => /ativ|active/i.test(i.status || "")) ? "Ativo" : (itens[0].status || "") }));
+    const b = adsCfg.busca.toLowerCase();
+    if (b) linhas = linhas.filter((l) => l.corpo.toLowerCase().includes(b) || l.itens.some((i) => i.nome.toLowerCase().includes(b)));
+    const ro = (x) => x.gasto ? x.receita / x.gasto : 0;
+    if (adsCfg.roas) linhas = linhas.filter((l) => adsCfg.roas === "bom" ? ro(l) >= 2 : adsCfg.roas === "medio" ? ro(l) >= 1.45 && ro(l) < 2 : ro(l) < 1.45);
+    if (adsCfg.gasto) linhas = linhas.filter((l) => l.gasto >= Number(adsCfg.gasto));
+    const ord = { gasto: (x) => x.gasto, receita: (x) => x.receita, roas: ro, compras: (x) => x.compras }[adsCfg.ordem];
+    linhas.sort((x, y) => ord(y) - ord(x));
+    const celulas = (x) => `<td class="n num">${brl(x.gasto)}</td><td class="n num">${brl(x.receita)}</td><td class="num roas ${x.gasto ? faixaRoas(ro(x), produto || null) : ""}">${x.gasto ? num(ro(x)) : "—"}</td><td class="n num">${int(x.compras)}</td><td class="n num">${x.compras && x.gasto ? brl(x.gasto / x.compras) : "—"}</td>` +
+      `<td class="n num">${fBrl(x.impressoes ? x.gasto / x.impressoes * 1000 : null)}</td><td class="n num">${fPct(div(x.video_3s, x.impressoes))}</td><td class="n num">${fPct(div(x.video_thruplay, x.video_3s))}</td><td class="n num">${fPct(div(x.cliques_link, x.impressoes))}</td><td class="n num">${fBrl(div(x.gasto, x.cliques_link))}</td>`;
+    const opt = (v, t, at) => `<option value="${v}" ${at === v ? "selected" : ""}>${t}</option>`;
+    $("analise").innerHTML = `<div class="acoes-sim">${seletorJanela()}</div>
+      <div class="cartao"><div class="cabeca-cartao"><h2>Anúncios por variação</h2><small>${lista.length} anúncios</small></div>
+        <div class="campo-linha" style="margin-bottom:12px">
+          <input class="cresce" id="ad-busca" placeholder="Filtrar pelo nome" aria-label="Filtrar pelo nome" value="${esc(adsCfg.busca)}">
+          <select id="ad-roas" aria-label="Filtrar ROAS">${opt("", "Qualquer ROAS", adsCfg.roas)}${opt("bom", "ROAS bom", adsCfg.roas)}${opt("medio", "ROAS em atenção", adsCfg.roas)}${opt("ruim", "ROAS ruim", adsCfg.roas)}</select>
+          <select id="ad-gasto" aria-label="Filtrar gasto">${opt("", "Qualquer gasto", adsCfg.gasto)}${opt("50", "Acima de R$ 50", adsCfg.gasto)}${opt("200", "Acima de R$ 200", adsCfg.gasto)}${opt("1000", "Acima de R$ 1.000", adsCfg.gasto)}</select>
+        </div>
+        ${linhas.length ? `<div class="rolar"><table><thead><tr><th>Anúncio</th><th class="n" data-ordem="gasto">Invest. ${adsCfg.ordem === "gasto" ? "↓" : ""}</th><th class="n" data-ordem="receita">Fatur. ${adsCfg.ordem === "receita" ? "↓" : ""}</th><th class="n" data-ordem="roas">ROAS ${adsCfg.ordem === "roas" ? "↓" : ""}</th><th class="n" data-ordem="compras">Compras ${adsCfg.ordem === "compras" ? "↓" : ""}</th><th class="n">CPA</th><th class="n">CPM</th><th class="n">Gancho</th><th class="n">Retenção</th><th class="n">CTR</th><th class="n">CPC</th><th class="n">Desde</th><th>Copy</th><th>Status</th></tr></thead><tbody>${
+          linhas.map((l) => {
+            const mais = l.itens.length > 1, aberto = adsCfg.abertos[l.corpo];
+            return `<tr><td>${mais ? `<button class="abre" data-abre="${esc(l.corpo)}" aria-expanded="${!!aberto}" aria-label="Ver variações">${aberto ? "▾" : "▸"}</button>` : ""}<span title="${esc(l.itens[0].campanha || "")}">${esc(l.corpo)}</span>${mais ? ` <small style="color:var(--apagado)">(${l.itens.length} variações)</small>` : ""}</td>${celulas(l)}<td class="n num">${l.primeiro ? rotuloDia(l.primeiro) : "—"}</td><td style="white-space:normal;min-width:120px;font-size:12px;color:var(--suave)">${mais ? "" : esc(l.itens[0].copy || "")}</td><td>${esc(l.status)}</td></tr>` +
+              (aberto ? l.itens.map((i) => `<tr class="filho"><td>${esc(i.nome)}</td>${celulas(i)}<td class="n num">${i.primeiro_dia ? rotuloDia(i.primeiro_dia) : "—"}</td><td style="white-space:normal;min-width:120px;font-size:12px;color:var(--suave)">${esc(i.copy || "")}</td><td>${esc(i.status || "")}</td></tr>`).join("") : "");
+          }).join("")}</tbody></table></div>
+          <p class="fonte">Faturamento e compras vêm da Hotmart, pelo anúncio que trouxe a pessoa. Toque no título da coluna para ordenar.</p>` :
+          `<div class="vazio">Aparece depois de importar o relatório do Gerenciador de Anúncios (em Importar e ajustes), com anúncios que já levaram visitas à página.</div>`}
+      </div>`;
+    ligarJanela();
+    $("ad-busca").addEventListener("change", (e) => { adsCfg.busca = e.target.value; desenharAnuncios(); });
+    $("ad-roas").addEventListener("change", (e) => { adsCfg.roas = e.target.value; desenharAnuncios(); });
+    $("ad-gasto").addEventListener("change", (e) => { adsCfg.gasto = e.target.value; desenharAnuncios(); });
+    $("analise").querySelectorAll("[data-ordem]").forEach((t) => t.addEventListener("click", () => { adsCfg.ordem = t.dataset.ordem; desenharAnuncios(); }));
+    $("analise").querySelectorAll("[data-abre]").forEach((t) => t.addEventListener("click", () => { adsCfg.abertos[t.dataset.abre] = !adsCfg.abertos[t.dataset.abre]; desenharAnuncios(); }));
+  }
+
+  // Comparar períodos: o que mudou nos anúncios de A para B.
+  let adsAB = { chave: null, a: [], b: [], corpo: true, minimo: 0, filtro: "" };
+  async function desenharAnunciosAB() {
+    const chave = `${cmp.a}|${cmp.b}|${versaoHistorico}`;
+    if (adsAB.chave !== chave) {
+      try {
+        const pedir = (r) => chamar({ anuncios: 1, de: r[0], ate: r[1] }, { catalogo: catalogo.produtos }).then((x) => (x.anuncios || []).filter((a) => a.ad_id));
+        const [a, b] = await Promise.all([pedir(cmp.a), pedir(cmp.b)]);
+        Object.assign(adsAB, { chave, a, b });
+      } catch (e) { adsAB.a = []; adsAB.b = []; }
+    }
+    const el = $("anuncios-ab"); if (!el) return;
+    const dA = diasEntre(...cmp.a), dB = diasEntre(...cmp.b), m = midiaDe();
+    const chaveDe = (x) => adsAB.corpo ? corpoDe(x.nome) : x.nome, grupos = {};
+    const noProd = (x) => !produto || x.produto === produto;
+    for (const x of adsAB.a) if (noProd(x)) ((grupos[chaveDe(x)] ||= { a: [], b: [] }).a).push(x);
+    for (const x of adsAB.b) if (noProd(x)) ((grupos[chaveDe(x)] ||= { a: [], b: [] }).b).push(x);
+    const luc = (t, dias, id) => (t.receita_liquida - t.receita * impostoDe(id) - t.gasto * (1 + m)) / dias;
+    let linhas = Object.entries(grupos).map(([nome, g]) => {
+      const A = somaAd(g.a), B = somaAd(g.b), id = (g.b[0] || g.a[0]).produto;
+      const ra = A.gasto ? A.receita / A.gasto : null, rb = B.gasto ? B.receita / B.gasto : null, ga = A.gasto / dA, gb = B.gasto / dB;
+      const leitura = !A.gasto ? "Novo" : !B.gasto ? "Parou" : gb < ga * .6 ? "Menos" : ra && rb < ra * .9 ? "Piorou" : rb > ra * 1.1 ? "Melhorou" : "Estável";
+      return { nome, n: Math.max(g.a.length, g.b.length), A, B, ra, rb, ga, gb, leitura, impacto: luc(B, dB, id) - luc(A, dA, id) };
+    });
+    const totalA = linhas.reduce((s, l) => s + l.ga, 0) || 1, totalB = linhas.reduce((s, l) => s + l.gb, 0) || 1;
+    const nomes = { Novo: "Novo", Parou: "Parou", Menos: "Perdeu verba", Piorou: "Piorou", Melhorou: "Melhorou", "Estável": "Estável" };
+    const conta = {}; for (const l of linhas) conta[l.leitura] = (conta[l.leitura] || 0) + 1;
+    const queda = linhas.filter((l) => l.impacto < 0).sort((x, y) => x.impacto - y.impacto).slice(0, 3), soma = linhas.reduce((s, l) => s + l.impacto, 0);
+    linhas = linhas.filter((l) => Math.max(l.ga, l.gb) >= adsAB.minimo && (!adsAB.filtro || l.leitura === adsAB.filtro)).sort((x, y) => x.impacto - y.impacto);
+    el.innerHTML = `<div class="cabeca-cartao"><h2>Anúncios: o que mudou de A para B</h2><small>por dia</small></div>
+      ${Object.keys(grupos).length ? `<p class="fonte" style="margin:0 0 10px">Lucro atribuído aos anúncios ${soma < 0 ? "caiu" : "subiu"} <b style="color:${soma < 0 ? "var(--critico)" : "var(--bom)"}">${brl(Math.abs(soma))} por dia</b>.${queda.length ? ` Quem mais puxou para baixo: ${queda.map((q) => `<b>${esc(q.nome)}</b> (${brl(q.impacto)})`).join(", ")}.` : ""}</p>
+      <div class="fichas"><button type="button" data-f="" aria-pressed="${!adsAB.filtro}">Todos</button>${Object.entries(nomes).filter(([k]) => conta[k]).map(([k, t]) => `<button type="button" data-f="${k}" aria-pressed="${adsAB.filtro === k}">${t} · ${conta[k]}</button>`).join("")}</div>
+      <div class="campo-linha" style="margin-bottom:10px"><label class="fonte" style="margin:0;display:flex;gap:6px;align-items:center"><input type="checkbox" id="ab-corpo" ${adsAB.corpo ? "checked" : ""} style="padding:0"> Agrupar por corpo</label>
+        <label class="fonte" style="margin:0;display:flex;gap:6px;align-items:center">Esconder gasto abaixo de R$ <input type="number" id="ab-min" min="0" step="5" value="${adsAB.minimo}" style="width:70px;padding:4px 8px">/dia</label></div>
+      <div class="rolar"><table><thead><tr><th>Corpo / anúncio</th><th>Leitura</th><th class="n" style="color:#b5adf2">Gasto A</th><th class="n" style="color:#b5adf2">% verba</th><th class="n" style="color:#b5adf2">ROAS A</th><th class="n" style="color:#b5adf2">Vendas</th><th class="n" style="color:#f0b27f">Gasto B</th><th class="n" style="color:#f0b27f">% verba</th><th class="n" style="color:#f0b27f">ROAS B</th><th class="n" style="color:#f0b27f">Vendas</th><th class="n">Impacto lucro/dia</th></tr></thead><tbody>${
+        linhas.map((l) => `<tr><td>${esc(l.nome)}${l.n > 1 ? ` <small style="color:var(--apagado)">${l.n} variações</small>` : ""}</td><td><span class="leitura ${l.leitura}">${nomes[l.leitura]}</span></td><td class="n num">${l.A.gasto ? brl(l.ga) : "—"}</td><td class="n num">${l.A.gasto ? pc(l.ga / totalA, 0) : "—"}</td><td class="n num">${l.ra == null ? "—" : num(l.ra)}</td><td class="n num">${l.A.gasto ? int(l.A.compras) : "—"}</td><td class="n num">${l.B.gasto ? brl(l.gb) : "—"}</td><td class="n num">${l.B.gasto ? pc(l.gb / totalB, 0) : "—"}</td><td class="n num ${l.ra != null && l.rb != null ? (l.rb < l.ra ? "delta-desce" : "delta-sobe") : ""}">${l.rb == null ? "—" : num(l.rb)}</td><td class="n num">${l.B.gasto ? int(l.B.compras) : "—"}</td><td class="n num ${l.impacto < 0 ? "delta-desce" : "delta-sobe"}">${l.impacto < 0 ? "−" : "+"}${brl(Math.abs(l.impacto))}</td></tr>`).join("")}</tbody></table></div>` :
+      `<div class="vazio">Aparece depois de importar o relatório do Gerenciador de Anúncios.</div>`}`;
+    el.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { adsAB.filtro = b.dataset.f; desenharAnunciosAB(); }));
+    $("ab-corpo")?.addEventListener("change", (e) => { adsAB.corpo = e.target.checked; desenharAnunciosAB(); });
+    $("ab-min")?.addEventListener("change", (e) => { adsAB.minimo = Number(e.target.value) || 0; desenharAnunciosAB(); });
+  }
+
+  // ----- ROAS por hora -----
+  function desenharHora() {
+    const h = extras?.hora || [];
+    const temGasto = h.some((x) => Number(x.gasto) > 0), temVenda = h.some((x) => Number(x.vendas) > 0);
+    $("analise").innerHTML = `<div class="acoes-sim">${seletorJanela()}</div><div class="cartao"><div class="cabeca-cartao"><h2>ROAS por hora</h2><small>horário de Brasília</small></div>${temGasto || temVenda ? `<div class="rolar"><table><thead><tr><th>Hora</th><th class="n">Investimento</th><th class="n">Faturamento</th><th class="n">ROAS</th><th class="n">CPA</th><th class="n">Vendas</th></tr></thead><tbody>${
+      h.map((x) => { const g = Number(x.gasto), r = Number(x.receita), v = Number(x.vendas), ro = g ? r / g : null; return `<tr><td class="num">${String(x.hora).padStart(2, "0")}:00</td><td class="n num">${g ? brl(g) : "—"}</td><td class="n num">${brl(r)}</td><td class="num roas ${faixaRoas(ro, produto || null)}">${ro == null ? "—" : num(ro) + "×"}</td><td class="n num">${g && v ? brl(g / v) : "—"}</td><td class="n num">${int(v)}</td></tr>`; }).join("")}</tbody></table></div>${temGasto ? "" : `<p class="fonte">Por enquanto só as vendas. O gasto por hora entra importando o relatório do Gerenciador com a coluna de hora.</p>`}` : `<div class="vazio">Aparece quando houver vendas ou gasto no período.</div>`}</div>`;
+    ligarJanela();
+  }
+
+  // ----- origem de vendas -----
+  const CANAIS = { trafego: "Tráfego", organico: "Orgânico", recuperacao: "Recuperação", email: "E-mail", whatsapp: "WhatsApp", outros: "Outros", nao_rastreada: "Não rastreada" };
+  function desenharOrigem() {
+    const ids = escolhidos(), o = extras?.origem || { meses: [], bumps: [] }, meses = {};
+    for (const l of o.meses) if (ids.includes(l.produto)) { const t = (meses[l.mes] ||= { total: 0 }); t[l.canal] = (t[l.canal] || 0) + Number(l.vendas); t.total += Number(l.vendas); }
+    const usados = Object.keys(CANAIS).filter((c) => Object.values(meses).some((t) => t[c]));
+    const lista = Object.keys(meses).sort().reverse();
+    const bumps = o.bumps.filter((b) => ids.includes(b.produto) && (Number(b.pedidos) || Number(b.bumps)));
+    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Origem das vendas</h2><small>mês a mês</small></div>${lista.length ? `<div class="rolar"><table><thead><tr><th>Mês</th><th class="n">Vendas</th>${usados.map((c) => `<th class="n">${CANAIS[c]}</th><th class="n">%</th>`).join("")}</tr></thead><tbody>${
+      lista.map((m) => { const t = meses[m]; return `<tr><td class="num">${m.slice(5)}/${m.slice(0, 4)}</td><td class="n num">${int(t.total)}</td>${usados.map((c) => `<td class="n num">${int(t[c] || 0)}</td><td class="n num" style="color:var(--suave)">${pct(t[c] || 0, t.total)}</td>`).join("")}</tr>`; }).join("")}</tbody></table></div>
+      <p class="fonte">A origem sai do link: anúncio ou utm_source. Use utm_source=bio, email, whatsapp ou recuperacao nos links que não são anúncio, para a venda não cair em "Não rastreada".</p>` : `<div class="vazio">Aparece quando houver vendas.</div>`}</div>
+      <div class="cartao"><div class="cabeca-cartao"><h2>Origem dos bumps</h2><small>de onde vieram os pedidos que levaram bump</small></div>${bumps.length ? `<div class="rolar"><table><thead><tr><th>Origem</th><th class="n">Pedidos</th><th class="n">Bumps</th><th class="n">% com bump</th><th class="n">Receita dos bumps</th></tr></thead><tbody>${
+      bumps.map((b) => `<tr><td>${esc(b.origem)}${tagProduto(b.produto)}</td><td class="n num">${int(b.pedidos)}</td><td class="n num">${int(b.bumps)}</td><td class="n num">${pct(b.bumps, b.pedidos)}</td><td class="n num">${brl(b.receita_bumps)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="vazio">Aparece quando alguém levar um bump.</div>`}</div>`;
+  }
+
+  // ----- por país -----
+  const nomePais = (() => {
+    const pt = new Intl.DisplayNames(["pt-BR"], { type: "region" }), en = new Intl.DisplayNames(["en"], { type: "region" }), porIngles = {};
+    for (let a = 65; a <= 90; a++) for (let b = 65; b <= 90; b++) { const c = String.fromCharCode(a, b); try { const n = en.of(c); if (n && n !== c) porIngles[n.toLowerCase()] = c; } catch (e) {} }
+    const nome = (t) => { const v = String(t || "?").trim(); const c = v.length === 2 ? v.toUpperCase() : porIngles[v.toLowerCase()]; try { return c ? pt.of(c) : v; } catch (e) { return v; } };
+    return nome;
+  })();
+  function desenharPais() {
+    const ids = escolhidos(), p = extras?.pais || { meta: [], hotmart: [] }, g = {};
+    const de = (n) => (g[nomePais(n)] ||= { gasto: 0, impressoes: 0, cliques_link: 0, visualizacoes_pagina: 0, video_3s: 0, checkouts_fb: 0, compras_fb: 0, receita_fb: 0, receita: 0, vendas: 0 });
+    for (const l of p.meta) if (ids.includes(l.produto)) { const t = de(l.pais); for (const c of ["gasto", "impressoes", "cliques_link", "visualizacoes_pagina", "video_3s", "checkouts_fb", "compras_fb", "receita_fb"]) t[c] += Number(l[c]) || 0; }
+    for (const l of p.hotmart) if (ids.includes(l.produto)) { const t = de(l.pais); t.receita += Number(l.receita) || 0; t.vendas += Number(l.vendas) || 0; }
+    const lista = Object.entries(g).sort((a, b) => b[1].gasto - a[1].gasto || b[1].receita - a[1].receita);
+    $("analise").innerHTML = `<div class="acoes-sim">${seletorJanela()}</div><div class="cartao"><div class="cabeca-cartao"><h2>Resultados por país</h2><small>${lista.length} países</small></div>${lista.length ? `<div class="rolar"><table class="enxuto"><thead><tr><th>País</th><th class="n">Investimento</th><th class="n">Fatur. Meta</th><th class="n">ROAS Meta</th><th class="n">Fatur. Hotmart</th><th class="n">ROAS Hotmart</th><th class="n">Vendas</th><th class="n">Gancho</th><th class="n">CTR</th><th class="n">CPM</th><th class="n">CPC</th><th class="n">Conexão</th><th class="n">Checkouts</th><th class="n">Custo/checkout</th><th class="n">Conv. checkout</th></tr></thead><tbody>${
+      lista.map(([n, t]) => { const rm = div(t.receita_fb, t.gasto), rh = div(t.receita, t.gasto); return `<tr><td>${esc(n)}</td><td class="n num">${t.gasto ? brl(t.gasto) : "—"}</td><td class="n num">${t.receita_fb ? brl(t.receita_fb) : "—"}</td><td class="n num">${rm == null ? "—" : num(rm)}</td><td class="n num">${brl(t.receita)}</td><td class="num roas ${faixaRoas(rh, produto || null)}">${rh == null ? "—" : num(rh)}</td><td class="n num">${int(t.vendas)}</td><td class="n num">${fPct(div(t.video_3s, t.impressoes))}</td><td class="n num">${fPct(div(t.cliques_link, t.impressoes))}</td><td class="n num">${fBrl(t.impressoes ? t.gasto / t.impressoes * 1000 : null)}</td><td class="n num">${fBrl(div(t.gasto, t.cliques_link))}</td><td class="n num">${fPct(div(t.visualizacoes_pagina, t.cliques_link))}</td><td class="n num">${fInt(t.checkouts_fb)}</td><td class="n num">${fBrl(div(t.gasto, t.checkouts_fb))}</td><td class="n num">${fPct(div(t.vendas, t.checkouts_fb))}</td></tr>`; }).join("")}</tbody></table></div><button class="pilula ver-colunas" type="button">ver todas as colunas</button>` : `<div class="vazio">Aparece quando houver vendas. O gasto por país entra importando o relatório do Gerenciador com a coluna de país.</div>`}</div>`;
+    ligarJanela();
+  }
+
+  // ----- importar e ajustes -----
+  function lerCSV(texto) {
+    texto = texto.replace(/^﻿/, "");
+    const primeira = texto.split(/\r?\n/, 1)[0] || "", sep = (primeira.match(/;/g) || []).length > (primeira.match(/,/g) || []).length ? ";" : primeira.includes("\t") ? "\t" : ",";
+    const linhas = []; let c = "", l = [], asp = false;
+    for (let i = 0; i < texto.length; i++) {
+      const ch = texto[i];
+      if (asp) { if (ch === '"' && texto[i + 1] === '"') { c += '"'; i++; } else if (ch === '"') asp = false; else c += ch; }
+      else if (ch === '"') asp = true;
+      else if (ch === sep) { l.push(c); c = ""; }
+      else if (ch === "\n" || ch === "\r") { if (ch === "\r" && texto[i + 1] === "\n") i++; l.push(c); c = ""; if (l.some((x) => x !== "")) linhas.push(l); l = []; }
+      else c += ch;
+    }
+    l.push(c); if (l.some((x) => x !== "")) linhas.push(l);
+    return linhas;
+  }
+  // "1.234,56" e "1234.56" viram 1234.56
+  const numeroCSV = (t) => {
+    let v = String(t ?? "").replace(/[^\d,.-]/g, ""); if (!v) return null;
+    if (v.includes(",") && v.includes(".")) v = v.lastIndexOf(",") > v.lastIndexOf(".") ? v.replace(/\./g, "").replace(",", ".") : v.replace(/,/g, "");
+    else if (v.includes(",")) v = v.replace(",", ".");
+    const n = Number(v); return isFinite(n) ? n : null;
+  };
+  const dataCSV = (t) => { const v = String(t || "").trim(); let m = v.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return `${m[1]}-${m[2]}-${m[3]}`; m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; };
+  const COLUNAS = {
+    dia: ["início dos relatórios", "inicio dos relatorios", "reporting starts", "dia", "day", "date"],
+    ad_id: ["identificação do anúncio", "identificacao do anuncio", "id do anúncio", "ad id", "ad_id"],
+    ad_nome: ["nome do anúncio", "nome do anuncio", "ad name", "anúncios", "anuncios"],
+    adset_id: ["identificação do conjunto de anúncios", "ad set id", "adset_id"],
+    adset_nome: ["nome do conjunto de anúncios", "ad set name", "adset_nome"],
+    campaign_id: ["identificação da campanha", "campaign id", "campaign_id"],
+    campaign_nome: ["nome da campanha", "campaign name", "campaign_nome"],
+    gasto: ["valor usado (brl)", "valor usado", "amount spent (brl)", "amount spent", "gasto", "spend"],
+    impressoes: ["impressões", "impressoes", "impressions"],
+    cliques: ["cliques (todos)", "clicks (all)"],
+    cliques_link: ["cliques no link", "link clicks"],
+    visualizacoes_pagina: ["visualizações da página de destino", "visualizacoes da pagina de destino", "landing page views"],
+    video_3s: ["reproduções de vídeo de 3 segundos", "visualizações de vídeo de 3 segundos", "3-second video plays", "3-second video views", "reproducoes de video de 3 segundos"],
+    video_thruplay: ["thruplays", "thruplay"],
+    checkouts_fb: ["finalizações de compra iniciadas", "finalizacoes de compra iniciadas", "checkouts initiated", "checkouts iniciados"],
+    compras_fb: ["compras", "purchases"],
+    receita_fb: ["valor de conversão da compra", "valor de conversao da compra", "purchases conversion value", "valor de conversão de compras"],
+    status: ["veiculação do anúncio", "veiculacao do anuncio", "ad delivery", "status"],
+    copy: ["corpo", "body", "copy"],
+    hora: ["hora do dia (fuso horário da conta de anúncios)", "hora do dia", "time of day (ad account time zone)", "time of day", "hourly stats aggregated by advertiser time zone", "hora"],
+    pais: ["país", "pais", "country"],
+  };
+  function interpretarCSV(texto) {
+    const t = lerCSV(texto); if (t.length < 2) throw new Error("O arquivo está vazio.");
+    const cab = t[0].map((x) => x.trim().toLowerCase()), onde = {};
+    for (const [campo, nomes] of Object.entries(COLUNAS)) { const i = cab.findIndex((c) => nomes.includes(c)); if (i >= 0) onde[campo] = i; }
+    const faltam = ["dia", "ad_id", "gasto"].filter((c) => onde[c] == null);
+    if (faltam.length) throw new Error("Faltam colunas no relatório: " + faltam.map((c) => ({ dia: "dia (detalhar por dia)", ad_id: "identificação do anúncio", gasto: "valor usado" }[c])).join(", ") + ".");
+    const tipo = onde.hora != null ? "hora" : onde.pais != null ? "pais" : "dia";
+    const permitidos = { dia: ["ad_nome", "adset_id", "adset_nome", "campaign_id", "campaign_nome", "impressoes", "cliques", "cliques_link", "visualizacoes_pagina", "video_3s", "video_thruplay", "checkouts_fb", "compras_fb", "receita_fb", "status", "copy"],
+                         hora: ["impressoes", "cliques_link"], pais: ["impressoes", "cliques_link", "visualizacoes_pagina", "video_3s", "checkouts_fb", "compras_fb", "receita_fb"] }[tipo];
+    const textos = ["ad_nome", "adset_id", "adset_nome", "campaign_id", "campaign_nome", "status", "copy"], inteiros = ["impressoes", "cliques", "cliques_link", "visualizacoes_pagina", "video_3s", "video_thruplay", "checkouts_fb", "compras_fb"];
+    const linhas = [];
+    for (const l of t.slice(1)) {
+      const dia = dataCSV(l[onde.dia]), ad_id = String(l[onde.ad_id] || "").trim(); if (!dia || !ad_id) continue;
+      const r = { dia, ad_id, gasto: numeroCSV(l[onde.gasto]) || 0 };
+      if (tipo === "hora") { const h = String(l[onde.hora] || "").match(/\d{1,2}/); if (!h) continue; r.hora = Number(h[0]); }
+      if (tipo === "pais") { r.pais = String(l[onde.pais] || "").trim(); if (!r.pais) continue; }
+      for (const c of permitidos) { if (onde[c] == null) continue; const v = l[onde[c]]; if (textos.includes(c)) { if (String(v || "").trim()) r[c] = String(v).trim().slice(0, 2000); } else { const n = numeroCSV(v); if (n != null) r[c] = inteiros.includes(c) ? Math.round(n) : n; } }
+      linhas.push(r);
+    }
+    if (!linhas.length) throw new Error("Nenhuma linha válida no arquivo.");
+    return { tipo, linhas };
+  }
+  function desenharConfig() {
+    const c = catalogo, nomeTipo = { dia: "por dia", hora: "por hora", pais: "por país" };
+    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Importar do Gerenciador de Anúncios</h2><small>arquivo CSV</small></div>
+        <p class="fonte" style="margin:0 0 12px">No Gerenciador, detalhe por dia e exporte em CSV, com a coluna Identificação do anúncio. O painel reconhece sozinho se é por dia, por hora ou por país. Importar o mesmo dia de novo só atualiza os números. Só contam anúncios que já levaram visitas à página de um produto.</p>
+        <div class="campo-linha"><input type="file" id="arq-csv" accept=".csv,text/csv" aria-label="Arquivo CSV"><button type="button" id="enviar-csv" disabled>Enviar</button></div>
+        <p class="fonte" id="res-csv" role="status"></p></div>
+      <div class="cartao"><div class="cabeca-cartao"><h2>Ajustes em uso</h2><small>no catálogo do painel</small></div><div class="ajustes num">
+        <div><span>Imposto da venda</span><b>${num(c.imposto_pct, 2)}%</b></div><div><span>Imposto sobre a mídia</span><b>${num(c.imposto_midia_pct, 1)}%</b></div>
+        <div><span>ROAS bom a partir de</span><b>${num(c.roas_bom)}</b></div><div><span>ROAS em atenção a partir de</span><b>${num(c.roas_atencao)}</b></div>
+        <div><span>Meta de lucro do mês</span><b>${brl(c.meta_lucro_mensal)}</b></div><div><span>Produtos no painel</span><b>${c.produtos.length}</b></div>
+      </div><p class="fonte">Para mudar um destes números, peça no chat: eles ficam no produtos.json.</p></div>`;
+    let lido = null;
+    $("arq-csv").addEventListener("change", async (e) => {
+      const f = e.target.files[0]; lido = null; $("enviar-csv").disabled = true; if (!f) return;
+      try { lido = interpretarCSV(await f.text()); const ds = lido.linhas.map((l) => l.dia).sort(); $("res-csv").textContent = `${int(lido.linhas.length)} linhas ${nomeTipo[lido.tipo]}, de ${rotuloDia(ds[0])} a ${rotuloDia(ds[ds.length - 1])}, somando ${brl(lido.linhas.reduce((s, l) => s + l.gasto, 0))}. Confira e toque em Enviar.`; $("enviar-csv").disabled = false; }
+      catch (err) { $("res-csv").textContent = err.message; }
+    });
+    $("enviar-csv").addEventListener("click", async () => {
+      if (!lido) return; $("enviar-csv").disabled = true; $("res-csv").textContent = "Enviando…";
+      try { const r = await postar({ importar: 1 }, lido); historico = null; chaveExtras = null; $("res-csv").textContent = `Pronto: ${int(r.linhas)} linhas importadas.`; lido = null; carregar(); }
+      catch (err) { $("res-csv").textContent = "Não deu para enviar. Tente de novo."; $("enviar-csv").disabled = false; }
+    });
+  }
+
+  // Dados extras da aba: período comum a anúncios, hora e país.
+  async function garantirExtras() {
+    const ate = hojeSP(), de = janela === "tudo" ? "2026-01-01" : isoDe(hojeMs() - (Number(janela) - 1) * 864e5), chave = `${de}|${versaoHistorico}`;
+    if (extras && chaveExtras === chave) return;
+    const r = await chamar({ analise: 1, de, ate }, { catalogo: catalogo.produtos });
+    extras = Array.isArray(r.metricas) ? r : null;   // servidor antigo: as telas ficam vazias, sem erro
+    chaveExtras = chave;
+  }
+
+  async function desenharAnalise(d) {
+    document.querySelectorAll("#sub-abas button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sub === sub)));
+    if (sub === "simulador" && sim?.chave === `${produto}|${d.periodo}` && $("placar-sim")) return;   // não atrapalha quem está mexendo
+    if (sub === "config" && $("arq-csv")) return;
+    if (sub !== "simulador") {
+      const foco = document.activeElement?.closest?.("#analise");   // nem quem está escolhendo data
+      if (foco && historico && versaoHistorico === d.versao) return;
+    }
+    if (!$("analise").innerHTML) $("analise").innerHTML = `<div class="cartao"><div class="vazio">Carregando a análise…</div></div>`;
+    try { await garantirHistorico(d); } catch (e) { if (!historico) { $("analise").innerHTML = `<div class="cartao"><div class="vazio">Não deu para carregar o histórico. Tente de novo.</div></div>`; return; } }
+    try { await garantirExtras(); } catch (e) { extras ||= null; }
+    if (aba !== "analise") return;
+    ({ simulador: () => montarSimulador(d), comparar: desenharComparar, escala: desenharEscala, mensal: desenharMensal, diario: desenharDiario,
+       anuncios: desenharAnuncios, hora: desenharHora, origem: desenharOrigem, pais: desenharPais, config: desenharConfig })[sub]();
+  }
+  $("analise").addEventListener("click", (e) => {
+    const b = e.target.closest(".ver-colunas"); if (!b) return;
+    const t = b.previousElementSibling?.querySelector("table.enxuto"); if (!t) return;
+    t.classList.toggle("tudo"); b.textContent = t.classList.contains("tudo") ? "menos colunas" : "ver todas as colunas";
+  });
+  $("sub-abas").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-sub]"); if (!b) return;
+    sub = b.dataset.sub; gravar("fg_painel_sub", sub); $("analise").innerHTML = ""; if (dados) desenharAnalise(dados);
+  });
+
+  // ---------- atualização automática ----------
+  function avisar(texto) {
+    const a = $("aviso"); a.textContent = texto; a.classList.add("on");
+    try { navigator.vibrate && navigator.vibrate([80, 60, 80]); } catch (e) {}
+    setTimeout(() => a.classList.remove("on"), 5000);
+  }
+  function relogio(ok = true) {
+    $("vivo").classList.toggle("parado", !ok);
+    $("vivo").textContent = ok ? "ao vivo" : "sem conexão";
+    $("atualizado").textContent = ultimaAtualizacao ? "atualizado " + new Date(ultimaAtualizacao).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "—";
+  }
+  // Venda nova em qualquer produto: compara pedidos e bumps de cada um com a leitura anterior.
+  function vendaNova(d) {
+    const agora = Object.fromEntries((d.kpis || []).map((k) => [k.id, { n: k.pedidos + k.bumps, r: Number(k.receita) || 0 }]));
+    if (pedidosAntes) {
+      for (const [id, x] of Object.entries(agora)) {
+        const antes = pedidosAntes[id];
+        if (antes && x.n > antes.n) { avisar(`Nova venda! ${nomeDe(id)} · ${brl(x.r - antes.r)}`); break; }
+      }
+    }
+    pedidosAntes = agora;
+  }
+  let pedido = 0;
+  async function carregar() {
+    const meu = ++pedido;
+    try {
+      const d = await chamar({ periodo, ...(produto ? { produto } : {}) }, { catalogo: catalogo.produtos });
+      if (meu !== pedido) return;   // chegou depois de outro pedido mais novo
+      if (d.periodo === periodo) vendaNova(d);
+      dados = d; versao = d.versao; ultimaAtualizacao = Date.now();
+      desenhar(d); relogio(true);
+    } catch (e) {
+      if (e.message === "senha") return mostrarLogin(true);
+      relogio(false);
+    }
+  }
+  async function verificar() {
+    if (document.hidden || !senha) return;
+    try {
+      const { versao: v } = await chamar({ versao: 1 });
+      if (v !== versao) await carregar(); else { ultimaAtualizacao = Date.now(); relogio(true); }
+    } catch (e) { if (e.message === "senha") return mostrarLogin(true); relogio(false); }
+  }
+
+  let timer = null;
+  async function iniciar() {
+    $("tela-login").hidden = true; $("app").hidden = false;
+    setTimeout(() => document.body.classList.add("pronto"), 1500);
+    try { await carregarCatalogo(); } catch (e) { relogio(false); return; }
+    irPara(aba); pedidosAntes = null; carregar();
+    clearInterval(timer); timer = setInterval(verificar, INTERVALO);
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && senha) { carregarCatalogo().catch(() => {}); verificar(); } });
+  let redim = null;
+  addEventListener("resize", () => { clearTimeout(redim); redim = setTimeout(() => dados && desenhar(dados), 150); });
+
+  // 3D com mouse: o cartão sob o ponteiro inclina um pouco e o reflexo segue o ponteiro (no celular fica o 3D da rolagem)
+  if (matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)").matches) {
+    let sob = null;
+    addEventListener("pointermove", (e) => {
+      const c = e.target.closest?.(".cartao");
+      if (sob && sob !== c) { sob.style.removeProperty("--rx"); sob.style.removeProperty("--ry"); }
+      sob = c; if (!c) return;
+      const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      c.style.setProperty("--mx", `${x * 100}%`); c.style.setProperty("--my", `${y * 100}%`);
+      if (c.classList.contains("kpi")) { c.style.setProperty("--rx", `${(.5 - y) * 10}deg`); c.style.setProperty("--ry", `${(x - .5) * 12}deg`); }
+    }, { passive: true });
+  }
+
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  // Avisos de venda no celular. No iPhone o aviso só existe com o painel aberto pelo ícone da tela de início.
+  const botaoAvisos = $("avisos");
+  let ligados = false;
+  const avisosLigados = (texto = "Avisos de venda ligados · tocar para mandar um teste") => { ligados = true; botaoAvisos.textContent = texto; };
+  if ("PushManager" in window && "Notification" in window && "serviceWorker" in navigator) {
+    botaoAvisos.hidden = false;
+    if (Notification.permission === "granted") navigator.serviceWorker.ready.then((r) => r.pushManager.getSubscription()).then((s) => s && avisosLigados()).catch(() => {});
+    botaoAvisos.addEventListener("click", async () => {
+      if (ligados) {
+        botaoAvisos.textContent = "Mandando o teste…";
+        try { const r = await chamar({ push_teste: 1 }, {}); avisosLigados(r.falhas.length ? `Teste falhou (${r.falhas.join(", ")}). Tocar de novo` : `Teste enviado para ${r.aparelhos} aparelho(s) · tocar para outro`); }
+        catch (e) { avisosLigados("Não deu para mandar o teste. Tocar de novo"); }
+        return;
+      }
+      botaoAvisos.textContent = "Ligando…";
+      try {
+        if ((await Notification.requestPermission()) !== "granted") throw new Error("negado");
+        const reg = await navigator.serviceWorker.ready;
+        const { chave } = await chamar({ push_chave: 1 }, {});
+        const bytes = Uint8Array.from(atob(chave.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
+        const inscricao = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: bytes }));
+        await chamar({ push_inscrever: 1 }, { inscricao: inscricao.toJSON() });
+        avisosLigados();
+      } catch (e) {
+        botaoAvisos.textContent = Notification.permission === "denied" ? "Avisos bloqueados: libere em Ajustes → Notificações → Painel" : "Não deu para ligar os avisos. Tocar de novo";
+      }
+    });
+  } else if (/iPhone|iPad/.test(navigator.userAgent)) {
+    botaoAvisos.hidden = false; botaoAvisos.disabled = true;
+    botaoAvisos.textContent = "Avisos de venda: abra o painel pelo ícone da tela de início";
+  }
+  senha ? iniciar() : mostrarLogin(false);
+</script>
+</body>
+</html>
