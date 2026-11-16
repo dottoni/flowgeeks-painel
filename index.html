@@ -149,6 +149,20 @@
   .etq.sobe { background: rgba(74, 222, 128, .12); color: #86efac; }
   .etq.desce { background: rgba(230, 103, 103, .14); color: #fca5a5; }
   .etq.estimativa { background: rgba(201, 164, 58, .16); color: #e6cd84; }
+  .resumo { margin: 0 0 6px; font-size: 15px; font-weight: 700; line-height: 1.4; }
+  .grupo-sub { align-self: center; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--suave); white-space: nowrap; padding-left: 6px; }
+  .etq.lim-bom { background: rgba(74, 222, 128, .12); color: #86efac; }
+  .etq.lim-atencao { background: rgba(250, 178, 25, .14); color: #fcd27b; }
+  .etq.lim-critico { background: rgba(230, 103, 103, .14); color: #fca5a5; }
+  details#cartao-produtos > summary { cursor: pointer; list-style: none; }
+  details#cartao-produtos > summary::-webkit-details-marker { display: none; }
+  details#cartao-produtos > summary h2::after { content: " ▾"; color: var(--suave); }
+  details#cartao-produtos[open] > summary h2::after { content: " ▴"; }
+  .ver-colunas { display: none; margin-top: 10px; }
+  @media (max-width: 560px) {
+    table.enxuto:not(.tudo) th:nth-child(n+5), table.enxuto:not(.tudo) td:nth-child(n+5) { display: none; }
+    .ver-colunas { display: inline-flex; }
+  }
 
   /* o destaque da tela: vidro limão sólido, texto escuro (nunca branco no limão) */
   .lucro { grid-column: 1 / -1; color: #08090a; border-color: transparent;
@@ -431,12 +445,17 @@
 
     <!-- ===== INÍCIO ===== -->
     <section class="grade" data-aba="inicio">
-      <div class="kpis" id="kpis"></div>
-      <div class="cartao" id="cartao-produtos">
-        <div class="cabeca-cartao"><h2>Por produto</h2><small>toque para ver só um</small></div>
-        <div class="rolar" id="tabela-produtos"></div>
+      <div class="cartao atencao" id="cartao-atencao">
+        <p class="resumo" id="resumo"></p>
+        <h2><svg><use href="#i-alerta"/></svg>Precisa de atenção hoje <small id="qtd-alertas" class="num"></small></h2>
+        <div class="alertas" id="alertas"></div>
       </div>
+      <div class="kpis" id="kpis"></div>
       <div class="grade duas" id="dia-a-dia"></div>
+      <details class="cartao" id="cartao-produtos">
+        <summary class="cabeca-cartao"><h2>Comparar produtos</h2><small>toque num produto para ver só ele</small></summary>
+        <div class="rolar" id="tabela-produtos"></div>
+      </details>
       <div class="grade linha-principal">
         <div class="cartao grafico">
           <div class="cabeca-cartao"><h2>Faturamento líquido por dia</h2><small>R$, após a Hotmart</small></div>
@@ -445,10 +464,6 @@
           <details class="numeros"><summary>Ver em tabela</summary><div class="rolar" id="tab-fat"></div></details>
         </div>
         <div class="grade">
-          <div class="cartao atencao">
-            <h2><svg><use href="#i-alerta"/></svg>Precisa de atenção hoje <small id="qtd-alertas" class="num"></small></h2>
-            <div class="alertas" id="alertas"></div>
-          </div>
           <div class="cartao">
             <div class="cabeca-cartao"><h2>Receita por anúncio</h2><small>maior → menor</small></div>
             <div class="barras" id="rank-anuncios"></div>
@@ -493,15 +508,19 @@
     <!-- ===== ANÁLISE ===== -->
     <section class="grade" data-aba="analise" hidden>
       <nav class="sub-abas" id="sub-abas" aria-label="Tipo de análise">
+        <span class="grupo-sub">Vale escalar?</span>
         <button class="pilula" data-sub="simulador" aria-pressed="true">Simulador de funil</button>
-        <button class="pilula" data-sub="comparar" aria-pressed="false">Comparar períodos</button>
         <button class="pilula" data-sub="escala" aria-pressed="false">Nível de escala</button>
+        <button class="pilula" data-sub="hora" aria-pressed="false">ROAS por hora</button>
+        <span class="grupo-sub">O que mudou?</span>
+        <button class="pilula" data-sub="comparar" aria-pressed="false">Comparar períodos</button>
         <button class="pilula" data-sub="mensal" aria-pressed="false">Mês a mês</button>
         <button class="pilula" data-sub="diario" aria-pressed="false">Métricas do dia</button>
+        <span class="grupo-sub">De onde vem a venda?</span>
         <button class="pilula" data-sub="anuncios" aria-pressed="false">Anúncios</button>
-        <button class="pilula" data-sub="hora" aria-pressed="false">ROAS por hora</button>
         <button class="pilula" data-sub="origem" aria-pressed="false">Origem de vendas</button>
         <button class="pilula" data-sub="pais" aria-pressed="false">Por país</button>
+        <span class="grupo-sub">Ajustes</span>
         <button class="pilula" data-sub="config" aria-pressed="false">Importar e ajustes</button>
       </nav>
       <div class="grade" id="analise"></div>
@@ -683,6 +702,16 @@
     const [x, y] = pts.at(-1);
     return `<svg class="faisca" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.join(" ")}"/><circle cx="${x}" cy="${y}" r="2.6"/></svg>`;
   }
+  // CPA real x CPA máximo: só ganha cor quando o produto tem cpa_max no produtos.json e há pedidos suficientes.
+  function cpaEtq(k, poucos) {
+    if (!k.gasto || !k.pedidos) return "";
+    const cpa = k.gasto / k.pedidos, max = produto ? Number(prod(produto)?.cpa_max) || 0 : 0;
+    if (!max) return `<span class="etq" data-dica="Sem CPA máximo no produtos.json${produto ? "" : " (escolha um produto)"}: sem cor">CPA ${brl(cpa)}</span>`;
+    const cls = poucos ? "" : cpa <= max ? "lim-bom" : cpa <= max * 1.2 ? "lim-atencao" : "lim-critico";
+    const palavra = poucos ? "poucos dados" : cpa <= max ? "dentro" : cpa <= max * 1.2 ? "perto do limite" : "acima do limite";
+    return `<span class="etq ${cls}" data-dica="CPA real ÷ CPA máximo de ${brl(max)}">CPA ${brl(cpa)} · máx ${brl(max)} · ${palavra}</span>`;
+  }
+
   function kpis(d) {
     const ids = escolhidos(), k = somar(d.kpis, ids), a = d.anterior ? somar(d.anterior, ids) : null;
     const pctImp = produto ? `${(impostoDe(produto) * 100).toLocaleString("pt-BR")}%` : "o % de cada produto";
@@ -690,6 +719,7 @@
     const ticket = k.pedidos ? k.receita / k.pedidos : 0, ticketA = a?.pedidos ? a.receita / a.pedidos : null;
     const roas = k.gasto ? k.receita_liquida / k.gasto : null;
     const r = ritmoMes(d), dias = serieDiaria(d.diario);
+    const poucos = k.pedidos < 5 || k.visitantes < 30, POUCOS = `<span class="etq estimativa" data-dica="Menos de 5 pedidos ou 30 visitantes: ainda é cedo para concluir">poucos dados</span>`;
     const explica = esc(`Faturamento líquido ${brl(k.receita_liquida)}<br>− anúncios ${brl(k.gasto)}<br>− imposto sobre a mídia ${brl(k.imposto_midia)}<br>− imposto estimado ${brl(k.imposto)} (${pctImp} do bruto)`);
     let meta;
     if (r.meta) {
@@ -713,15 +743,15 @@
     $("kpis").innerHTML = `
       <div class="cartao kpi lucro" data-dica="${explica}"><span>Lucro limpo</span><div class="linha-kpi"><strong class="num ${k.lucro < 0 ? "negativo" : ""}"><small>R$</small>${reais(k.lucro)}</strong>${faisca(dias, (x) => x.lucro)}</div>
         <div class="etiquetas">${variacao(k.lucro, a?.lucro)}<span class="etq estimativa">estimativa</span></div></div>
+      ${meta}
       <div class="cartao kpi"><span>Faturamento líquido</span><div class="linha-kpi"><strong class="num"><small>R$</small>${reais(k.receita_liquida)}</strong>${faisca(dias, (x) => x.receita_liquida)}</div>
         <div class="etiquetas">${variacao(k.receita_liquida, a?.receita_liquida)}<span class="etq">${int(k.pedidos)} pedidos${k.bumps ? ` · ${int(k.bumps)} bumps` : ""}</span></div></div>
       <div class="cartao kpi"><span>Gasto em anúncios</span><div class="linha-kpi"><strong class="num"><small>R$</small>${reais(k.gasto)}</strong>${faisca(dias, (x) => x.gasto)}</div>
-        <div class="etiquetas"><span class="etq">${roas == null ? "sem gasto" : `retorno ${roas.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}×`}</span>${k.gasto && k.pedidos ? `<span class="etq">CPA ${brl(k.gasto / k.pedidos)}</span>` : ""}</div></div>
+        <div class="etiquetas"><span class="etq">${roas == null ? "sem gasto" : `retorno ${roas.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}×`}</span>${cpaEtq(k, poucos)}</div></div>
       <div class="cartao kpi"><span>Conversão da página</span><div class="linha-kpi"><strong class="num">${pct(k.pedidos, k.visitantes)}</strong>${faisca(dias, (x) => x.visitantes && x.pedidos / x.visitantes)}</div>
-        <div class="etiquetas">${variacao(conv, convA)}<span class="etq">${int(k.visitantes)} visitantes</span></div></div>
+        <div class="etiquetas">${poucos ? POUCOS : variacao(conv, convA)}<span class="etq">${int(k.visitantes)} visitantes</span></div></div>
       <div class="cartao kpi" data-dica="Quanto cada pedido deixa, em média, contando os bumps (valor pago pelo cliente)"><span>Ticket por pedido</span><div class="linha-kpi"><strong class="num"><small>R$</small>${k.pedidos ? reais(ticket) : "—"}</strong>${faisca(dias, (x) => x.pedidos && x.receita / x.pedidos)}</div>
-        <div class="etiquetas">${variacao(ticket, ticketA)}<span class="etq">com os bumps</span></div></div>
-      ${meta}`;
+        <div class="etiquetas">${poucos ? POUCOS : variacao(ticket, ticketA)}<span class="etq">com os bumps</span></div></div>`;
   }
 
   function tabelaProdutos(d) {
@@ -890,12 +920,22 @@
     }), { valor: (i) => i.rotulo });
   }
 
+  // Frase do topo: a conclusão do período em uma linha (lucro, comparação, meta e quantos pontos pedem atenção).
+  function resumo(k, a, r, n) {
+    const per = { hoje: "Hoje", "7d": "Nos últimos 7 dias", "30d": "Nos últimos 30 dias", tudo: "Até aqui" }[dados?.periodo] || "No período";
+    let txt = `${per}, lucro de ${brl(k.lucro)} (estimativa)`;
+    if (a && dados?.periodo !== "tudo" && a.lucro) { const v = (k.lucro - a.lucro) / Math.abs(a.lucro) * 100; if (Math.abs(v) >= 0.5) txt += `, ${v > 0 ? "▲" : "▼"} ${Math.abs(v).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}% vs ${NOME_ANTERIOR[dados.periodo]}`; }
+    if (r.meta) txt += `; a meta do mês está em ${Math.round(r.projPct * 100)}% no ritmo atual`;
+    txt += n ? `. ${n} ponto${n > 1 ? "s pedem" : " pede"} atenção.` : ". Nada pede atenção agora.";
+    $("resumo").textContent = txt;
+  }
+
   function alertas(d) {
     const ids = escolhidos(), k = somar(d.kpis, ids), a = d.anterior ? somar(d.anterior, ids) : null, lista = [];
     const cor = { cliente: "#e87ba4", pagamento: "#fab219", reembolso: "#e66767", "anúncio": "#ec835a", meta: "#b8f23a", "tráfego": "#ec835a", lucro: "#e66767", ok: "#4ade80" };
     if (k.abandonos) lista.push(["cliente", `${k.abandonos} carrinho${k.abandonos > 1 ? "s" : ""} abandonado${k.abandonos > 1 ? "s" : ""} para chamar no WhatsApp`, "clientes"]);
     if (k.aguardando) lista.push(["pagamento", `${k.aguardando} boleto${k.aguardando > 1 ? "s" : ""}/Pix aguardando pagamento`, "vendas"]);
-    if (k.reembolsos) lista.push(["reembolso", `${k.reembolsos} reembolso${k.reembolsos > 1 ? "s" : ""} no período`, "vendas"]);
+    if (k.reembolsos) { const tx = k.reembolsos / Math.max(1, k.pedidos + k.reembolsos); lista.push(["reembolso", `${k.reembolsos} reembolso${k.reembolsos > 1 ? "s" : ""} no período (${pct(k.reembolsos, k.pedidos + k.reembolsos)} dos pedidos)${k.pedidos + k.reembolsos >= 20 && tx > 0.1 ? " · acima de 10%: rever a promessa da página" : ""}`, "vendas"]); }
     if (k.gasto > 0 && k.lucro < 0) lista.push(["lucro", `Gastando mais do que volta: lucro de ${brl(k.lucro)} no período`, "anuncios"]);
     for (const an of d.anuncios) if (an.gasto > 0 && !an.pedidos) lista.push(["anúncio", `${an.anuncio}${produto ? "" : ` (${nomeDe(an.produto)})`} gastou ${brl(an.gasto)} sem vender`, "anuncios"]);
     if (a && a.visitantes >= 30 && k.visitantes >= 30) {
@@ -907,6 +947,9 @@
     const aVenda = ids.filter((id) => prod(id)?.status === "à venda" && prod(id)?.paginas?.length);
     const visHoje = d.diario.filter((x) => x.dia === hojeSP() && aVenda.includes(x.produto)).reduce((s, x) => s + x.visitantes, 0);
     if (aVenda.length && !visHoje && (d.mes.horas_hoje || 0) >= 10) lista.push(["tráfego", "Nenhuma visita hoje até agora", "anuncios"]);
+    const GRAV = { lucro: 0, "anúncio": 1, reembolso: 2, "tráfego": 3, meta: 4, pagamento: 5, cliente: 6 };
+    lista.sort((x, y) => (GRAV[x[0]] ?? 9) - (GRAV[y[0]] ?? 9));
+    resumo(k, a, r, lista.length);
     if (!lista.length) lista.push(["ok", "Tudo certo por aqui", ""]);
     $("qtd-alertas").textContent = lista[0][0] === "ok" ? "" : lista.length;
     $("alertas").innerHTML = lista.slice(0, 6).map(([t, txt, ir]) =>
@@ -1341,8 +1384,8 @@
     const meses = {};
     for (const x of serieHistorica()) { const m = x.dia.slice(0, 7), t = (meses[m] ||= { m, gasto: 0, receita: 0, receita_liquida: 0, reembolsos_valor: 0, lucro: 0, pedidos: 0, visitantes: 0 }); for (const c of Object.keys(t)) if (c !== "m") t[c] += x[c]; }
     const lista = Object.values(meses).filter((t) => t.gasto || t.receita || t.visitantes).sort((a, b) => b.m.localeCompare(a.m));
-    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Mês a mês</h2><small>desde o início</small></div>${lista.length ? `<div class="rolar"><table><thead><tr><th>Mês</th><th class="n">Investimento</th><th class="n">Faturamento</th><th class="n">Reembolsos</th><th class="n">Líquido</th><th class="n">Lucro após impostos</th><th class="n">ROAS</th><th class="n">Pedidos</th><th class="n">CPA</th></tr></thead><tbody>${
-      lista.map((t) => `<tr><td class="num">${t.m.slice(5)}/${t.m.slice(0, 4)}</td><td class="n num">${brl(t.gasto)}</td><td class="n num">${brl(t.receita + t.reembolsos_valor)}</td><td class="n num">${brl(t.reembolsos_valor)}</td><td class="n num">${brl(t.receita_liquida)}</td><td class="n num ${t.lucro < 0 ? "negativo" : ""}">${brl(t.lucro)}</td><td class="num roas ${faixaRoas(roasDe(t), produto || null)}">${roasDe(t) == null ? "—" : num(roasDe(t))}</td><td class="n num">${int(t.pedidos)}</td><td class="n num">${t.pedidos && t.gasto ? brl(t.gasto / t.pedidos) : "—"}</td></tr>`).join("")}</tbody></table></div><p class="fonte">O mês atual está em andamento.</p>` : `<div class="vazio">Aparece quando houver vendas ou gasto.</div>`}</div>`;
+    $("analise").innerHTML = `<div class="cartao"><div class="cabeca-cartao"><h2>Mês a mês</h2><small>desde o início</small></div>${lista.length ? `<div class="rolar"><table class="enxuto"><thead><tr><th>Mês</th><th class="n">Investimento</th><th class="n">Faturamento</th><th class="n">Reembolsos</th><th class="n">Líquido</th><th class="n">Lucro após impostos</th><th class="n">ROAS</th><th class="n">Pedidos</th><th class="n">CPA</th></tr></thead><tbody>${
+      lista.map((t) => `<tr><td class="num">${t.m.slice(5)}/${t.m.slice(0, 4)}</td><td class="n num">${brl(t.gasto)}</td><td class="n num">${brl(t.receita + t.reembolsos_valor)}</td><td class="n num">${brl(t.reembolsos_valor)}</td><td class="n num">${brl(t.receita_liquida)}</td><td class="n num ${t.lucro < 0 ? "negativo" : ""}">${brl(t.lucro)}</td><td class="num roas ${faixaRoas(roasDe(t), produto || null)}">${roasDe(t) == null ? "—" : num(roasDe(t))}</td><td class="n num">${int(t.pedidos)}</td><td class="n num">${t.pedidos && t.gasto ? brl(t.gasto / t.pedidos) : "—"}</td></tr>`).join("")}</tbody></table></div><button class="pilula ver-colunas" type="button">ver todas as colunas</button><p class="fonte">O mês atual está em andamento.</p>` : `<div class="vazio">Aparece quando houver vendas ou gasto.</div>`}</div>`;
   }
 
   // ----- métricas do dia: o funil inteiro, da impressão à venda -----
@@ -1521,8 +1564,8 @@
     for (const l of p.meta) if (ids.includes(l.produto)) { const t = de(l.pais); for (const c of ["gasto", "impressoes", "cliques_link", "visualizacoes_pagina", "video_3s", "checkouts_fb", "compras_fb", "receita_fb"]) t[c] += Number(l[c]) || 0; }
     for (const l of p.hotmart) if (ids.includes(l.produto)) { const t = de(l.pais); t.receita += Number(l.receita) || 0; t.vendas += Number(l.vendas) || 0; }
     const lista = Object.entries(g).sort((a, b) => b[1].gasto - a[1].gasto || b[1].receita - a[1].receita);
-    $("analise").innerHTML = `<div class="acoes-sim">${seletorJanela()}</div><div class="cartao"><div class="cabeca-cartao"><h2>Resultados por país</h2><small>${lista.length} países</small></div>${lista.length ? `<div class="rolar"><table><thead><tr><th>País</th><th class="n">Investimento</th><th class="n">Fatur. Meta</th><th class="n">ROAS Meta</th><th class="n">Fatur. Hotmart</th><th class="n">ROAS Hotmart</th><th class="n">Vendas</th><th class="n">Gancho</th><th class="n">CTR</th><th class="n">CPM</th><th class="n">CPC</th><th class="n">Conexão</th><th class="n">Checkouts</th><th class="n">Custo/checkout</th><th class="n">Conv. checkout</th></tr></thead><tbody>${
-      lista.map(([n, t]) => { const rm = div(t.receita_fb, t.gasto), rh = div(t.receita, t.gasto); return `<tr><td>${esc(n)}</td><td class="n num">${t.gasto ? brl(t.gasto) : "—"}</td><td class="n num">${t.receita_fb ? brl(t.receita_fb) : "—"}</td><td class="n num">${rm == null ? "—" : num(rm)}</td><td class="n num">${brl(t.receita)}</td><td class="num roas ${faixaRoas(rh, produto || null)}">${rh == null ? "—" : num(rh)}</td><td class="n num">${int(t.vendas)}</td><td class="n num">${fPct(div(t.video_3s, t.impressoes))}</td><td class="n num">${fPct(div(t.cliques_link, t.impressoes))}</td><td class="n num">${fBrl(t.impressoes ? t.gasto / t.impressoes * 1000 : null)}</td><td class="n num">${fBrl(div(t.gasto, t.cliques_link))}</td><td class="n num">${fPct(div(t.visualizacoes_pagina, t.cliques_link))}</td><td class="n num">${fInt(t.checkouts_fb)}</td><td class="n num">${fBrl(div(t.gasto, t.checkouts_fb))}</td><td class="n num">${fPct(div(t.vendas, t.checkouts_fb))}</td></tr>`; }).join("")}</tbody></table></div>` : `<div class="vazio">Aparece quando houver vendas. O gasto por país entra importando o relatório do Gerenciador com a coluna de país.</div>`}</div>`;
+    $("analise").innerHTML = `<div class="acoes-sim">${seletorJanela()}</div><div class="cartao"><div class="cabeca-cartao"><h2>Resultados por país</h2><small>${lista.length} países</small></div>${lista.length ? `<div class="rolar"><table class="enxuto"><thead><tr><th>País</th><th class="n">Investimento</th><th class="n">Fatur. Meta</th><th class="n">ROAS Meta</th><th class="n">Fatur. Hotmart</th><th class="n">ROAS Hotmart</th><th class="n">Vendas</th><th class="n">Gancho</th><th class="n">CTR</th><th class="n">CPM</th><th class="n">CPC</th><th class="n">Conexão</th><th class="n">Checkouts</th><th class="n">Custo/checkout</th><th class="n">Conv. checkout</th></tr></thead><tbody>${
+      lista.map(([n, t]) => { const rm = div(t.receita_fb, t.gasto), rh = div(t.receita, t.gasto); return `<tr><td>${esc(n)}</td><td class="n num">${t.gasto ? brl(t.gasto) : "—"}</td><td class="n num">${t.receita_fb ? brl(t.receita_fb) : "—"}</td><td class="n num">${rm == null ? "—" : num(rm)}</td><td class="n num">${brl(t.receita)}</td><td class="num roas ${faixaRoas(rh, produto || null)}">${rh == null ? "—" : num(rh)}</td><td class="n num">${int(t.vendas)}</td><td class="n num">${fPct(div(t.video_3s, t.impressoes))}</td><td class="n num">${fPct(div(t.cliques_link, t.impressoes))}</td><td class="n num">${fBrl(t.impressoes ? t.gasto / t.impressoes * 1000 : null)}</td><td class="n num">${fBrl(div(t.gasto, t.cliques_link))}</td><td class="n num">${fPct(div(t.visualizacoes_pagina, t.cliques_link))}</td><td class="n num">${fInt(t.checkouts_fb)}</td><td class="n num">${fBrl(div(t.gasto, t.checkouts_fb))}</td><td class="n num">${fPct(div(t.vendas, t.checkouts_fb))}</td></tr>`; }).join("")}</tbody></table></div><button class="pilula ver-colunas" type="button">ver todas as colunas</button>` : `<div class="vazio">Aparece quando houver vendas. O gasto por país entra importando o relatório do Gerenciador com a coluna de país.</div>`}</div>`;
     ligarJanela();
   }
 
@@ -1643,6 +1686,11 @@
     ({ simulador: () => montarSimulador(d), comparar: desenharComparar, escala: desenharEscala, mensal: desenharMensal, diario: desenharDiario,
        anuncios: desenharAnuncios, hora: desenharHora, origem: desenharOrigem, pais: desenharPais, config: desenharConfig })[sub]();
   }
+  $("analise").addEventListener("click", (e) => {
+    const b = e.target.closest(".ver-colunas"); if (!b) return;
+    const t = b.previousElementSibling?.querySelector("table.enxuto"); if (!t) return;
+    t.classList.toggle("tudo"); b.textContent = t.classList.contains("tudo") ? "menos colunas" : "ver todas as colunas";
+  });
   $("sub-abas").addEventListener("click", (e) => {
     const b = e.target.closest("[data-sub]"); if (!b) return;
     sub = b.dataset.sub; gravar("fg_painel_sub", sub); $("analise").innerHTML = ""; if (dados) desenharAnalise(dados);
