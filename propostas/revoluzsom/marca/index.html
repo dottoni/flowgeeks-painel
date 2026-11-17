@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Revoluzsom · nova marca (proposta)</title>
+<style>
+@font-face{font-family:'Anton';font-weight:400;font-display:swap;src:url(../fonts/Anton-400.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-weight:400 700;font-display:swap;src:url(../fonts/Inter.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-display:swap;src:url(../fonts/JetBrainsMono-500.woff2) format('woff2')}
+:root{--bg:#07070a;--bg2:#0f0f14;--line:#24242e;--tx:#f4f3f7;--mu:#9b9aa6;--red:#d9101f;--vio:#8b5cf6;--cy:#22d3ee;
+  --disp:"Anton",Impact,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace;--body:"Inter",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.55 var(--body);overflow-x:hidden}
+.wrap{width:min(1180px,100% - 32px);margin-inline:auto}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
+.disp{font-family:var(--disp);font-weight:400;text-transform:uppercase;line-height:1}
+.bar{position:sticky;top:0;z-index:9;background:#f4f3f7;color:#07070a;font:600 12.5px var(--body);text-align:center;padding:9px 12px}
+section{padding:clamp(64px,10vw,120px) 0;border-bottom:1px solid var(--line)}
+.k{display:flex;align-items:center;gap:12px;margin-bottom:22px}.k::before{content:"";width:28px;height:2px;background:var(--red)}
+h2.disp{font-size:clamp(44px,8vw,96px);margin-bottom:28px}
+h2 .out{color:transparent;-webkit-text-stroke:1.5px var(--tx)}
+p.lead{max-width:640px;color:#d6d5de;font-size:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:28px;position:relative;overflow:hidden}
+.card .mono{margin-bottom:16px;display:block}
+
+/* abertura */
+.open{min-height:92vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:28px;position:relative;overflow:hidden}
+.open::before{content:"";position:absolute;inset:-20%;background:radial-gradient(35% 45% at 70% 40%,rgba(139,92,246,.22),transparent 70%),radial-gradient(25% 30% at 85% 70%,rgba(34,211,238,.12),transparent 70%);pointer-events:none}
+.word{font-family:var(--disp);font-size:clamp(64px,15vw,210px);line-height:.9;text-transform:uppercase;letter-spacing:.005em;display:flex;flex-wrap:wrap}
+.word .a{color:var(--tx)}.word .b{color:transparent;-webkit-text-stroke:2px var(--tx)}.word .c{color:var(--red)}
+.tagline{font-family:var(--mono);font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#d6d5de}
+
+/* pixel R */
+.px{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--g,6%);aspect-ratio:5/7;width:var(--w,120px)}
+.px i{background:var(--off,#1a1a22);border-radius:var(--r,8%)}
+.px i.on{background:var(--on,var(--red))}
+.px.anim i.on{animation:lit 3.2s calc(var(--d)*70ms) infinite}
+@keyframes lit{0%{background:var(--off,#1a1a22)}6%{background:#fff}14%,78%{background:var(--on,var(--red))}92%,100%{background:var(--off,#1a1a22)}}
+.sym{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap}
+.sym .lbl{font-family:var(--mono);font-size:11px;color:var(--mu);margin-top:10px;text-align:center}
+
+/* antes x depois */
+.old{display:grid;place-items:center;min-height:260px;background:#000;border-radius:14px}
+.old img{width:200px;height:auto}
+.new{display:flex;align-items:center;gap:22px;min-height:260px;justify-content:center;background:#000;border-radius:14px;padding:20px;flex-wrap:wrap}
+.lock{font-family:var(--disp);font-size:clamp(40px,5vw,64px);text-transform:uppercase;line-height:.92}
+.lock span{display:block}
+.lock .b{color:transparent;-webkit-text-stroke:1.5px var(--tx)}.lock .c{color:var(--red)}
+ul.x{list-style:none;display:grid;gap:8px;margin-top:18px;font-size:15px;color:#d6d5de}
+ul.x li::before{content:"▸ ";color:var(--red)}
+
+/* cores */
+.sw{border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.sw div:first-child{height:150px;display:flex;align-items:flex-end;padding:14px;font-family:var(--mono);font-size:12px}
+.sw .t{padding:16px;background:var(--bg2)}
+.sw .chip{background:rgba(7,7,10,.78);color:#fff;padding:4px 8px;border-radius:6px}
+.sw b{font-family:var(--disp);font-weight:400;font-size:26px;text-transform:uppercase;display:block}
+.sw small{color:var(--mu);font-size:13.5px}
+.cores{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+
+/* tipos */
+.type{display:grid;gap:22px}
+.type .row{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:baseline;border-top:1px solid var(--line);padding-top:20px}
+.t1{font-family:var(--disp);font-size:clamp(48px,7vw,88px);text-transform:uppercase;line-height:.95}
+.t2{font-size:22px;font-weight:700}.t3{font-size:17px;color:#d6d5de;max-width:640px}
+.t4{font-family:var(--mono);font-size:14px;letter-spacing:.14em;text-transform:uppercase}
+
+/* aplicações */
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.app{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.app .stage{border-radius:12px;overflow:hidden;position:relative;background:#000;aspect-ratio:1;display:grid;place-items:center}
+.app h3{font-size:17px}.app p{font-size:14.5px;color:var(--mu)}
+.ig img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ig .tarja{position:absolute;left:0;right:0;bottom:0;background:#07070a;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ig .tarja span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:#fff;text-transform:uppercase}
+.ig .tarja .px{--w:16px;--g:8%;--off:transparent}
+.ig .tt{position:absolute;left:14px;top:14px;font-family:var(--disp);font-size:32px;line-height:.92;text-transform:uppercase;text-shadow:0 2px 20px rgba(0,0,0,.7)}
+.led{background:#000;width:100%;height:100%;display:grid;place-items:center;background-image:radial-gradient(#1a1a22 30%,transparent 32%);background-size:10px 10px}
+.tee svg{width:78%;height:auto}
+.case{background:#15151b;width:86%;aspect-ratio:1.5;border-radius:10px;border:3px solid #2c2c36;position:relative;display:flex;align-items:center;justify-content:center;gap:16px;box-shadow:inset 0 0 0 10px #101015}
+.case::before,.case::after{content:"";position:absolute;width:26px;height:26px;border:3px solid #3a3a46;border-radius:4px;top:10px}
+.case::before{left:10px}.case::after{right:10px}
+.case .n{font-family:var(--disp);font-size:44px;color:#e9e8ee;opacity:.9}
+.avatar{width:62%;aspect-ratio:1;border-radius:50%;background:#07070a;display:grid;place-items:center;border:1px solid #2a2a33}
+.cartao{width:88%;aspect-ratio:1.75;border-radius:10px;background:#07070a;border:1px solid #2a2a33;padding:16px;display:flex;flex-direction:column;justify-content:space-between}
+.cartao .nm{font-family:var(--disp);font-size:24px;text-transform:uppercase;line-height:1}
+.cartao .mono{font-size:9.5px;color:#cfcdd8}
+.princ{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.princ div{border-top:2px solid var(--red);padding-top:16px}
+.princ b{font-family:var(--disp);font-weight:400;font-size:26px;text-transform:uppercase;display:block;line-height:1;margin-bottom:10px}
+.princ p{font-size:14.5px;color:var(--mu)}
+footer{padding:40px 0 60px;color:var(--mu);font-size:13px}
+@media (max-width:900px){.grid2,.grid3,.apps{grid-template-columns:1fr}.cores{grid-template-columns:1fr 1fr}.princ{grid-template-columns:1fr 1fr}.type .row{grid-template-columns:1fr}}
+@media (max-width:520px){.princ{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.px.anim i.on{animation:none}}
+</style>
+</head>
+<body>
+<div class="bar">Proposta FlowGeeks · nova marca para a Revoluzsom · rascunho para conversa · <a href="../" style="color:#d9101f;font-weight:700">← ver o site</a></div>
+
+<section class="open">
+  <div class="wrap" style="position:relative">
+    <p class="mono k">Nova marca · proposta</p>
+    <div class="word"><span class="a">Revo</span><span class="b">luz</span><span class="c">som</span></div>
+    <p class="tagline" style="margin-top:26px">Ninguém fica parado.</p>
+    <p class="lead" style="margin-top:28px">O nome já diz tudo: <b>LUZ</b> e <b>SOM</b>. A marca nova para de dizer "DJ" e passa a dizer o que a Revoluzsom entrega de verdade: luz de palco sobre o preto.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="mono k">01 · Por que mudar</p>
+    <h2 class="disp">Hoje o logo diz <span class="out">"DJ".</span></h2>
+    <div class="grid2">
+      <div class="card"><span class="mono">Hoje</span>
+        <div class="old"><img src="../img/revoluzsom-mark.webp" alt="Logo atual da Revoluzsom: fone de ouvido com equalizador colorido" width="1017" height="791"></div>
+        <ul class="x"><li>O fone de ouvido conta "DJ", que é só 1 dos 6 serviços</li><li>O equalizador arco-íris briga com as fotos da pista</li><li>Some em tamanho pequeno (ícone, avatar)</li></ul>
+      </div>
+      <div class="card"><span class="mono">Proposta</span>
+        <div class="new"><div class="px anim" id="r-main" style="--w:92px"></div><div class="lock"><span>Revo</span><span class="b">luz</span><span class="c">som</span></div></div>
+        <ul class="x"><li>Um "R" feito de pixels, como um painel de LED</li><li>O nome em três tempos: sólido, contorno (a luz), vermelho (o som)</li><li>Legível de 16 px até o painel de 8 metros</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="mono k">02 · O símbolo</p>
+    <h2 class="disp">Um R que <span class="out">acende.</span></h2>
+    <p class="lead">Desenhado numa grade de 5 × 7 pixels, igual a um painel de LED. Parado, é o logo. Animado, é a vinheta que roda nos painéis da própria Revoluzsom antes da festa: 200 convidados vendo a marca acender.</p>
+    <div class="sym" style="margin-top:40px">
+      <div><div class="px anim" data-r style="--w:150px"></div><p class="lbl">vinheta no LED</p></div>
+      <div><div class="px" data-r style="--w:100px;--on:#f4f3f7"></div><p class="lbl">branco</p></div>
+      <div style="background:var(--red);padding:16px;border-radius:12px"><div class="px" data-r style="--w:68px;--on:#fff;--off:rgba(0,0,0,.18)"></div><p class="lbl" style="color:#fff">sobre vermelho</p></div>
+      <div style="background:#f4f3f7;padding:16px;border-radius:12px"><div class="px" data-r style="--w:46px;--on:#07070a;--off:#e2e1e8"></div><p class="lbl" style="color:#07070a">sobre claro</p></div>
+      <div><div class="px" data-r style="--w:16px;--g:4%;--r:0;--off:transparent"></div><p class="lbl">16 px</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="mono k">03 · Cores</p>
+    <h2 class="disp">O palco apagado <span class="out">e a luz.</span></h2>
+    <div class="cores">
+      <div class="sw"><div style="background:#07070a;color:#9b9aa6;border-bottom:1px solid var(--line)">#07070A</div><div class="t"><b>Preto Palco</b><small>Fundo de quase tudo</small></div></div>
+      <div class="sw"><div style="background:#f4f3f7;color:#07070a">#F4F3F7</div><div class="t"><b>Branco Luz</b><small>Texto e logotipo</small></div></div>
+      <div class="sw"><div style="background:#d9101f;color:#fff">#D9101F</div><div class="t"><b>Vermelho Rec</b><small>A marca e a ação. O único chapado forte</small></div></div>
+      <div class="sw"><div style="background:radial-gradient(circle at 30% 30%,#8b5cf6,#2a1260 70%)"><span class="chip">#8B5CF6</span></div><div class="t"><b>Violeta Pista</b><small>Só como luz: brilho e facho</small></div></div>
+      <div class="sw"><div style="background:radial-gradient(circle at 70% 30%,#22d3ee,#06343c 70%)"><span class="chip">#22D3EE</span></div><div class="t"><b>Ciano Feixe</b><small>Só como luz, em dose pequena</small></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="mono k">04 · Letras</p>
+    <div class="type">
+      <div class="row"><span class="mono">Anton · títulos</span><span class="t1">A pista que todo mundo comenta</span></div>
+      <div class="row"><span class="mono">Inter 700 · subtítulos</span><span class="t2">Som, luz, LED e DJ de uma empresa só</span></div>
+      <div class="row"><span class="mono">Inter 400 · texto</span><span class="t3">Antes de montar, a gente desenha o seu evento em 3D, dentro do seu espaço: palco, luz, telão e estrutura.</span></div>
+      <div class="row"><span class="mono">JetBrains Mono · ficha técnica</span><span class="t4">PA 100% RCF · Painel de LED 8 × 3 m · 200 convidados</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="mono k">05 · Onde a marca aparece</p>
+    <h2 class="disp">Da camiseta <span class="out">ao painel de 8 m.</span></h2>
+    <div class="apps">
+      <div class="app"><div class="stage ig"><img src="../img/case-6ac3f9647c375.webp" alt="Post de Instagram com foto da pista e tarja técnica" width="1920" height="887" loading="lazy"><div class="tt">Adriele<br>&amp; Pablo</div><div class="tarja"><span>Casamento · Serra dos Cocais</span><div class="px" data-r></div></div></div>
+        <h3>Post do Instagram</h3><p>Foto da pista e a tarja técnica sempre no mesmo lugar. A grade vira portfólio.</p></div>
+      <div class="app"><div class="stage"><div class="led"><div class="px anim" data-r style="--w:34%;--g:10%;--r:50%;--off:#16161d"></div></div></div>
+        <h3>Vinheta no painel de LED</h3><p>6 segundos do R acendendo, antes da festa ou da palestra. A mídia que eles já têm.</p></div>
+      <div class="app"><div class="stage tee"><svg viewBox="0 0 200 200" aria-label="Camiseta preta da equipe com o R de pixel"><path d="M60 30 L82 22 Q100 34 118 22 L140 30 L176 56 L160 84 L142 74 L142 182 L58 182 L58 74 L40 84 L24 56 Z" fill="#111116" stroke="#2c2c36" stroke-width="2"/><g id="tee-r"></g><text x="100" y="160" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2" fill="#cfcdd8">EQUIPE TÉCNICA</text></svg></div>
+        <h3>Camiseta da equipe</h3><p>O R no peito e "EQUIPE TÉCNICA" em mono. Dá rosto a quem monta.</p></div>
+      <div class="app"><div class="stage"><div class="case"><div class="px" data-r style="--w:50px;--on:#e9e8ee;--off:transparent"></div><span class="n">07</span></div></div>
+        <h3>Case de equipamento</h3><p>Estêncil branco do R e o número do case. A marca chega antes do caminhão abrir.</p></div>
+      <div class="app"><div class="stage"><div class="avatar"><div class="px" data-r style="--w:34%;--off:transparent"></div></div></div>
+        <h3>WhatsApp, Instagram e Google</h3><p>O mesmo R vermelho no preto em todo perfil. Reconhecível em 40 px.</p></div>
+      <div class="app"><div class="stage"><div class="cartao"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="nm">Anselmo</div><div class="px" data-r style="--w:22px;--off:transparent"></div></div><div><div class="mono">Som · Luz · LED · DJ</div><div class="mono" style="margin-top:4px">(11) 97539-5285 · Itupeva-SP</div></div></div></div>
+        <h3>Cartão e orçamento</h3><p>O orçamento em PDF preto, com o render 3D na capa e a ficha técnica em mono.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="mono k">06 · Regras da marca</p>
+    <div class="princ">
+      <div><b>Acende no escuro</b><p>O fundo é o palco apagado, e a cor só aparece como luz. O que não ilumina é preto ou branco.</p></div>
+      <div><b>Ficha técnica à mostra</b><p>Equipamento e números em letra mono. A noiva sente que há método, e a empresa encontra o dado.</p></div>
+      <div><b>Prova antes da promessa</b><p>Fala real de cliente, com nome e fonte, no lugar de adjetivo nosso.</p></div>
+      <div><b>Uma ação, em vermelho</b><p>Em cada peça, só uma coisa é vermelha: o que a pessoa deve fazer.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap">Proposta da FlowGeeks, 16/11/2026. O nome Revoluzsom fica: as 29 opiniões no Casamentos.com.br e as 16 no Google estão nele. Fontes livres (Google Fonts).</div></footer>
+
+<script>
+// desenha o R de pixels (5 × 7)
+var R=["11110","10001","10001","11110","10100","10010","10001"];
+function draw(el){var h='',n=0;R.forEach(function(row,y){row.split('').forEach(function(c,x){h+='<i'+(c==='1'?' class="on" style="--d:'+(n++)+'"':'')+'></i>'})});el.innerHTML=h}
+document.querySelectorAll('[data-r],#r-main').forEach(draw);
+// R no peito da camiseta (SVG)
+var g=document.getElementById('tee-r'),s='',sz=5.2,gap=.9,x0=87,y0=62;
+R.forEach(function(row,y){row.split('').forEach(function(c,x){if(c==='1')s+='<rect x="'+(x0+x*(sz+gap))+'" y="'+(y0+y*(sz+gap))+'" width="'+sz+'" height="'+sz+'" fill="#d9101f"/>'})});
+g.innerHTML=s;
+</script>
+</body>
+</html>
