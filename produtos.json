@@ -47,7 +47,9 @@
       "status": "à venda",
       "teto_perda": 300,
       "projeto": "enxoval",
-      "paginas": ["https://bebenapontadolapis.com.br/"],
+      "paginas": [
+        "https://bebenapontadolapis.com.br/"
+      ],
       "hotmart": {
         "204455": "Essencial",
         "204456": "Chá de Fraldas na Conta Certa",
@@ -72,7 +74,9 @@
       "cor": "#8a6fd1",
       "status": "em preparação",
       "projeto": "kit-sublimacao",
-      "paginas": ["https://fornada-natal.pages.dev/"],
+      "paginas": [
+        "https://fornada-natal.pages.dev/"
+      ],
       "hotmart": {
         "204395": "Fornada de Natal",
         "204483": "Forno Cheio",
@@ -173,6 +177,11 @@
       "dia": "2026-11-07",
       "produto": "raio-x",
       "texto": "Página: pixel da Meta no início da página (19h56), a visita passa a ser contada ~0,7 s mais cedo; visitas por clique sobem sem ser melhora do anúncio"
+    },
+    {
+      "dia": "2026-11-16",
+      "produto": "enxoval",
+      "texto": "Página longa: vitrine do app, checkout com autor Agência Flowgeeks e bloco 'Tem lista grátis. Por que pagar?' antes das opções"
     }
   ]
 }
