@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revoluzsom · Som, luz e LED para eventos</title>
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Revoluzsom · Som, luz e LED para eventos">
+<meta property="og:description" content="Som, iluminação, painel de LED, estrutura e DJ para casamentos, 15 anos e eventos de empresa. Veja seu evento em 3D antes do dia.">
+<!-- og:image e og:url: pôr o endereço completo (https://revoluzsom.com.br/img/case-6ac3f95bb723b.webp) quando a página for ao ar -->
+<meta name="description" content="Som, iluminação, painel de LED, estrutura e DJ para casamentos, 15 anos e eventos de empresa. Itupeva/SP, de São Paulo a Campinas. Veja seu evento em 3D antes do dia.">
+<link rel="preload" as="font" type="font/woff2" href="fonts/Anton-400.woff2" crossorigin>
+<link rel="preload" as="image" href="img/hero-mobile.jpg" media="(max-width:700px)" fetchpriority="high">
+<link rel="preload" as="image" href="img/case-6ac3f95bb723b.webp" media="(min-width:701px)" fetchpriority="high">
+<style>
+@font-face{font-family:'Anton';font-weight:400;font-display:swap;src:url(fonts/Anton-400.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-weight:400 700;font-display:swap;src:url(fonts/Inter.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'JetBrains Mono';font-weight:500;font-display:swap;src:url(fonts/JetBrainsMono-500.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{
+  --bg:#07070a; --bg2:#0e0e13; --line:#22222b; --tx:#f4f3f7; --mu:#9b9aa6;
+  --red:#ff2d3d; --red2:#d9101f; --vio:#8b5cf6; --mag:#e040fb; --cy:#22d3ee;
+  --disp:"Anton",Impact,"Arial Narrow",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --body:"Inter",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--tx);font:16px/1.55 var(--body);overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit}
+.wrap{width:min(1180px,100% - 32px);margin-inline:auto}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
+.disp{font-family:var(--disp);font-weight:400;text-transform:uppercase;line-height:.88;letter-spacing:-.005em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 26px;border-radius:999px;font-weight:700;font-size:16px;text-decoration:none;border:0;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s}
+.btn-red{background:var(--red2);color:#fff;box-shadow:0 10px 30px -12px rgba(0,0,0,.8)}
+.btn-red:hover{transform:translateY(-2px);background:#c20d1b;box-shadow:0 14px 34px -12px rgba(0,0,0,.9)}
+.btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px)}
+.btn-ghost:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+.btn .arr{transition:transform .2s}.btn:hover .arr{transform:translateX(4px)}
+section{position:relative}
+:focus-visible{outline:2px solid var(--cy);outline-offset:3px}
+
+/* NAV */
+.nav{position:fixed;inset:0 0 auto;z-index:50;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.nav.on{background:rgba(7,7,10,.82);backdrop-filter:blur(14px);border-color:var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo img{height:40px;width:auto}
+.nav ul{display:flex;gap:28px;list-style:none}
+.nav ul a{text-decoration:none;font-size:14px;color:#d6d5de}
+.nav ul a:hover{color:#fff}
+.nav .btn{min-height:44px;padding:0 20px;font-size:14px}
+.eq{display:inline-flex;gap:2px;align-items:flex-end;height:14px}
+.eq i{width:3px;background:var(--red);border-radius:1px;animation:eq 1s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:-.3s;background:var(--mag)}.eq i:nth-child(3){animation-delay:-.6s;background:var(--cy)}.eq i:nth-child(4){animation-delay:-.15s}
+@keyframes eq{0%,100%{height:3px}50%{height:14px}}
+
+/* HERO */
+.hero{min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;padding:120px 0 40px;isolation:isolate}
+.hero-bg{position:absolute;inset:0;z-index:-3}
+.hero-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;transform:scale(1.08);animation:breathe 14s ease-in-out infinite alternate}
+@keyframes breathe{to{transform:scale(1)}}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(7,7,10,.65) 0%,rgba(7,7,10,.25) 35%,rgba(7,7,10,.85) 72%,var(--bg) 100%)}
+.beams{position:absolute;inset:0;z-index:-1;pointer-events:none;mix-blend-mode:screen;overflow:hidden}
+.beam{position:absolute;top:-10%;width:34vmax;height:130vh;transform-origin:50% 0;filter:blur(6px);opacity:.55;
+  background:conic-gradient(from 180deg at 50% 0,transparent 0 172deg,var(--c) 180deg,transparent 188deg 360deg)}
+.beam.b1{--c:rgba(139,92,246,.9);left:8%;animation:sweep 7s ease-in-out infinite alternate}
+.beam.b2{--c:rgba(255,45,61,.75);left:42%;animation:sweep 9s ease-in-out -3s infinite alternate-reverse}
+.beam.b3{--c:rgba(34,211,238,.7);right:4%;animation:sweep 8s ease-in-out -5s infinite alternate}
+@keyframes sweep{0%{transform:rotate(-28deg)}100%{transform:rotate(26deg)}}
+.hero .mono{color:#d6d5de}
+.hero h1{font-size:clamp(84px,24vw,230px);line-height:.92;margin:18px 0 18px}
+.hero h1 span{display:block}
+.hero h1 .glow{color:transparent;-webkit-text-stroke:2px #fff;text-shadow:0 0 40px rgba(224,64,251,.45)}
+.hero h1 .red{color:var(--red);text-shadow:0 0 60px rgba(255,45,61,.55)}
+.cite{font-size:14px;color:#cfcdd8;max-width:520px;border-left:2px solid var(--red);padding-left:12px;margin-bottom:22px}
+.cite b{color:#fff}
+.hero p.lead{font-size:clamp(17px,2.2vw,21px);max-width:620px;color:#e7e6ee;margin-bottom:28px}
+.paths{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:34px}
+.proof{display:flex;flex-wrap:wrap;gap:10px 28px;padding-top:22px;border-top:1px solid rgba(255,255,255,.14)}
+.proof div{display:flex;align-items:baseline;gap:8px;font-size:14px;color:#cfcdd8}
+.proof strong{font-family:var(--disp);font-size:30px;font-weight:400;color:#fff;letter-spacing:.01em}
+.star{color:#ffc93c}
+.hero-bg picture{display:contents}
+.hero .reveal{opacity:0;transform:translateY(24px);animation:up .9s cubic-bezier(.2,.7,.2,1) forwards}
+.hero h1.reveal,.hero p.lead.reveal{opacity:1;animation-name:upT}
+@keyframes upT{to{transform:none}}
+.hero .d1{animation-delay:.1s}.hero .d2{animation-delay:.25s}.hero .d3{animation-delay:.4s}.hero .d4{animation-delay:.55s}.hero .d5{animation-delay:.7s}
+@keyframes up{to{opacity:1;transform:none}}
+
+/* MARQUEE */
+.marq{border-block:1px solid var(--line);background:var(--bg2);overflow-x:clip;overflow-y:visible;padding:18px 0}
+.marq .lbl{position:absolute;left:16px;top:-11px;background:var(--bg);padding:2px 10px;border:1px solid var(--line);border-radius:999px;z-index:2}
+.track{display:flex;gap:44px;width:max-content;animation:mq 38s linear infinite}
+.track span{font-family:var(--disp);font-size:clamp(28px,4vw,44px);text-transform:uppercase;white-space:nowrap;color:#2c2c36;-webkit-text-stroke:1px #55546a}
+.track span.hl{color:#fff;-webkit-text-stroke:0}
+.track i{font-style:normal;color:var(--red);font-size:24px;align-self:center}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* SECTION HEAD */
+.sec{padding:clamp(80px,12vw,150px) 0}
+.kicker{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.kicker::before{content:"";width:28px;height:2px;background:var(--red)}
+h2.disp{font-size:clamp(48px,9vw,120px);line-height:1.02}
+h2 .out{color:transparent;-webkit-text-stroke:1.5px var(--tx)}
+.sub{color:var(--mu);font-size:18px;max-width:560px;margin-top:20px}
+
+/* 3D */
+.ba{position:relative;margin-top:48px;border-radius:20px;overflow:hidden;border:1px solid var(--line);aspect-ratio:960/445;background:#111;--p:50%;box-shadow:0 40px 100px -40px rgba(0,0,0,.9)}
+.ba:focus-within{outline:2px solid var(--cy);outline-offset:3px}
+.ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ba .top{clip-path:inset(0 calc(100% - var(--p)) 0 0)}
+.ba .handle{position:absolute;top:0;bottom:0;left:var(--p);width:2px;background:#fff;transform:translateX(-1px);pointer-events:none}
+.ba .handle::after{content:"◀ ▶";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:#000;font-size:11px;letter-spacing:2px;padding:12px 12px;border-radius:999px;white-space:nowrap;font-weight:700}
+.ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0;touch-action:pan-y}
+.tag{position:absolute;top:14px;padding:6px 10px;border-radius:6px;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);color:#fff;pointer-events:none}
+.tag.l{left:14px}.tag.r{right:14px}
+.ba-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;margin-top:28px}
+.ba-foot p{max-width:620px;color:#cfcdd8;font-size:18px}
+
+/* CASES */
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px}
+.case{background:var(--bg2);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,border-color .3s}
+.case:hover{transform:translateY(-6px);border-color:#3a3a48}
+.case figure{aspect-ratio:16/10;overflow:hidden;position:relative}
+.case figure img{width:100%;height:100%;object-fit:cover;transition:transform .8s}
+.case:hover figure img{transform:scale(1.06)}
+.case figure figcaption{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.7);padding:5px 9px;border-radius:6px;color:#fff}
+.case .bd{padding:22px 22px 24px;display:flex;flex-direction:column;gap:14px;flex:1}
+.case h3{font-family:var(--disp);font-weight:400;font-size:34px;text-transform:uppercase;line-height:.95}
+.case .where{color:var(--mu);font-size:14px}
+.spec{list-style:none;border-top:1px dashed #33333f;padding-top:14px;display:grid;gap:8px}
+.spec li{font-family:var(--mono);font-size:12.5px;color:#d9d8e2;display:flex;gap:10px}
+.spec li::before{content:"▸";color:var(--red)}
+
+/* DOIS PALCOS */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:56px}
+.stage{position:relative;min-height:560px;border-radius:20px;overflow:hidden;display:flex;align-items:flex-end;padding:28px;isolation:isolate;border:1px solid var(--line)}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1s}
+.stage:hover img{transform:scale(1.05)}
+.stage::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,transparent 20%,rgba(7,7,10,.92) 75%)}
+.stage h3{font-family:var(--disp);font-weight:400;font-size:clamp(44px,6vw,72px);text-transform:uppercase;line-height:.9;margin:10px 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chips span{font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35)}
+.stage p{color:#d9d8e2;margin-bottom:20px;max-width:440px}
+
+/* KIT */
+.kit{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
+.item{position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;padding:22px;border:1px solid var(--line)}
+.item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(1.1);transition:transform .8s,filter .8s}
+.item:hover img{transform:scale(1.07);filter:saturate(1.35)}
+.item::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(7,7,10,.1) 30%,rgba(7,7,10,.92))}
+.item .n{position:absolute;top:18px;left:22px;color:#fff}
+.item h3{font-family:var(--disp);font-weight:400;font-size:44px;text-transform:uppercase;line-height:.9;margin-bottom:8px}
+.item p{font-size:15px;color:#d9d8e2}
+
+/* AVALIAÇÕES */
+.rev-head{display:grid;grid-template-columns:1.5fr .5fr;gap:40px;align-items:end}
+.rev-head h2.disp{font-size:clamp(44px,7vw,100px)}
+@media (min-width:981px){.score{grid-template-columns:1fr}}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.score div{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px}
+.score strong{display:block;font-family:var(--disp);font-weight:400;font-size:56px;line-height:1}
+.score span{font-size:13px;color:var(--mu)}
+.wall{columns:3 320px;column-gap:16px;margin-top:56px}
+.q{break-inside:avoid;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px}
+.q .st{color:#ffc93c;letter-spacing:2px;font-size:14px;margin-bottom:10px}
+.q p{font-size:16.5px;line-height:1.5;color:#ecebf2}
+.q p mark{background:none;color:#fff;box-shadow:inset 0 -0.45em 0 rgba(255,45,61,.45)}
+.q footer{margin-top:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.q footer b{font-size:14px}
+.q.big{background:linear-gradient(160deg,#1b0f2e,#120a1d);border-color:#3b2a5c}
+.q.big p{font-family:var(--disp);font-size:32px;line-height:1.02;text-transform:uppercase}
+
+/* COMO */
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:56px;border-top:1px solid var(--line)}
+.step{padding:26px 20px 0 0;position:relative}
+.step::before{content:"";position:absolute;top:-5px;left:0;width:9px;height:9px;border-radius:50%;background:var(--red)}
+.step .num{font-family:var(--disp);font-size:64px;line-height:1;color:transparent;-webkit-text-stroke:1px #4a4a5a;display:block;margin-bottom:10px}
+.step h3{font-size:18px;margin-bottom:8px}
+.step p{font-size:14.5px;color:var(--mu)}
+.step blockquote{margin-top:12px;font-size:13.5px;color:#cfcdd8;border-left:2px solid var(--vio);padding-left:10px;font-style:italic}
+
+/* CLIENTES */
+.logos{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:40px}
+.logos div{background:var(--bg);display:grid;place-items:center;height:120px;padding:24px}
+.logos img{max-height:46px;width:auto;filter:brightness(0) invert(1);opacity:.6;transition:opacity .3s}
+.logos div:hover img{opacity:1}
+
+/* FORM */
+.cta{overflow:hidden;isolation:isolate}
+.cta::before{content:"";position:absolute;inset:-20% -10% auto;height:120%;z-index:-1;background:radial-gradient(50% 50% at 30% 40%,rgba(139,92,246,.25),transparent 70%),radial-gradient(40% 40% at 80% 60%,rgba(255,45,61,.22),transparent 70%)}
+.cta-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+form{background:rgba(14,14,19,.85);border:1px solid #2c2c38;border-radius:22px;padding:28px;display:grid;gap:16px;backdrop-filter:blur(10px)}
+.types{display:flex;flex-wrap:wrap;gap:8px}
+.types input{position:absolute;opacity:0;pointer-events:none}
+.types label{padding:10px 14px;border-radius:999px;border:1px solid #3a3a48;font-size:14px;cursor:pointer;transition:all .2s;min-height:44px;display:inline-flex;align-items:center}
+.types input:checked+label{background:var(--red2);border-color:var(--red2);color:#fff}
+.types input:focus-visible+label{outline:2px solid var(--cy);outline-offset:2px}
+.field{display:grid;gap:6px}
+.field label{font-size:13px;color:var(--mu)}
+.field input,.field select{height:52px;border-radius:12px;border:1px solid #3a3a48;background:#0a0a0e;color:#fff;font:16px var(--body);padding:0 14px;width:100%;color-scheme:dark}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+form .btn{width:100%}
+.fine{font-size:12.5px;color:var(--mu);text-align:center}
+
+/* FOOTER */
+footer.site{border-top:1px solid var(--line);padding:48px 0 110px}
+.ft{display:flex;flex-wrap:wrap;justify-content:space-between;gap:28px;align-items:flex-start}
+.ft img{height:56px;width:auto}
+.ft ul{list-style:none;display:grid;gap:8px;font-size:15px}
+.ft a{text-decoration:none;color:#d6d5de}.ft a:hover{color:#fff}
+
+/* STICKY MOBILE */
+.sticky{position:fixed;left:12px;right:12px;bottom:12px;z-index:60;display:none;transform:translateY(140%);visibility:hidden;transition:transform .35s,visibility 0s .35s}
+.sticky.on{transform:none;visibility:visible;transition:transform .35s,visibility 0s}
+.sticky .btn{width:100%;box-shadow:0 12px 40px -6px rgba(0,0,0,.85)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+@media (max-width:980px){
+  .nav ul{display:none}
+  .cases{grid-template-columns:1fr}
+  .split{grid-template-columns:1fr}
+  .stage{min-height:480px}
+  .kit{grid-template-columns:1fr 1fr}
+  .rev-head{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr;border-top:0;border-left:1px solid var(--line);margin-left:4px}
+  .step{padding:0 0 30px 24px}
+  .step::before{top:8px;left:-5px}
+  .cta-grid{grid-template-columns:1fr}
+  .logos{grid-template-columns:repeat(2,1fr)}
+  .sticky{display:block}
+}
+@media (max-width:560px){
+  .hero{padding-top:100px}
+  .paths .btn{width:100%}
+  .proof strong{font-size:26px}
+  .kit{grid-template-columns:1fr}
+  .item{aspect-ratio:5/4}
+  .ba{aspect-ratio:4/3}
+  .ba .handle::after{padding:10px}
+  .row2{grid-template-columns:1fr}
+  .q.big p{font-size:28px}
+  .nav .btn{display:none}
+  .stage{padding:22px}
+}
+
+/* UAU 1 · APAGÃO NA ABERTURA */
+.blackout{position:absolute;inset:0;z-index:4;background:#000;pointer-events:none;animation:power 1.25s linear forwards}
+@keyframes power{0%{opacity:1}24%{opacity:1}25%{opacity:.35}31%{opacity:.95}40%{opacity:.95}41%{opacity:.15}47%{opacity:.7}60%{opacity:0}100%{opacity:0;visibility:hidden}}
+.hero h1 .red{animation:neon 7s 1.4s infinite}
+@keyframes neon{0%,90%,93%,96%,100%{opacity:1}91%,94.5%{opacity:.35}}
+/* UAU 2 · CANHÃO DE LUZ */
+.spot{position:absolute;left:0;top:0;width:60vmax;height:60vmax;margin:-30vmax 0 0 -30vmax;z-index:-1;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,rgba(255,255,255,.28),rgba(224,64,251,.14) 45%,transparent 100%);
+  transform:translate(70vw,35vh);animation:roam 16s ease-in-out infinite alternate}
+.spot.manual{animation:none;transition:transform .25s cubic-bezier(.2,.7,.2,1)}
+@keyframes roam{0%{transform:translate(72vw,30vh)}33%{transform:translate(25vw,55vh)}66%{transform:translate(60vw,70vh)}100%{transform:translate(15vw,25vh)}}
+/* UAU 3 · PISTA DE LED */
+.pista{position:relative;height:min(82vh,760px);min-height:540px;overflow:hidden;display:flex;align-items:center;border-bottom:1px solid var(--line);touch-action:pan-y;cursor:crosshair;background:#050507}
+.pista canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+.pista::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(5,5,7,.88) 0%,rgba(5,5,7,.55) 38%,transparent 70%),radial-gradient(130% 90% at 50% 50%,transparent 55%,rgba(5,5,7,.8))}
+.pista-in{position:relative;z-index:2;pointer-events:none}
+.pista h2{font-size:clamp(56px,10vw,140px)}
+.pista-q{margin-top:22px;max-width:420px;color:#e7e6ee;font-size:15px;border-left:2px solid var(--red);padding:8px 12px;background:rgba(5,5,7,.6)}
+.pista-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:2;color:#fff;opacity:.75;white-space:nowrap;pointer-events:none;animation:hint 2.2s ease-in-out infinite}
+@keyframes hint{50%{opacity:.25}}
+/* UAU 5 · FAIXA INCLINADA */
+.band-wrap{overflow:hidden;padding:48px 0;margin-bottom:clamp(60px,9vw,120px)}
+.band{transform:rotate(-3deg);background:var(--red2);margin:0 -40px;padding:16px 0;box-shadow:0 20px 50px -20px rgba(0,0,0,.9)}
+.band.b2{background:#fff;color:#07070a;transform:rotate(2deg);margin-top:-30px}
+.band-t{display:flex;white-space:nowrap;font-family:var(--disp);font-size:clamp(44px,8vw,110px);text-transform:uppercase;line-height:1;will-change:transform}
+.band-t span{padding-right:.4em}
+@media (prefers-reduced-motion:reduce){
+  .blackout,.spot,.pista-hint{display:none}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv,.hero .reveal{opacity:1;transform:none}
+  .hero-bg img{transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:url" content="https://dottoni.github.io/flowgeeks-painel/propostas/revoluzsom/">
+<meta property="og:image" content="https://dottoni.github.io/flowgeeks-painel/propostas/revoluzsom/img/og-whatsapp.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<style>
+.proposta{position:fixed;top:0;left:0;right:0;z-index:70;height:34px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px;
+  background:#f4f3f7;color:#07070a;font:600 12.5px/1.2 Inter,system-ui,sans-serif;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proposta b{font-weight:700}
+.nav{top:34px}
+.hero{padding-top:154px}
+@media (max-width:560px){.hero{padding-top:134px}.proposta .longo{display:none}}
+</style>
+</head>
+<body>
+<div class="proposta" role="note"><b>Proposta FlowGeeks</b> · prévia do site novo da Revoluzsom<span class="longo">, ainda não é o site oficial</span></div>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Revoluzsom, início">
+      <img src="img/revoluzsom-mark.webp" alt="Revoluzsom" width="1017" height="791">
+    </a>
+    <ul>
+      <li><a href="#3d">Projeto 3D</a></li>
+      <li><a href="#cases">Cases</a></li>
+      <li><a href="#palcos">Casamento ou empresa</a></li>
+      <li><a href="#avaliacoes">Avaliações</a></li>
+    </ul>
+    <a class="btn btn-red" href="#orcamento"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Ver minha data</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 1. HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <picture><source media="(max-width:700px)" srcset="img/hero-mobile.jpg" width="700" height="887"><img src="img/case-6ac3f95bb723b.webp" alt="Pista de casamento com palco envelopado em LED roxo e convidados dançando, montado pela Revoluzsom na Serra dos Cocais" width="1920" height="887" fetchpriority="high"></picture>
+  </div>
+  <div class="spot" id="spot" aria-hidden="true"></div>
+  <div class="blackout" aria-hidden="true"></div>
+  <div class="beams" aria-hidden="true"><div class="beam b1"></div><div class="beam b2"></div><div class="beam b3"></div></div>
+  <div class="wrap">
+    <p class="mono reveal d1">Som · Luz · LED · DJ &nbsp;/&nbsp; Itupeva-SP, de São Paulo a Campinas</p>
+    <h1 class="disp reveal d2"><span>Ninguém</span><span class="glow">ficou</span><span class="red">parado.</span></h1>
+    <p class="cite reveal d3">“…teve até telão com as coreografias, então ninguém ficou parado!” <b>Joyce</b> · Casamentos.com.br</p>
+    <p class="lead reveal d3">Som, iluminação, painel de LED, estrutura e DJ para o seu casamento, 15 anos ou evento de empresa. E você vê tudo montado em 3D antes do grande dia.</p>
+    <div class="paths reveal d4">
+      <a class="btn btn-red" href="#orcamento" data-tipo="Casamento">Vou casar ou fazer festa <span class="arr">→</span></a>
+      <a class="btn btn-ghost" href="#orcamento" data-tipo="Evento corporativo">Evento da minha empresa <span class="arr">→</span></a>
+    </div>
+    <div class="proof reveal d5">
+      <div><strong>5.0</strong><span class="star" aria-hidden="true">★★★★★</span> 29 opiniões no Casamentos.com.br</div>
+      <div><strong>99%</strong> dos casais recomendam</div>
+      <div><strong>4,6</strong><span class="star" aria-hidden="true">★</span> no Google</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. SALÕES -->
+<section class="marq" aria-label="Espaços onde a Revoluzsom já montou">
+  <span class="mono lbl">Onde a pista já acendeu</span>
+  <div class="track" aria-hidden="true">
+    <span class="hl">Serra dos Cocais</span><i>✦</i><span>Lagoa Santa Rita</span><i>✦</i><span class="hl">Cyan Resort</span><i>✦</i><span>Wet'n Wild</span><i>✦</i><span class="hl">Quinta Pinheiros</span><i>✦</i><span>Casa Giglio</span><i>✦</i><span class="hl">Verdano</span><i>✦</i>
+    <span class="hl">Serra dos Cocais</span><i>✦</i><span>Lagoa Santa Rita</span><i>✦</i><span class="hl">Cyan Resort</span><i>✦</i><span>Wet'n Wild</span><i>✦</i><span class="hl">Quinta Pinheiros</span><i>✦</i><span>Casa Giglio</span><i>✦</i><span class="hl">Verdano</span><i>✦</i>
+  </div>
+</section>
+
+<!-- 2b. PISTA DE LED INTERATIVA -->
+<section class="pista" id="pista" aria-labelledby="pista-t">
+  <canvas id="floor" aria-hidden="true"></canvas>
+  <div class="wrap pista-in">
+    <p class="mono kicker">Experimente</p>
+    <h2 class="disp" id="pista-t">Passe o dedo.<br><span class="out">Essa é a pista.</span></h2>
+    <p class="pista-q">“…pista led é perfeita, som perfeito…” <b>Joyce</b> · Casamentos.com.br</p>
+  </div>
+  <p class="mono pista-hint" aria-hidden="true">← passe o dedo aqui →</p>
+</section>
+
+<!-- 3. PROJETO 3D -->
+<section class="sec" id="3d">
+  <div class="wrap">
+    <p class="mono kicker rv">O nosso diferencial</p>
+    <h2 class="disp rv">Veja a festa<br><span class="out">antes da festa.</span></h2>
+    <div class="ba rv" id="ba">
+      <img src="img/modelo3d-real.webp" alt="O evento montado: palco com painéis de LED e iluminação verde num salão com plateia" width="960" height="445" loading="lazy">
+      <img class="top" src="img/modelo3d-render.webp" alt="O projeto 3D do mesmo salão, feito antes da montagem" width="960" height="444" loading="lazy">
+      <div class="handle" aria-hidden="true"></div>
+      <span class="tag l mono">Projeto 3D</span><span class="tag r mono">No dia</span>
+      <input type="range" min="0" max="100" value="50" aria-label="Arraste para comparar o projeto 3D com o evento montado">
+    </div>
+    <div class="ba-foot rv">
+      <p>Antes de montar, a gente desenha o seu evento em 3D, dentro do seu espaço: palco, luz, telão e estrutura. Você muda o que quiser antes do grande dia. Arraste a imagem e compare.</p>
+      <a class="btn btn-red" href="#orcamento">Quero o meu em 3D <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- 4. CASES -->
+<section class="sec" id="cases" style="padding-top:0">
+  <div class="wrap">
+    <p class="mono kicker rv">Ficha técnica de verdade</p>
+    <h2 class="disp rv">Três eventos<br><span class="out">que acenderam.</span></h2>
+    <div class="cases">
+      <article class="case rv">
+        <figure><img src="img/case-6ac3f9647c375.webp" alt="Convidados dançando na pista com palco de LED roxo e azul" width="1920" height="887" loading="lazy"><figcaption class="mono">Casamento · set/2026</figcaption></figure>
+        <div class="bd">
+          <h3>Adriele &amp; Pablo</h3>
+          <p class="where">Serra dos Cocais, Itatiba</p>
+          <ul class="spec"><li>PA 100% RCF</li><li>Palco todo envelopado em LED</li><li>LED no fundo, no teto, na testeira da house mix e na frente</li><li>DJ Viktor Mora</li></ul>
+        </div>
+      </article>
+      <article class="case rv">
+        <figure><img src="img/case-6ac2dac583a94.webp" alt="Pista de LED com fachos de luz branca e verde antes da festa" width="1600" height="720" loading="lazy"><figcaption class="mono">Casamento · 200 convidados</figcaption></figure>
+        <div class="bd">
+          <h3>Fernanda &amp; Lucas</h3>
+          <p class="where">Lagoa Santa Rita, Itupeva</p>
+          <ul class="spec"><li>Painéis de LED e lustre decorativo</li><li>Luz focal nas mesas e arquitetural</li><li>DJ show com dançarinos</li><li>CO2, bazuca de CO2 e tambores de LED</li></ul>
+        </div>
+      </article>
+      <article class="case rv">
+        <figure><img src="img/seg-cover.webp" alt="Palco corporativo com painel de LED azul da SEG Automotive" width="500" height="231" loading="lazy"><figcaption class="mono">Corporativo · ~100 convidados</figcaption></figure>
+        <div class="bd">
+          <h3>SEG Automotive</h3>
+          <p class="where">Supplier Day 26 · Cyan Resort, Itupeva</p>
+          <ul class="spec"><li>Palco 8 × 3 m</li><li>Painel de LED 8 × 3 m</li><li>8 totens de LED de 3 × 0,5 m</li><li>Som e luz cênica</li></ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="band-wrap" aria-hidden="true">
+  <div class="band"><div class="band-t" data-dir="-1"><span>Som ✦</span><span>Luz ✦</span><span>LED ✦</span><span>DJ ✦</span><span>Estrutura ✦</span><span>Som ✦</span><span>Luz ✦</span><span>LED ✦</span><span>DJ ✦</span><span>Estrutura ✦</span><span>Som ✦</span><span>Luz ✦</span><span>LED ✦</span><span>DJ ✦</span><span>Estrutura ✦</span><span>Som ✦</span><span>Luz ✦</span><span>LED ✦</span><span>DJ ✦</span><span>Estrutura ✦</span></div></div>
+  <div class="band b2"><div class="band-t" data-dir="1"><span>Casamento ✦</span><span>15 anos ✦</span><span>Formatura ✦</span><span>Convenção ✦</span><span>Lançamento ✦</span><span>Casamento ✦</span><span>15 anos ✦</span><span>Formatura ✦</span><span>Convenção ✦</span><span>Lançamento ✦</span><span>Casamento ✦</span><span>15 anos ✦</span><span>Formatura ✦</span><span>Convenção ✦</span><span>Lançamento ✦</span><span>Casamento ✦</span><span>15 anos ✦</span><span>Formatura ✦</span><span>Convenção ✦</span><span>Lançamento ✦</span></div></div>
+</div>
+
+<!-- 5. DOIS PALCOS -->
+<section class="sec" id="palcos" style="padding-top:0">
+  <div class="wrap">
+    <p class="mono kicker rv">Escolha o seu palco</p>
+    <h2 class="disp rv">Dois públicos.<br><span class="out">O mesmo cuidado.</span></h2>
+    <div class="split">
+      <article class="stage rv">
+        <img src="img/case-6ac3f93513cbd.webp" alt="Pista lotada sob estrutura de LED magenta" width="1600" height="739" loading="lazy">
+        <div>
+          <span class="mono">Casamentos e festas</span>
+          <h3>A pista que<br>todo mundo comenta.</h3>
+          <div class="chips"><span>Casamento</span><span>15 anos</span><span>Formatura</span><span>Aniversário</span><span>Bodas</span></div>
+          <p>Pista de LED, telão, lustre, luz nas mesas e DJ.</p>
+          <a class="btn btn-red" href="#orcamento" data-tipo="Casamento">Ver minha data <span class="arr">→</span></a>
+        </div>
+      </article>
+      <article class="stage rv">
+        <img src="img/corp-lancamentos.webp" alt="Lançamento de produto com estrutura de treliça e letreiro Product Launch" width="1600" height="900" loading="lazy">
+        <div>
+          <span class="mono">Eventos de empresa</span>
+          <h3>O palco que<br>a sua marca merece.</h3>
+          <div class="chips"><span>Convenção</span><span>Lançamento</span><span>Premiação</span><span>Palestra</span><span>Feira</span><span>Confraternização</span></div>
+          <p>Palco, painel de LED, som e luz cênica com equipe técnica própria, do primeiro contato ao último aplauso.</p>
+          <a class="btn btn-ghost" href="#orcamento" data-tipo="Evento corporativo">Falar do meu evento <span class="arr">→</span></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 6. O QUE A GENTE LEVA -->
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <p class="mono kicker rv">Tudo de uma empresa só</p>
+    <h2 class="disp rv">O que chega<br><span class="out">no caminhão.</span></h2>
+    <div class="kit">
+      <div class="item rv"><img src="img/svc-som.webp" alt="Caixas de som de PA montadas ao lado do palco" width="1600" height="903" loading="lazy"><span class="n mono">01</span><h3>Som</h3><p>PA dimensionado para o espaço e para o número de convidados.</p></div>
+      <div class="item rv"><img src="img/case-6ac2db4cb0221.webp" alt="Fachos de luz cruzando a pista" width="1920" height="864" loading="lazy"><span class="n mono">02</span><h3>Luz</h3><p>Fachos na pista, luz arquitetural no salão e luz focal nas mesas.</p></div>
+      <div class="item rv"><img src="img/svc-led.webp" alt="Painel de LED em palco escuro com a marca Revoluzsom" width="1600" height="1200" loading="lazy"><span class="n mono">03</span><h3>Painel de LED</h3><p>Telão, pista de LED, totens e palco envelopado.</p></div>
+      <div class="item rv"><img src="img/svc-estruturas.webp" alt="Estrutura de treliça e palco sendo montados num salão" width="1600" height="878" loading="lazy"><span class="n mono">04</span><h3>Estrutura</h3><p>Palco, treliça e box truss, com montagem e desmontagem pela nossa equipe.</p></div>
+      <div class="item rv"><img src="img/svc-djs.webp" alt="DJ tocando para a pista cheia com chuva de papel vermelho" width="1600" height="894" loading="lazy"><span class="n mono">05</span><h3>DJ</h3><p>Telão com as coreografias das músicas, para ninguém ficar parado.</p></div>
+      <div class="item rv"><img src="img/svc-equipe.webp" alt="Técnicos da Revoluzsom operando a mesa de som e luz" width="1600" height="894" loading="lazy"><span class="n mono">06</span><h3>Equipe técnica</h3><p>Gente nossa operando som, luz e imagem do começo ao fim.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. AVALIAÇÕES -->
+<section class="sec" id="avaliacoes" style="padding-top:0">
+  <div class="wrap">
+    <div class="rev-head">
+      <div>
+        <p class="mono kicker rv">Quem já dançou aqui</p>
+        <h2 class="disp rv">O nome que mais<br>aparece nas avaliações<br><span class="out">é o do Anselmo.</span></h2>
+      </div>
+      <div class="score rv">
+        <div><strong>5.0</strong><span>29 opiniões<br>Casamentos.com.br</span></div>
+        <div><strong>4,6</strong><span>16 avaliações<br>Google</span></div>
+      </div>
+    </div>
+    <div class="wall">
+      <blockquote class="q big rv"><p>“Até o gerente do espaço elogiou!”</p><footer><b>Michelle</b><span class="mono">Casamentos.com.br · 2022</span></footer></blockquote>
+      <blockquote class="q rv"><div class="st" aria-label="5 estrelas">★★★★★</div><p>“Nosso casamento aconteceu no dia 09/11/2024 e foi incrível, o DJ, a pista, o telão, <mark>ficou INCRIVEEEEEL!!</mark> Todos elogiaram. Desde o primeiro contato com o Anselmo ele nos ajudou e nos assegurou de tudo.”</p><footer><b>Amanda</b><span class="mono">Casamento · Google</span></footer></blockquote>
+      <blockquote class="q rv"><div class="st" aria-label="5 estrelas">★★★★★</div><p>“Além da qualidade da entrega, o atendimento é personalizado e super ágil, <mark>conseguindo entregar um evento além do esperado</mark>, sem falar do custo benefício…”</p><footer><b>Sara</b><span class="mono">Evento corporativo · Google</span></footer></blockquote>
+      <blockquote class="q rv"><p>“A iluminação ficou maravilhosa, <mark>pista led é perfeita, som perfeito</mark>, Anselmo e Fabi super simpáticos em todo o momento e o repertório das músicas ficou sensacional!”</p><footer><b>Joyce</b><span class="mono">Casamentos.com.br · 2022</span></footer></blockquote>
+      <blockquote class="q rv"><p>“Anselmo é um cara fora do normal, nos ajudou em cada detalhe até mesmo nas indicações de outros fornecedores, <mark>realmente esse ama o que faz!</mark>”</p><footer><b>Gabriel</b><span class="mono">Casamentos.com.br · 2022</span></footer></blockquote>
+      <blockquote class="q rv"><div class="st" aria-label="5 estrelas">★★★★★</div><p>“Anselmo e sua equipe fizeram um trabalho incrível no meu casamento. Desde o momento da negociação, sempre muito educados e atenciosos, até a entrega final, <mark>com som e LED incrível demais.</mark>”</p><footer><b>Henrique</b><span class="mono">Casamento · Google</span></footer></blockquote>
+      <blockquote class="q big rv"><p>“A festa ficou linda com a decoração cênica e quanto ao som, nunca nos divertimos tanto!”</p><footer><b>Jordana</b><span class="mono">Casamentos.com.br · 2021</span></footer></blockquote>
+      <blockquote class="q rv"><p>“O serviço foi ótimo e pudemos contar com a opinião deles para termos a melhor iluminação possível no nosso casamento! <mark>O Lustre deu um destaque lindo no salão!</mark>”</p><footer><b>Mayara</b><span class="mono">Casamentos.com.br · 2022</span></footer></blockquote>
+      <blockquote class="q rv"><div class="st" aria-label="5 estrelas">★★★★★</div><p>“Organizados e cooperam para com o evento com os profissionais respeitando cada espaço e suas necessidades. <mark>Show em resolver as eventualidades</mark> e ainda agrega onde ver necessidade pro sucesso do evento.”</p><footer><b>Jairo</b><span class="mono">Google</span></footer></blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- 8. COMO FUNCIONA -->
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <p class="mono kicker rv">Do primeiro “oi” ao último aplauso</p>
+    <h2 class="disp rv">Como a sua<br><span class="out">noite acontece.</span></h2>
+    <div class="steps">
+      <div class="step rv"><span class="num">01</span><h3>A conversa</h3><p>Você conta a data, o espaço e o que imagina.</p><blockquote>“Desde o primeiro contato com o Anselmo ele nos ajudou.” Amanda</blockquote></div>
+      <div class="step rv"><span class="num">02</span><h3>A visita</h3><p>Quando precisa, a equipe visita o seu espaço e sugere o que cabe nele.</p><blockquote>“A equipe foi visitar o espaço e deu várias ideias.” Mayara</blockquote></div>
+      <div class="step rv"><span class="num">03</span><h3>O projeto 3D</h3><p>Você vê palco, luz e telão no seu salão e ajusta antes.</p></div>
+      <div class="step rv"><span class="num">04</span><h3>A montagem</h3><p>A equipe monta palco, luz e som no seu espaço antes da festa.</p><blockquote>“No dia do evento eles chegaram cedo, montaram todas a estrutura de forma ágil.” Mayara</blockquote></div>
+      <div class="step rv"><span class="num">05</span><h3>A festa</h3><p>Som, luz e DJ com a nossa equipe operando até o fim.</p><blockquote>“Nunca nos divertimos tanto!” Jordana</blockquote></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. CLIENTES -->
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <p class="mono kicker rv">Marcas que já subiram no nosso palco</p>
+    <div class="logos rv">
+      <div><img src="img/cli-ambev.webp" alt="Ambev" width="271" height="97" loading="lazy"></div>
+      <div><img src="img/cli-herbalife.webp" alt="Herbalife" width="435" height="147" loading="lazy"></div>
+      <div><img src="img/cli-syngenta.webp" alt="Syngenta" width="445" height="157" loading="lazy"></div>
+      <div><img src="img/cli-brf.webp" alt="BRF" width="267" height="146" loading="lazy"></div>
+      <div><img src="img/cli-remax.webp" alt="RE/MAX" width="432" height="202" loading="lazy"></div>
+      <div><img src="img/cli-thule.webp" alt="Thule" width="352" height="119" loading="lazy"></div>
+      <div><img src="img/cli-wetnwild.webp" alt="Wet'n Wild" width="311" height="153" loading="lazy"></div>
+      <div><img src="img/cli-world_trade_center.webp" alt="World Trade Center" width="219" height="207" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. ORÇAMENTO -->
+<section class="sec cta" id="orcamento">
+  <div class="wrap cta-grid">
+    <div>
+      <p class="mono kicker rv">A agenda de 2027 já abriu</p>
+      <h2 class="disp rv">A sua data<br><span class="out">ainda está</span><br>livre?</h2>
+      <p class="sub rv">Conte o tipo de evento, a data e o lugar. A mensagem já vai pronta para o WhatsApp da Revoluzsom, e a gente responde com o que cabe no seu espaço.</p>
+    </div>
+    <form id="f" class="rv" novalidate>
+      <div class="field">
+        <label id="tl">Tipo de evento</label>
+        <div class="types" role="radiogroup" aria-labelledby="tl">
+          <input type="radio" name="tipo" id="t1" value="Casamento" checked><label for="t1">Casamento</label>
+          <input type="radio" name="tipo" id="t2" value="15 anos"><label for="t2">15 anos</label>
+          <input type="radio" name="tipo" id="t3" value="Formatura"><label for="t3">Formatura</label>
+          <input type="radio" name="tipo" id="t4" value="Aniversário"><label for="t4">Aniversário</label>
+          <input type="radio" name="tipo" id="t5" value="Evento corporativo"><label for="t5">Empresa</label>
+          <input type="radio" name="tipo" id="t6" value="Outro evento"><label for="t6">Outro</label>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="data">Data</label><input id="data" name="data" type="date"></div>
+        <div class="field"><label for="conv">Convidados</label>
+          <select id="conv" name="conv"><option value="">Escolha</option><option>Até 100</option><option>100 a 200</option><option>200 a 400</option><option>Mais de 400</option></select>
+        </div>
+      </div>
+      <div class="field"><label for="local">Cidade ou espaço</label><input id="local" name="local" type="text" placeholder="Ex.: Serra dos Cocais, Itatiba" autocomplete="off"></div>
+      <div class="field"><label for="nome">Seu nome</label><input id="nome" name="nome" type="text" autocomplete="given-name"></div>
+      <button class="btn btn-red" type="submit">Ver minha data no WhatsApp <span class="arr">→</span></button>
+      <p class="fine">Abre o WhatsApp com a mensagem pronta. Nada é enviado sem você tocar em enviar.</p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap ft">
+    <div><img src="img/revoluzsom-mark.webp" alt="Revoluzsom" width="1017" height="791" loading="lazy"><p class="mono" style="margin-top:14px">Som e Iluminação · Itupeva-SP</p></div>
+    <ul>
+      <li><a href="https://wa.me/5511975395285" rel="noopener">WhatsApp (11) 97539-5285</a></li>
+      <li><a href="mailto:revoluzsom@revoluzsom.com.br">revoluzsom@revoluzsom.com.br</a></li>
+      <li><a href="https://www.instagram.com/revoluzsom/" rel="noopener">Instagram @revoluzsom</a></li>
+    </ul>
+    <ul>
+      <li class="mono">De São Paulo a Campinas</li>
+      <li><a href="#3d">Projeto 3D</a></li>
+      <li><a href="#cases">Cases</a></li>
+      <li><a href="#avaliacoes">Avaliações</a></li>
+    </ul>
+  </div>
+</footer>
+
+<div class="sticky" id="sticky"><a class="btn btn-red" href="#orcamento"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Ver minha data</a></div>
+
+<script>
+(function(){
+  var WA='5511975395285';
+  var nav=document.getElementById('nav'),sticky=document.getElementById('sticky'),orc=document.getElementById('orcamento');
+  function onScroll(){
+    var y=window.scrollY;nav.classList.toggle('on',y>40);
+    var r=orc.getBoundingClientRect();
+    sticky.classList.toggle('on',y>window.innerHeight*.8 && r.top>window.innerHeight*.6);
+  }
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  // revelar ao entrar na tela
+  var els=document.querySelectorAll('.rv');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el)});
+  }else{els.forEach(function(el){el.classList.add('in')})}
+
+
+  var calm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // canhão de luz que segue o mouse
+  var hero=document.querySelector('.hero'),spot=document.getElementById('spot');
+  if(!calm&&matchMedia('(pointer:fine)').matches){
+    hero.addEventListener('pointermove',function(e){spot.classList.add('manual');spot.style.transform='translate('+e.clientX+'px,'+(e.clientY+scrollY-hero.offsetTop)+'px)'});
+    hero.addEventListener('pointerleave',function(){spot.classList.remove('manual');spot.style.transform=''});
+  }
+
+  // faixas inclinadas que correm com a rolagem
+  var bands=document.querySelectorAll('.band-t'),bwrap=document.querySelector('.band-wrap'),bt=false;
+  function moveBands(){bt=false;var r=bwrap.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)return;
+    var o=(innerHeight-r.top)*.45;bands.forEach(function(b){var d=+b.dataset.dir,w=b.scrollWidth/4;var x=d<0?-(o%w):-w+(o%w);b.style.transform='translateX('+x+'px)'})}
+  if(!calm){addEventListener('scroll',function(){if(!bt){bt=true;requestAnimationFrame(moveBands)}},{passive:true});moveBands()}
+
+  // pista de LED interativa
+  (function(){
+    var sec=document.getElementById('pista'),cv=document.getElementById('floor'),cx=cv.getContext('2d');
+    var dpr,W,Hh,S,cols,rows,E,Hu,run=false,lastIn=-1e9,hi=0;
+    var HUES=[292,262,188,352,320];
+    function size(){dpr=Math.min(devicePixelRatio||1,2);W=sec.clientWidth;Hh=sec.clientHeight;cv.width=W*dpr;cv.height=Hh*dpr;
+      S=W<700?28:40;cols=Math.ceil(W/S)+1;rows=Math.ceil(Hh/S)+1;E=new Float32Array(cols*rows);Hu=new Float32Array(cols*rows)}
+    function hit(x,y,rad,hue){var c=Math.floor(x/S),r=Math.floor(y/S),R=Math.ceil(rad);
+      for(var dy=-R;dy<=R;dy++)for(var dx=-R;dx<=R;dx++){var cc=c+dx,rr=r+dy;if(cc<0||rr<0||cc>=cols||rr>=rows)continue;
+        var d=Math.sqrt(dx*dx+dy*dy);if(d>rad)continue;var i=rr*cols+cc,v=1-d/(rad+.6);if(v>E[i]){E[i]=v;Hu[i]=hue}}}
+    function draw(t){var k=t*.001,g=3,dancer=t-lastIn>1800;
+      if(dancer){var dx=W*(.62+.3*Math.sin(k*.9)),dy=Hh*(.5+.36*Math.sin(k*1.37));hit(dx,dy,2.3,HUES[Math.floor(k/1.5)%5])}
+      cx.setTransform(dpr,0,0,dpr,0,0);cx.fillStyle='#050507';cx.fillRect(0,0,W,Hh);
+      for(var r=0;r<rows;r++)for(var c=0;c<cols;c++){var i=r*cols+c,e=E[i];
+        var idle=.5+.5*Math.sin(c*.42+k*2)*Math.sin(r*.5-k*1.4),ih=268+50*Math.sin(c*.12+r*.09+k*.4);
+        var L=7+idle*13+e*56,h=e>.04?Hu[i]:ih,s=e>.04?100:70;
+        cx.fillStyle='hsl('+h.toFixed(0)+','+s+'%,'+L.toFixed(1)+'%)';cx.fillRect(c*S+g/2,r*S+g/2,S-g,S-g);E[i]=e*.955}}
+    function loop(t){if(!run)return;draw(t);requestAnimationFrame(loop)}
+    function at(x,y,rad){var b=cv.getBoundingClientRect();lastIn=performance.now();hit(x-b.left,y-b.top,rad,HUES[hi]);}
+    sec.addEventListener('pointermove',function(e){if(e.pointerType==='mouse')at(e.clientX,e.clientY,1.8)});
+    sec.addEventListener('pointerdown',function(e){hi=(hi+1)%5;at(e.clientX,e.clientY,3.2)});
+    sec.addEventListener('touchmove',function(e){for(var j=0;j<e.touches.length;j++)at(e.touches[j].clientX,e.touches[j].clientY,1.8)},{passive:true});
+    size();addEventListener('resize',function(){size();if(calm)draw(0)});
+    if(calm){draw(0);return}
+    new IntersectionObserver(function(es){var v=es[0].isIntersecting;if(v&&!run){run=true;requestAnimationFrame(loop)}else if(!v)run=false}).observe(sec);
+  })();
+
+  // antes e depois do 3D (desliza sozinho na primeira vez)
+  var ba=document.getElementById('ba'),rng=ba.querySelector('input'),touched=false;
+  function setP(v){ba.style.setProperty('--p',v+'%');rng.value=v}
+  rng.addEventListener('input',function(){touched=true;setP(rng.value)});
+  if(!calm&&'IntersectionObserver' in window){
+    var bio=new IntersectionObserver(function(es){if(!es[0].isIntersecting)return;bio.disconnect();
+      var t0=null,keys=[[0,100],[700,100],[2300,0],[3000,0],[3900,50]];
+      function ease(x){return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2}
+      function step(ts){if(touched)return;if(t0===null)t0=ts;var e=ts-t0,v=50;
+        for(var j=1;j<keys.length;j++){if(e<=keys[j][0]){var a=keys[j-1],b=keys[j];v=a[1]+(b[1]-a[1])*ease((e-a[0])/(b[0]-a[0]||1));break}}
+        setP(Math.round(v*10)/10);if(e<keys[keys.length-1][0])requestAnimationFrame(step)}
+      requestAnimationFrame(step)},{threshold:.6});
+    bio.observe(ba);
+  }
+
+  // botões que já escolhem o tipo de evento
+  document.querySelectorAll('[data-tipo]').forEach(function(a){
+    a.addEventListener('click',function(){
+      var v=a.getAttribute('data-tipo');
+      var r=document.querySelector('input[name=tipo][value="'+v+'"]');if(r)r.checked=true;
+    });
+  });
+
+  // formulário vira mensagem no WhatsApp
+  document.getElementById('f').addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var fd=new FormData(this),d=fd.get('data'),dt='';
+    if(d){var p=d.split('-');dt=p[2]+'/'+p[1]+'/'+p[0]}
+    var l=['Olá! Vim do site e quero ver a minha data.'];
+    if(fd.get('nome'))l.push('Nome: '+fd.get('nome'));
+    l.push('Evento: '+fd.get('tipo'));
+    if(dt)l.push('Data: '+dt);
+    if(fd.get('local'))l.push('Local: '+fd.get('local'));
+    if(fd.get('conv'))l.push('Convidados: '+fd.get('conv'));
+    window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(l.join('\n')),'_blank','noopener');
+  });
+})();
+</script>
+</body>
+</html>
