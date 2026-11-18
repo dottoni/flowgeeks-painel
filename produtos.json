@@ -196,6 +196,11 @@
       "dia": "2026-11-17",
       "produto": "enxoval",
       "texto": "Página longa: linha 'Pague no Pix ou em até 12x no cartão' embaixo dos botões de compra"
+    },
+    {
+      "dia": "2026-11-18",
+      "produto": "enxoval",
+      "texto": "Página longa: topo novo ('O app que faz a conta do enxoval', botão na 1ª tela, telas do app logo abaixo); os R$ 1.259 desceram para o exemplo"
     }
   ]
 }
