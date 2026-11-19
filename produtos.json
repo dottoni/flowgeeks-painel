@@ -206,6 +206,11 @@
       "dia": "2026-11-19",
       "produto": "enxoval",
       "texto": "Página longa: botão 'Experimentar o app' (demo em /demo, sem cadastro) no topo e embaixo da vitrine"
+    },
+    {
+      "dia": "2026-11-19",
+      "produto": "enxoval",
+      "texto": "Anúncio novo demo_A1 leva direto à demo (/demo); o botão dos planos da demo devolve a origem do anúncio (UTMs, fbclid) à página"
     }
   ]
 }
